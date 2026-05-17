@@ -1110,8 +1110,8 @@ function MarketplaceTab() {
       <AnimatePresence>
         {/* PREMIUM PRODUCT DETAIL MODAL */}
         {viewingProduct && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-md p-2">
-            <motion.div initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }} transition={{ duration: 0.3, ease: "easeOut" }} className="w-full max-h-[58vh] max-w-3xl flex flex-col md:flex-row relative bg-white shadow-[4px_4px_0_rgba(0,0,0,1)] border-2 border-black overflow-hidden">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-md p-4">
+            <motion.div initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }} transition={{ duration: 0.3, ease: "easeOut" }} className="w-full h-auto md:h-[420px] max-w-3xl flex flex-col md:flex-row relative bg-white shadow-[4px_4px_0_rgba(0,0,0,1)] border-2 border-black overflow-hidden">
               
               {/* Close Button */}
               <button onClick={() => setViewingProduct(null)} className="absolute top-0 right-0 z-50 p-2 text-black hover:text-[var(--theme-accent)] transition-colors">
@@ -1119,12 +1119,12 @@ function MarketplaceTab() {
               </button>
               
               {/* Large Image Side */}
-              <div className="w-full md:w-[42%] bg-gray-50 flex items-center justify-center relative border-b-2 md:border-b-0 md:border-r-2 border-black min-h-[170px]">
+              <div className="w-full md:w-[42%] md:h-full bg-gray-50 flex items-center justify-center relative border-b-2 md:border-b-0 md:border-r-2 border-black min-h-[170px]">
                  <img src={viewingProduct.image} className="w-full h-full object-contain p-2" alt={viewingProduct.name} />
               </div>
   
               {/* Details Side */}
-              <div className="w-full md:w-[58%] bg-white p-4 overflow-y-auto flex flex-col justify-center brutal-scrollbar">
+              <div className="w-full md:w-[58%] md:h-full bg-white p-4 overflow-y-auto flex flex-col justify-center brutal-scrollbar">
                  <div className="w-full">
                     <span className="text-gray-400 font-orbitron font-bold uppercase tracking-[0.2em] text-[8px] mb-1 block">{viewingProduct.category}</span>
                     <h2 className="text-lg lg:text-xl font-orbitron font-bold uppercase leading-tight text-black mb-1">{viewingProduct.name}</h2>
@@ -1157,15 +1157,15 @@ function MarketplaceTab() {
 
         {/* BATCH CHECKOUT MODAL */}
         {isCheckoutOpen && checkoutItems.length > 0 && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-md p-2">
-            <motion.div initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }} transition={{ duration: 0.3, ease: "easeOut" }} className="w-full max-h-[68vh] max-w-2xl flex flex-col md:flex-row relative bg-white shadow-[4px_4px_0_rgba(0,0,0,1)] border-2 border-black overflow-hidden">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-md p-4">
+            <motion.div initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }} transition={{ duration: 0.3, ease: "easeOut" }} className="w-full h-auto md:h-[450px] max-w-2xl flex flex-col md:flex-row relative bg-white shadow-[4px_4px_0_rgba(0,0,0,1)] border-2 border-black overflow-hidden">
               
               <button onClick={() => setIsCheckoutOpen(false)} className="absolute top-2 right-2 z-50 p-2 text-black hover:text-gray-500 transition-colors">
                 <X size={24} strokeWidth={2} />
               </button>
               
               {/* Order Summary Side */}
-              <div className="w-full md:w-5/12 bg-gray-50 p-4 overflow-y-auto border-b-4 md:border-b-0 md:border-r-4 border-black brutal-scrollbar">
+              <div className="w-full md:w-5/12 md:h-full bg-gray-50 p-4 overflow-y-auto border-b-4 md:border-b-0 md:border-r-4 border-black brutal-scrollbar">
                  <h3 className="text-sm font-orbitron font-bold mb-3 uppercase tracking-widest text-black border-b-4 border-black pb-1">Order Summary</h3>
                  
                  <div className="space-y-2 mb-3">
@@ -1197,7 +1197,7 @@ function MarketplaceTab() {
               </div>
 
               {/* Checkout Form Side */}
-              <div className="w-full md:w-7/12 p-4 overflow-y-auto brutal-scrollbar">
+              <div className="w-full md:w-7/12 md:h-full p-4 overflow-y-auto brutal-scrollbar">
                  <div className="w-full">
                    <h3 className="text-sm font-orbitron font-bold mb-3 uppercase tracking-widest text-black border-b-4 border-black pb-1">Secure Checkout</h3>
 
