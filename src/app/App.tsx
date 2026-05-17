@@ -688,7 +688,7 @@ function BlogDetailView({ blog, onBack }: { blog: any, onBack: () => void }) {
         </div>
 
         <h1 className="text-2xl sm:text-4xl md:text-6xl font-orbitron italic font-bold uppercase leading-tight mb-4 break-words">{blog.title}</h1>
-        <p className="text-sm sm:text-xl font-jakarta font-bold text-gray-700 mb-8 sm:mb-12 break-words">{blog.subtitle}</p>
+        <p className="text-sm sm:text-xl font-jakarta font-normal sm:font-bold text-gray-700 mb-8 sm:mb-12 break-words">{blog.subtitle}</p>
 
         <div className="flex items-center gap-3 mb-12 border-y-4 border-black py-4">
           <div className="w-12 h-12 bg-black flex items-center justify-center text-white font-orbitron font-bold">
