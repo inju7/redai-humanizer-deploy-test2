@@ -1111,7 +1111,7 @@ function MarketplaceTab() {
         {/* PREMIUM PRODUCT DETAIL MODAL */}
         {viewingProduct && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-md p-4">
-            <motion.div initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }} transition={{ duration: 0.3, ease: "easeOut" }} className="w-full h-auto md:h-[420px] max-w-3xl flex flex-col md:flex-row relative bg-white shadow-[4px_4px_0_rgba(0,0,0,1)] border-2 border-black overflow-hidden">
+            <motion.div initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }} transition={{ duration: 0.3, ease: "easeOut" }} className="w-full h-auto md:h-[340px] max-w-4xl flex flex-col md:flex-row relative bg-white shadow-[4px_4px_0_rgba(0,0,0,1)] border-2 border-black overflow-hidden">
               
               {/* Close Button */}
               <button onClick={() => setViewingProduct(null)} className="absolute top-0 right-0 z-50 p-2 text-black hover:text-[var(--theme-accent)] transition-colors">
@@ -1119,27 +1119,27 @@ function MarketplaceTab() {
               </button>
               
               {/* Large Image Side */}
-              <div className="w-full md:w-[42%] md:h-full bg-gray-50 flex items-center justify-center relative border-b-2 md:border-b-0 md:border-r-2 border-black min-h-[170px]">
+              <div className="w-full md:w-[35%] md:h-full bg-gray-50 flex items-center justify-center relative border-b-2 md:border-b-0 md:border-r-2 border-black min-h-[140px]">
                  <img src={viewingProduct.image} className="w-full h-full object-contain p-2" alt={viewingProduct.name} />
               </div>
   
               {/* Details Side */}
-              <div className="w-full md:w-[58%] md:h-full bg-white p-4 overflow-y-auto flex flex-col justify-center brutal-scrollbar">
+              <div className="w-full md:w-[65%] md:h-full bg-white p-4 overflow-y-auto flex flex-col justify-center brutal-scrollbar">
                  <div className="w-full">
-                    <span className="text-gray-400 font-orbitron font-bold uppercase tracking-[0.2em] text-[8px] mb-1 block">{viewingProduct.category}</span>
-                    <h2 className="text-lg lg:text-xl font-orbitron font-bold uppercase leading-tight text-black mb-1">{viewingProduct.name}</h2>
-                    <p className="font-jakarta font-bold text-base text-[var(--theme-accent)] mb-2">{viewingProduct.priceStr}</p>
+                    <span className="text-gray-400 font-orbitron font-bold uppercase tracking-[0.2em] text-[8px] mb-0.5 block">{viewingProduct.category}</span>
+                    <h2 className="text-lg lg:text-xl font-orbitron font-bold uppercase leading-tight text-black mb-0.5">{viewingProduct.name}</h2>
+                    <p className="font-jakarta font-bold text-base text-[var(--theme-accent)] mb-1">{viewingProduct.priceStr}</p>
                     
                     <div className="mb-2">
                        <p className="font-jakarta text-xs text-gray-600 leading-relaxed font-light">{viewingProduct.desc}</p>
                     </div>
-
-                    <ul className="space-y-1 mb-4 font-jakarta text-[10px] text-gray-500 uppercase tracking-widest border-t border-gray-200 pt-2">
-                       <li className="flex items-center gap-2"><span className="w-1 h-1 bg-black rounded-full"></span> Premium Quality</li>
-                       <li className="flex items-center gap-2"><span className="w-1 h-1 bg-black rounded-full"></span> Protocol Branding</li>
-                       <li className="flex items-center gap-2"><span className="w-1 h-1 bg-black rounded-full"></span> Limited Batch</li>
-                    </ul>
-
+ 
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 mb-3 font-jakarta text-[9px] text-gray-500 uppercase tracking-widest border-t border-gray-200 pt-2">
+                       <span className="flex items-center gap-1"><span className="w-1 h-1 bg-black rounded-full"></span> Premium Quality</span>
+                       <span className="flex items-center gap-1"><span className="w-1 h-1 bg-black rounded-full"></span> Protocol Branding</span>
+                       <span className="flex items-center gap-1"><span className="w-1 h-1 bg-black rounded-full"></span> Limited Batch</span>
+                    </div>
+ 
                     <div className="flex flex-row gap-2">
                        <button onClick={() => addToCart(viewingProduct)} className="flex-1 bg-white text-black font-orbitron font-bold py-2 border border-black hover:bg-gray-50 transition-colors uppercase text-[10px] tracking-[0.05em] shadow-[2px_2px_0_#000]">
                          Add to Bag
@@ -1150,7 +1150,7 @@ function MarketplaceTab() {
                     </div>
                  </div>
               </div>
-
+ 
             </motion.div>
           </motion.div>
         )}
