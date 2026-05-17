@@ -4,7 +4,7 @@ import {
   Cpu, Zap, Layers, Shield, Terminal, Code2, 
   TrendingUp, Users, DollarSign, Share2, Tag, 
   ChevronRight, Link, BarChart, PenTool, LayoutTemplate, 
-  Store, Network, MessageSquare, ArrowRight, Activity, Sliders, CheckCircle, Star, Plus, Minus, X, AlertTriangle, Award
+  Store, Network, MessageSquare, ArrowRight, Activity, Sliders, CheckCircle, Star, Plus, Minus, X, AlertTriangle, Award, Menu
 } from "lucide-react";
 
 type TabState = "home" | "blog" | "ads" | "marketplace" | "referral" | "career";
@@ -33,6 +33,7 @@ export default function App() {
   const [activeTool, setActiveTool] = useState<string>("Text Humanizer");
   const [credits] = useState(5);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
     <div className="relative min-h-screen pb-32 bg-[var(--theme-bg)] selection:bg-[var(--theme-accent)] selection:text-white">
@@ -61,7 +62,7 @@ export default function App() {
             </div>
           </div>
 
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-3 sm:gap-6">
             <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-black border-2 border-white">
               <Zap size={16} className="text-[var(--theme-cyan)]" />
               <span className="text-sm font-orbitron italic font-bold text-white">{credits} UNITS</span>
@@ -69,9 +70,53 @@ export default function App() {
             <button className="brutal-button bg-[var(--theme-accent)] hover:bg-[var(--theme-cyan)] border-white text-white hover:text-black">
               SIGN IN
             </button>
+            <button 
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
+              className="lg:hidden w-9 h-9 flex items-center justify-center bg-black border-2 border-white text-white hover:bg-[var(--theme-accent)] transition-colors active:translate-y-0.5"
+            >
+              {isMobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
+            </button>
           </div>
         </div>
       </nav>
+
+      {/* Mobile Navigation Dropdown Menu */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="fixed top-20 left-0 right-0 bg-black border-b-4 border-black z-50 p-3 lg:hidden flex flex-col gap-1.5 shadow-[0_8px_0_#000]"
+          >
+            {[
+              { id: "home", label: "REDAI HUMANIZER" },
+              { id: "blog", label: "BLOG" },
+              { id: "ads", label: "MARKETING DEALS" },
+              { id: "marketplace", label: "MARKETPLACE" },
+              { id: "referral", label: "REFERRAL" },
+              { id: "career", label: "CAREER" }
+            ].map(tab => (
+              <button 
+                key={tab.id}
+                onClick={() => {
+                   setActiveTab(tab.id as TabState);
+                   setIsMobileMenuOpen(false);
+                   window.scrollTo(0, 0);
+                }}
+                className={`w-full text-left px-3 py-2.5 font-orbitron font-bold text-[10px] uppercase transition-all border-2 ${
+                   activeTab === tab.id 
+                   ? "bg-[var(--theme-accent)] text-white border-white shadow-[2px_2px_0_#fff]" 
+                   : "bg-transparent text-gray-300 border-transparent hover:border-white hover:text-white"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* FIXED LEFT SIDEBAR (Collapsible Drawer on Mobile, Docked on Desktop) */}
       {activeTab === "home" && (
@@ -129,13 +174,13 @@ export default function App() {
             <motion.div key="home" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="pb-0">
               
               {/* --- SMART WORKSPACE --- */}
-              <section className="max-w-[1600px] mx-auto px-6 md:px-8 py-8">
+              <section className="max-w-[1600px] mx-auto px-3 sm:px-6 md:px-8 py-6 lg:py-8">
                 
-                <div className="mb-6 flex justify-between items-end">
+                <div className="mb-4 lg:mb-6 flex justify-between items-end">
                    <div>
-                      <div className="inline-block px-3 py-1 bg-black text-white font-orbitron italic text-xs mb-2">AETERNUM PROTOCOL V4.2</div>
+                      <div className="inline-block px-2 py-0.5 bg-black text-white font-orbitron italic text-[8px] sm:text-xs mb-1.5 sm:mb-2">AETERNUM PROTOCOL V4.2</div>
                       <div>
-                         <h2 className="inline-block bg-[var(--theme-accent)] text-white border-2 border-black px-4 py-1.5 font-orbitron italic font-bold uppercase leading-none text-3xl md:text-4xl shadow-[4px_4px_0_#000] mb-2">Architecting The Truth</h2>
+                         <h2 className="inline-block bg-[var(--theme-accent)] text-white border-2 border-black px-3 py-1 sm:px-4 sm:py-1.5 font-orbitron italic font-bold uppercase leading-none text-lg sm:text-2xl md:text-4xl shadow-[3px_3px_0_#000] mb-1 sm:mb-2">Architecting The Truth</h2>
                       </div>
                    </div>
                 </div>
@@ -342,12 +387,12 @@ function WorkspaceProcessor({ activeTool }: { activeTool: string }) {
     <div className="brutal-container bg-white border-4 border-black flex flex-col">
       
       {/* Top Parameter Nav */}
-      <div className="bg-black p-3 border-b-4 border-black flex flex-wrap gap-2">
+      <div className="bg-black p-3 border-b-4 border-black flex flex-nowrap overflow-x-auto scrollbar-none lg:flex-wrap gap-2">
          {["Free", "Standard", "Academic", "Simple", "Flowing", "Informal", "Formal", "Expand", "Shorten", "Custom"].map(param => (
             <button 
                key={param}
                onClick={() => setActiveParam(param)}
-               className={`px-4 py-2 font-orbitron font-bold text-sm uppercase transition-colors ${
+               className={`px-3 lg:px-4 py-1.5 lg:py-2 font-orbitron font-bold text-[10px] lg:text-sm uppercase transition-colors whitespace-nowrap ${
                   activeParam === param ? "bg-[var(--theme-cyan)] text-black border-2 border-[var(--theme-cyan)]" : "bg-transparent text-white border-2 border-transparent hover:border-white"
                }`}
             >
@@ -357,29 +402,29 @@ function WorkspaceProcessor({ activeTool }: { activeTool: string }) {
       </div>
 
       {/* Split Input / Output Panes */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 h-[500px] divide-y-4 lg:divide-y-0 lg:divide-x-4 divide-black">
+      <div className="grid grid-cols-1 lg:grid-cols-2 h-auto lg:h-[520px] divide-y-4 lg:divide-y-0 lg:divide-x-4 divide-black">
          
          {/* Left Pane: Input */}
-         <div className="flex flex-col bg-gray-50 relative p-4 group">
+         <div className="flex flex-col bg-gray-50 relative p-4 group h-[320px] lg:h-full">
             <div className="flex justify-between items-center mb-2">
-               <span className="font-bold text-xs text-black uppercase">Paste your text here — English</span>
-               <span className="font-bold text-xs bg-[var(--theme-accent)] text-white px-2 py-1">{input.split(/\s+/).filter(Boolean).length} WORDS</span>
+               <span className="font-bold text-[10px] lg:text-xs text-black uppercase">Paste your text here — English</span>
+               <span className="font-bold text-[10px] lg:text-xs bg-[var(--theme-accent)] text-white px-2 py-0.5">{input.split(/\s+/).filter(Boolean).length} WORDS</span>
             </div>
             <textarea
               value={input} onChange={(e) => setInput(e.target.value)} disabled={status !== "idle" && status !== "complete"}
               placeholder="Start typing or paste your document..."
-              className="flex-1 w-full bg-transparent resize-none outline-none font-jakarta text-lg leading-relaxed text-black"
+              className="flex-1 w-full bg-transparent resize-none outline-none font-jakarta text-sm lg:text-lg leading-relaxed text-black pb-16"
             />
             
-            <div className="absolute bottom-6 right-6 flex gap-4">
+            <div className="absolute bottom-4 right-4 flex gap-2">
                {input.length === 0 && (
-                  <button onClick={() => setInput("The rapid advancement of artificial intelligence has created new paradigms in digital communication. Many organizations are now exploring generative models to automate their content pipelines.")} className="bg-white border-2 border-black px-4 py-2 font-bold text-sm hover:bg-black hover:text-white transition-colors shadow-[2px_2px_0_#000] text-black">
-                     Try a sample ✦
+                  <button onClick={() => setInput("The rapid advancement of artificial intelligence has created new paradigms in digital communication. Many organizations are now exploring generative models to automate their content pipelines.")} className="bg-white border-2 border-black px-3 py-1.5 font-bold text-xs hover:bg-black hover:text-white transition-colors shadow-[2px_2px_0_#000] text-black">
+                     Try sample ✦
                   </button>
                )}
                <button 
                  onClick={handleProcess} disabled={status === "scanning" || status === "processing" || !input.trim()}
-                 className={`brutal-button px-6 py-3 text-lg transition-all ${status === "idle" || status === "complete" ? "bg-[var(--theme-cyan)] hover:bg-[var(--theme-accent)]" : "bg-gray-300 cursor-not-allowed"}`}
+                 className={`brutal-button px-4 py-2 text-xs lg:text-base lg:px-6 lg:py-3 transition-all ${status === "idle" || status === "complete" ? "bg-[var(--theme-cyan)] hover:bg-[var(--theme-accent)]" : "bg-gray-300 cursor-not-allowed"}`}
                >
                  {status === "scanning" || status === "processing" ? "SCANNING..." : `EXECUTE ${activeTool.toUpperCase()}`}
                </button>
@@ -387,27 +432,27 @@ function WorkspaceProcessor({ activeTool }: { activeTool: string }) {
          </div>
 
          {/* Right Pane: Output */}
-         <div className={`flex flex-col bg-white p-4 transition-colors ${status === "complete" ? "bg-[var(--theme-cyan)]/10" : ""}`}>
+         <div className={`flex flex-col bg-white p-4 transition-colors h-[320px] lg:h-full ${status === "complete" ? "bg-[var(--theme-cyan)]/10" : ""}`}>
             <div className="flex justify-between items-center mb-2">
-               <span className="font-bold text-xs text-black uppercase">Output will appear here</span>
-               {status === "complete" && <span className="font-bold text-xs bg-black text-[var(--theme-cyan)] px-2 py-1">ANALYSIS READY</span>}
+               <span className="font-bold text-[10px] lg:text-xs text-black uppercase">Output will appear here</span>
+               {status === "complete" && <span className="font-bold text-[10px] lg:text-xs bg-black text-[var(--theme-cyan)] px-2 py-0.5">ANALYSIS READY</span>}
             </div>
             {status === "idle" && (
-               <div className="flex-1 flex items-center justify-center text-gray-400 font-bold uppercase text-center p-8">
+               <div className="flex-1 flex items-center justify-center text-gray-400 font-bold uppercase text-center p-8 text-xs lg:text-sm">
                   Awaiting Input Stream...
                </div>
             )}
             {(status === "scanning" || status === "processing") && (
                <div className="flex-1 flex flex-col items-center justify-center text-black">
-                  <Activity size={48} className="animate-pulse mb-4 text-[var(--theme-accent)]" />
-                  <p className="font-orbitron font-bold italic uppercase animate-pulse">Running Neural Check...</p>
+                  <Activity size={36} className="animate-pulse mb-3 text-[var(--theme-accent)]" />
+                  <p className="font-orbitron font-bold italic uppercase text-xs animate-pulse">Running Neural Check...</p>
                </div>
             )}
             {status === "complete" && (
                <textarea
                  value={output}
                  readOnly
-                 className="flex-1 w-full bg-transparent resize-none outline-none font-jakarta text-lg leading-relaxed text-black font-medium"
+                 className="flex-1 w-full bg-transparent resize-none outline-none font-jakarta text-sm lg:text-lg leading-relaxed text-black font-medium pb-4"
                />
             )}
          </div>
