@@ -129,14 +129,7 @@ export default function App() {
             />
           )}
 
-          {/* Floating Menu Toggle Trigger (Mobile/Tablet Only) */}
-          <button 
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="fixed left-0 top-[35%] z-30 lg:hidden bg-[var(--theme-accent)] text-white border-2 border-l-0 border-black p-2.5 shadow-[3px_3px_0_#000] active:translate-y-0.5 active:shadow-none hover:bg-black transition-all flex items-center gap-2 rounded-r-lg group"
-          >
-            <Sliders size={13} className="text-white group-hover:rotate-90 transition-transform" />
-            <span className="font-orbitron font-black uppercase text-[8px] tracking-wider select-none">Protocols</span>
-          </button>
+          {/* Floating Menu Toggle Trigger (Mobile/Tablet Only) - Handled premium-style inline inside the workspace flow */}
 
           <aside className={`fixed top-16 lg:top-20 left-0 bottom-32 w-[240px] bg-white border-r-4 border-black z-40 flex flex-col shadow-[4px_0_0_#000] transition-transform duration-300 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
             <div className="bg-black text-white p-3 border-b-4 border-black text-center flex items-center justify-between">
@@ -176,6 +169,25 @@ export default function App() {
               {/* --- SMART WORKSPACE --- */}
               <section className="max-w-[1600px] mx-auto px-3 sm:px-6 md:px-8 py-6 lg:py-8">
                 
+                {/* Embedded Active Protocol Bar for Mobile */}
+                <div className="lg:hidden w-full mb-5">
+                   <button 
+                      onClick={() => setIsSidebarOpen(true)} 
+                      className="w-full bg-white border-[3px] border-black p-3.5 flex items-center justify-between shadow-[4px_4px_0_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all group"
+                   >
+                      <div className="flex items-center gap-2.5">
+                         <div className="w-7 h-7 bg-black flex items-center justify-center border border-black shadow-[1px_1px_0_var(--theme-accent)]">
+                            <Sliders size={12} className="text-white group-hover:rotate-90 transition-transform" />
+                         </div>
+                         <div className="text-left">
+                            <p className="font-orbitron font-black text-[8px] uppercase tracking-widest text-gray-500 leading-none mb-0.5">Active Protocol</p>
+                            <p className="font-orbitron font-extrabold text-[11px] uppercase text-[var(--theme-accent)] leading-none">{activeTool}</p>
+                         </div>
+                      </div>
+                      <span className="font-orbitron font-black text-[8px] bg-black text-white px-2 py-1 uppercase tracking-widest border border-black group-hover:bg-[var(--theme-accent)] transition-colors">Change</span>
+                   </button>
+                </div>
+
                 <div className="mb-4 lg:mb-6 flex justify-between items-end">
                    <div>
                       <div className="inline-block px-2 py-0.5 bg-black text-white font-orbitron italic text-[8px] sm:text-xs mb-1.5 sm:mb-2">AETERNUM PROTOCOL V4.2</div>
@@ -312,11 +324,59 @@ export default function App() {
                 </div>
               </section>
 
-              {/* Testimonials (Smaller containers, more users) */}
-              <section className="bg-white border-b-4 border-black py-12 px-6">
+              {/* Testimonials (Interactive Mobile Carousel + Rating Badge, Desktop High-Density Grid) */}
+              <section className="bg-white border-b-4 border-black py-12 px-4 sm:px-6">
                 <div className="max-w-[1600px] mx-auto">
-                   <h2 className="text-3xl md:text-4xl text-black font-orbitron italic font-bold uppercase text-center mb-10 tracking-tighter shadow-none">Verified Operations</h2>
-                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                   <div className="text-center mb-10">
+                      <span className="text-[var(--theme-accent)] font-orbitron font-bold uppercase tracking-[0.3em] text-[10px] mb-1.5 block">CUSTOMER VERIFICATION</span>
+                      <h2 className="text-2xl sm:text-4xl text-black font-orbitron italic font-bold uppercase tracking-tighter mb-3 leading-none">Verified Operations</h2>
+                      
+                      {/* Rating Stats Summary */}
+                      <div className="inline-flex flex-wrap items-center justify-center gap-3 sm:gap-4 bg-black border-2 border-black text-white p-3 shadow-[4px_4px_0_var(--theme-accent)] mt-2">
+                         <div className="flex items-center gap-1.5">
+                            <span className="text-lg sm:text-xl font-orbitron font-black text-[var(--theme-cyan)]">4.9</span>
+                            <div className="flex text-[var(--theme-accent)]">
+                               <Star size={11} fill="currentColor" className="text-[var(--theme-accent)]" />
+                               <Star size={11} fill="currentColor" className="text-[var(--theme-accent)]" />
+                               <Star size={11} fill="currentColor" className="text-[var(--theme-accent)]" />
+                               <Star size={11} fill="currentColor" className="text-[var(--theme-accent)]" />
+                               <Star size={11} fill="currentColor" className="text-[var(--theme-accent)]" />
+                            </div>
+                         </div>
+                         <div className="h-4 w-[1px] bg-white/30 hidden sm:block"></div>
+                         <span className="font-orbitron font-bold text-[8px] sm:text-[9px] uppercase tracking-wider">15,000+ COMPLETED BYPASSES</span>
+                         <div className="h-4 w-[1px] bg-white/30 hidden sm:block"></div>
+                         <span className="font-jakarta text-[8px] sm:text-[9px] text-green-400 font-black">99.8% SUCCESS SCORE</span>
+                      </div>
+                   </div>
+
+                   {/* Mobile Viewport: Premium Swipe Deck Cards */}
+                   <div className="md:hidden flex overflow-x-auto gap-4 pb-6 snap-x snap-mandatory scrollbar-none px-1">
+                      {[
+                        { name: "Sarah J.", role: "College Student", text: "Bypassed Turnitin instantly. Saved my academic career. 10/10 protocol." },
+                        { name: "Mark T.", role: "SEO Agency", text: "We use the API to mass-humanize our programmatic SEO blogs. AdSense approved." },
+                        { name: "Elena R.", role: "Freelance Writer", text: "Clients think I spend hours writing these articles. Matches my voice perfectly." },
+                        { name: "David C.", role: "Content Manager", text: "Tested 5 different tools. REDAI is the only one that passes Originality 3.0." },
+                        { name: "Priya M.", role: "Professor", text: "The detection is incredibly accurate. I use it to filter out low-effort submissions." },
+                        { name: "James L.", role: "Affiliate Marketer", text: "My product review sites are flourishing. The rewording tool handles bulk jobs." },
+                        { name: "Chris W.", role: "Editor", text: "Uncanny cadence matching. The grammar check alone saves my team hours." },
+                        { name: "Anna B.", role: "Student", text: "The essay writer provides an amazing starting point without raising any AI flags." },
+                        { name: "Luke D.", role: "Content Director", text: "Streamlined our publishing workflow. AI detection score is now consistently 0%." },
+                        { name: "Sophia V.", role: "PhD Candidate", text: "Flawless academic phrasing. Preserves my original arguments perfectly." },
+                        { name: "Marcus K.", role: "SEO Specialist", text: "Completely revolutionized our local search campaigns. Zero drops in traffic." },
+                        { name: "Chloe P.", role: "Copywriter", text: "The humanizer adds the perfect natural cadence. Feels like a top-tier copywriter." },
+                        { name: "Nate B.", role: "Digital Agency", text: "Passes Copyleaks and GPTZero with ease. Absolutely robust security protocol." },
+                        { name: "Zoe T.", role: "Blog Owner", text: "My readers love the new tone. Natural, engaging, and highly informative." },
+                        { name: "Ethan F.", role: "Tech Journalist", text: "The best paraphraser in the market. Retains context perfectly." }
+                      ].map((item, idx) => (
+                         <div key={idx} className="w-[82vw] flex-shrink-0 snap-center">
+                            <TestimonialCard name={item.name} role={item.role} text={item.text} />
+                         </div>
+                      ))}
+                   </div>
+
+                   {/* Desktop Viewport: 5-Column High Density Grid */}
+                   <div className="hidden md:grid grid-cols-3 lg:grid-cols-5 gap-3">
                       <TestimonialCard name="Sarah J." role="College Student" text="Bypassed Turnitin instantly. Saved my academic career. 10/10 protocol." />
                       <TestimonialCard name="Mark T." role="SEO Agency" text="We use the API to mass-humanize our programmatic SEO blogs. AdSense approved." />
                       <TestimonialCard name="Elena R." role="Freelance Writer" text="Clients think I spend hours writing these articles. Matches my voice perfectly." />
@@ -548,19 +608,19 @@ function MiniAdContainer() {
 
 function BlogDetailView({ blog, onBack }: { blog: any, onBack: () => void }) {
   return (
-    <div className="bg-white border-4 border-black p-8 md:p-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <button onClick={onBack} className="mb-8 flex items-center gap-2 font-orbitron font-bold uppercase text-sm hover:text-[var(--theme-accent)] transition-colors">
+    <div className="bg-white border-4 border-black p-4 sm:p-8 md:p-12 animate-in fade-in slide-in-from-bottom-4 duration-500 overflow-hidden w-full">
+      <button onClick={onBack} className="mb-6 sm:mb-8 flex items-center gap-2 font-orbitron font-bold uppercase text-xs sm:text-sm hover:text-[var(--theme-accent)] transition-colors">
         <ArrowRight size={20} className="rotate-180" /> Back to Blogs
       </button>
 
       <div className="max-w-4xl mx-auto">
-        <div className="flex items-center gap-4 mb-6">
-          <span className="bg-black text-white px-3 py-1 text-xs font-bold uppercase tracking-widest">{blog.category}</span>
-          <span className="text-gray-500 font-bold uppercase text-xs">{blog.date || "MAY 16, 2026"}</span>
+        <div className="flex items-center gap-4 mb-4 sm:mb-6">
+          <span className="bg-black text-white px-2.5 py-0.5 sm:px-3 sm:py-1 text-[10px] sm:text-xs font-bold uppercase tracking-widest">{blog.category}</span>
+          <span className="text-gray-500 font-bold uppercase text-[10px] sm:text-xs">{blog.date || "MAY 16, 2026"}</span>
         </div>
 
-        <h1 className="text-5xl md:text-7xl font-orbitron italic font-bold uppercase leading-none mb-4">{blog.title}</h1>
-        <p className="text-2xl font-jakarta font-bold text-gray-700 mb-12">{blog.subtitle}</p>
+        <h1 className="text-2xl sm:text-4xl md:text-6xl font-orbitron italic font-bold uppercase leading-tight mb-4 break-words">{blog.title}</h1>
+        <p className="text-sm sm:text-xl font-jakarta font-bold text-gray-700 mb-8 sm:mb-12 break-words">{blog.subtitle}</p>
 
         <div className="flex items-center gap-3 mb-12 border-y-4 border-black py-4">
           <div className="w-12 h-12 bg-black flex items-center justify-center text-white font-orbitron font-bold">
@@ -577,28 +637,28 @@ function BlogDetailView({ blog, onBack }: { blog: any, onBack: () => void }) {
             <img src={blog.image} className="w-full h-full object-cover" alt={blog.title} />
           </div>
 
-          <div className="prose prose-xl max-w-none font-jakarta text-black">
-            <h2 className="text-3xl font-orbitron italic font-bold uppercase mb-4 border-l-8 border-black pl-4">Introduction</h2>
-            <p className="leading-relaxed mb-8">{blog.intro}</p>
+          <div className="prose prose-xl max-w-none font-jakarta text-black w-full overflow-hidden break-words">
+            <h2 className="text-xl sm:text-3xl font-orbitron italic font-bold uppercase mb-4 border-l-[6px] sm:border-l-8 border-black pl-3 sm:pl-4 break-words">Introduction</h2>
+            <p className="leading-relaxed mb-8 text-sm sm:text-lg">{blog.intro}</p>
             
-            <div className="my-12 aspect-[21/9] border-4 border-black overflow-hidden shadow-[8px_8px_0_var(--theme-cyan)]">
+            <div className="my-8 sm:my-12 aspect-[21/9] border-4 border-black overflow-hidden shadow-[4px_4px_0_var(--theme-cyan)] sm:shadow-[8px_8px_0_var(--theme-cyan)]">
                <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&auto=format&fit=crop&q=80" className="w-full h-full object-cover" alt="Detail Image 1" />
             </div>
 
-            <h2 className="text-3xl font-orbitron italic font-bold uppercase mb-4 border-l-8 border-[var(--theme-accent)] pl-4">Deep Dive Discussion</h2>
-            <p className="leading-relaxed mb-8">{blog.discussion}</p>
+            <h2 className="text-xl sm:text-3xl font-orbitron italic font-bold uppercase mb-4 border-l-[6px] sm:border-l-8 border-[var(--theme-accent)] pl-3 sm:pl-4 break-words">Deep Dive Discussion</h2>
+            <p className="leading-relaxed mb-8 text-sm sm:text-lg">{blog.discussion}</p>
 
-            <div className="my-12 aspect-[21/9] border-4 border-black overflow-hidden shadow-[8px_8px_0_var(--theme-accent)]">
+            <div className="my-8 sm:my-12 aspect-[21/9] border-4 border-black overflow-hidden shadow-[4px_4px_0_var(--theme-accent)] sm:shadow-[8px_8px_0_var(--theme-accent)]">
                <img src="https://images.unsplash.com/photo-1620712943543-bcc4628c9757?w=1200&auto=format&fit=crop&q=80" className="w-full h-full object-cover" alt="Detail Image 2" />
             </div>
 
-            <div className="bg-gray-50 border-4 border-black p-8 mb-12">
-               <h2 className="text-2xl font-orbitron italic font-bold uppercase mb-4">Summary</h2>
-               <p className="italic text-gray-700">The neural structures in this text successfully bypass predictive detection layers. AI writing is a powerful tool, maintaining human authenticity is critical for SEO and academic integrity. Always verify your content with a robust detection protocol.</p>
+            <div className="bg-gray-50 border-4 border-black p-4 sm:p-8 mb-8 sm:mb-12">
+               <h2 className="text-lg sm:text-2xl font-orbitron italic font-bold uppercase mb-3 sm:mb-4">Summary</h2>
+               <p className="italic text-gray-700 text-xs sm:text-base leading-relaxed">The neural structures in this text successfully bypass predictive detection layers. AI writing is a powerful tool, maintaining human authenticity is critical for SEO and academic integrity. Always verify your content with a robust detection protocol.</p>
             </div>
 
-            <h2 className="text-3xl font-orbitron italic font-bold uppercase mb-4 border-l-8 border-[var(--theme-cyan)] pl-4">Conclusion</h2>
-            <p className="leading-relaxed mb-12">{blog.conclusion}</p>
+            <h2 className="text-xl sm:text-3xl font-orbitron italic font-bold uppercase mb-4 border-l-[6px] sm:border-l-8 border-[var(--theme-cyan)] pl-3 sm:pl-4 break-words">Conclusion</h2>
+            <p className="leading-relaxed mb-12 text-sm sm:text-lg">{blog.conclusion}</p>
           </div>
         </div>
 
@@ -1081,7 +1141,7 @@ function MarketingDealsTab() {
           {/* Compact Header with Sub-tab Switcher */}
           <div className="flex flex-col md:flex-row md:items-center justify-between border-b-2 border-black pb-4 mb-4 gap-4">
              <div>
-                <h2 className="text-2xl md:text-3xl text-black font-orbitron italic font-bold uppercase">MARKETING DEALS & CONSIGNMENTS</h2>
+                <h2 className="text-lg sm:text-2xl md:text-3xl text-black font-orbitron italic font-bold uppercase tracking-tight leading-tight">MARKETING DEALS & CONSIGNMENTS</h2>
                 <p className="text-[10px] text-gray-500 font-jakarta font-bold uppercase tracking-wider">AETERNUM COLLABORATION PROTOCOL</p>
              </div>
 
@@ -1375,35 +1435,52 @@ function ProductCard({ product, onClick, onAddToCart, onBuyNow }: { product: any
   return (
     <div 
       onClick={onClick} 
-      className="brutal-container bg-white border-2 border-black p-1.5 cursor-pointer hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0_var(--theme-accent)] transition-all flex flex-col justify-between h-auto min-h-[220px] w-full max-w-[240px] mx-auto"
+      className="brutal-container bg-white border-2 border-black p-1.5 cursor-pointer hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0_var(--theme-accent)] transition-all flex flex-col justify-between h-auto min-h-[235px] w-full mx-auto"
     >
-       <div className="aspect-[1/1] w-full bg-gray-50 overflow-hidden relative border border-gray-200 flex-shrink-0">
+       <div className="aspect-square w-full bg-gray-50 overflow-hidden relative border border-black flex-shrink-0 group">
           <img 
              src={product.images[imgIndex]} 
-             className="w-full h-full object-cover transition-all duration-700 ease-in-out" 
+             className="w-full h-full object-cover transition-transform duration-700 ease-in-out group-hover:scale-105" 
              alt={product.name} 
           />
-          <div className="absolute bottom-1 right-1 bg-black/80 text-[var(--theme-cyan)] px-1 py-0.5 font-mono text-[6px] tracking-widest uppercase">
-             Preview {imgIndex + 1}/{product.images.length}
+          {/* Limited Batch Overlay Tags */}
+          <div className="absolute top-1 left-1 bg-black text-white border border-white text-[6px] sm:text-[7px] font-orbitron font-bold px-1.5 py-0.5 uppercase tracking-wider shadow-[1px_1px_0_#000] z-10">
+             BATCH #{100 + product.id}
+          </div>
+          <div className="absolute top-1 right-1 bg-[var(--theme-accent)] text-white border border-black text-[5px] sm:text-[6px] font-orbitron font-extrabold px-1 py-0.5 uppercase tracking-tighter shadow-[1px_1px_0_#000] animate-pulse z-10">
+             RUN: 100/100
+          </div>
+          
+          <div className="absolute bottom-1 right-1 bg-black/80 text-[var(--theme-cyan)] px-1 py-0.5 font-mono text-[5px] sm:text-[6px] tracking-widest uppercase z-10">
+             PREVIEW {imgIndex + 1}/{product.images.length}
           </div>
        </div>
+
        <div className="flex flex-col justify-between flex-grow mt-1.5">
-          <div className="mb-1">
-             <h3 className="font-orbitron font-bold uppercase text-[9px] leading-tight text-black line-clamp-1 mb-0.5">{product.name}</h3>
-             <div className="flex justify-between items-center">
-                <span className="font-jakarta text-[7px] text-gray-500 font-bold uppercase tracking-wider">{product.category}</span>
-                <span className="font-jakarta font-black text-[9px] text-[var(--theme-accent)]">{product.priceStr}</span>
+          <div className="mb-1.5">
+             <div className="flex items-center gap-0.5 text-[var(--theme-accent)] mb-0.5">
+                <Star size={6} fill="currentColor" />
+                <Star size={6} fill="currentColor" />
+                <Star size={6} fill="currentColor" />
+                <Star size={6} fill="currentColor" />
+                <Star size={6} fill="currentColor" />
+                <span className="text-[5px] sm:text-[6px] text-gray-500 font-bold ml-1 font-jakarta">({(12 + product.id * 3)})</span>
+             </div>
+             <h3 className="font-orbitron font-black uppercase text-[8px] sm:text-[10px] leading-tight text-black line-clamp-2 min-h-[22px] sm:min-h-[26px] mb-1 tracking-tight break-words">{product.name}</h3>
+             <div className="flex justify-between items-center mt-1">
+                <span className="font-jakarta text-[6px] sm:text-[7px] text-gray-500 font-extrabold uppercase tracking-wider">{product.category}</span>
+                <span className="font-orbitron font-black text-[8px] sm:text-[10px] text-[var(--theme-accent)] leading-none">{product.priceStr}</span>
              </div>
           </div>
 
           {/* Quick Actions Inline */}
-          <div className="flex gap-1 border-t border-gray-200 pt-1.5 mt-auto">
+          <div className="flex gap-1 border-t border-black pt-1.5 mt-auto">
              <button 
                 onClick={(e) => { 
                    e.stopPropagation(); 
                    onAddToCart(product); 
                 }} 
-                className="flex-1 bg-white hover:bg-gray-100 text-black border border-black py-0.5 font-orbitron font-bold text-[7px] uppercase tracking-wider text-center"
+                className="flex-1 bg-white hover:bg-gray-100 text-black border border-black py-1 font-orbitron font-black text-[6px] sm:text-[8px] uppercase tracking-wider text-center active:translate-y-0.5 transition-all"
              >
                 + Bag
              </button>
@@ -1412,7 +1489,7 @@ function ProductCard({ product, onClick, onAddToCart, onBuyNow }: { product: any
                    e.stopPropagation(); 
                    onBuyNow(product); 
                 }} 
-                className="flex-1 bg-black hover:bg-gray-900 text-white border border-black py-0.5 font-orbitron font-bold text-[7px] uppercase tracking-wider text-center"
+                className="flex-1 bg-black hover:bg-gray-900 text-white border border-black py-1 font-orbitron font-black text-[6px] sm:text-[8px] uppercase tracking-wider text-center active:translate-y-0.5 transition-all"
              >
                 Buy
              </button>
@@ -1542,6 +1619,58 @@ function MarketplaceTab() {
         "https://images.unsplash.com/photo-1604871000636-074fa5117945?w=400&q=80"
       ],
       desc: "High-quality poster print of an AI's dream state. Perfect for brutalist office spaces." 
+    },
+    { 
+      id: 9, 
+      name: "REDAI Hardware Key V1", 
+      category: "Hardware", 
+      price: 2200, 
+      priceStr: "PHP 2,200.00", 
+      image: "https://images.unsplash.com/photo-1597872200319-3813c95c8080?w=400&q=80", 
+      images: [
+        "https://images.unsplash.com/photo-1597872200319-3813c95c8080?w=400&q=80", 
+        "https://images.unsplash.com/photo-1563770660941-20978e870e26?w=400&q=80"
+      ],
+      desc: "Physical authentication key featuring high-speed encryption layers. Secure your neural workspace physically." 
+    },
+    { 
+      id: 10, 
+      name: "Aeternum Stealth Bomber Jacket", 
+      category: "Cool Hoodies", 
+      price: 3500, 
+      priceStr: "PHP 3,500.00", 
+      image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400&q=80", 
+      images: [
+        "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400&q=80", 
+        "https://images.unsplash.com/photo-1542272604-787c3835535d?w=400&q=80"
+      ],
+      desc: "Premium brutalist bomber jacket with matte-black zippers and custom insulated Aeternum lining." 
+    },
+    { 
+      id: 11, 
+      name: "Syntax Mechanical Keyboard", 
+      category: "Hardware", 
+      price: 4500, 
+      priceStr: "PHP 4,500.00", 
+      image: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400&q=80", 
+      images: [
+        "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400&q=80", 
+        "https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=400&q=80"
+      ],
+      desc: "Compact mechanical keyboard featuring tactile custom silent red switches and bold brutalist keycaps." 
+    },
+    { 
+      id: 12, 
+      name: "Neural State Desk Mat", 
+      category: "Art", 
+      price: 950, 
+      priceStr: "PHP 950.00", 
+      image: "https://images.unsplash.com/photo-1631009185129-e5837f64d84f?w=400&q=80", 
+      images: [
+        "https://images.unsplash.com/photo-1631009185129-e5837f64d84f?w=400&q=80", 
+        "https://images.unsplash.com/photo-1585776245991-cf89dd7fc73a?w=400&q=80"
+      ],
+      desc: "Stitched-edge water-resistant desk mat featuring the original neural network schematic print." 
     }
   ];
 
@@ -1580,16 +1709,16 @@ function MarketplaceTab() {
       )}
 
       <div className="text-center mb-8">
-        <h2 className="text-4xl md:text-5xl text-black font-orbitron italic mb-4">RED<span className="text-[var(--theme-accent)]">AI</span>'S <span className="text-[var(--theme-accent)]">MARKETPLACE</span></h2>
+        <h2 className="text-xl sm:text-3xl md:text-5xl text-black font-orbitron italic font-bold uppercase tracking-tighter leading-tight mb-4">RED<span className="text-[var(--theme-accent)]">AI</span>'S <span className="text-[var(--theme-accent)]">MARKETPLACE</span></h2>
       </div>
 
       {/* Filter Bar */}
-      <div className="flex flex-wrap gap-2.5 justify-center mb-8">
+      <div className="flex overflow-x-auto md:flex-wrap gap-2 justify-start md:justify-center mb-8 pb-2 md:pb-0 scrollbar-none px-1">
         {filters.map(f => (
           <button 
             key={f} 
             onClick={() => setActiveFilter(f)}
-            className={`px-4 py-1.5 font-orbitron font-bold uppercase text-[10px] border-2 transition-all ${activeFilter === f ? 'bg-black text-white border-black shadow-[2px_2px_0_var(--theme-accent)] translate-y-[-1px]' : 'bg-white text-black border-black hover:bg-gray-100'}`}
+            className={`px-3 py-1.5 font-orbitron font-bold uppercase text-[9px] sm:text-[10px] border-2 transition-all flex-shrink-0 ${activeFilter === f ? 'bg-black text-white border-black shadow-[2px_2px_0_var(--theme-accent)] translate-y-[-1px]' : 'bg-white text-black border-black hover:bg-gray-100'}`}
           >
             {f}
           </button>
@@ -1597,7 +1726,7 @@ function MarketplaceTab() {
       </div>
 
       {/* Premium Product Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 md:gap-6">
         {filteredProducts.map((p) => (
           <ProductCard key={p.id} product={p} onClick={() => setViewingProduct(p)} onAddToCart={addToCart} onBuyNow={buyNow} />
         ))}
@@ -1773,9 +1902,9 @@ function MarketplaceTab() {
 function TabContainer({ title, subtitle, children, gridClass = "grid-cols-1 md:grid-cols-2 lg:grid-cols-3" }: { title: string, subtitle?: string, children: React.ReactNode, gridClass?: string }) {
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }} className="space-y-12">
-      <div className="text-center mb-16">
-        <h2 className="text-5xl md:text-6xl text-black font-orbitron italic mb-4">{title}</h2>
-        {subtitle && <p className="text-xl text-black font-jakarta max-w-3xl mx-auto">{subtitle}</p>}
+      <div className="text-center mb-10 md:mb-16 px-4">
+        <h2 className="text-2xl sm:text-4xl md:text-6xl text-black font-orbitron italic font-bold uppercase tracking-tighter leading-none mb-3 md:mb-4">{title}</h2>
+        {subtitle && <p className="text-xs sm:text-base md:text-xl text-black font-jakarta max-w-3xl mx-auto font-bold">{subtitle}</p>}
       </div>
       <div className={`grid gap-8 ${gridClass}`}>
         {children}
