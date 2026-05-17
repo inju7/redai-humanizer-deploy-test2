@@ -1103,8 +1103,8 @@ function MarketplaceTab() {
       <AnimatePresence>
         {/* PREMIUM PRODUCT DETAIL MODAL */}
         {viewingProduct && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center bg-white p-4 md:p-8">
-            <motion.div initial={{ scale: 0.98, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.98, opacity: 0 }} transition={{ duration: 0.4, ease: "easeOut" }} className="w-full h-full max-w-[1400px] flex flex-col md:flex-row relative">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+            <motion.div initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }} transition={{ duration: 0.3, ease: "easeOut" }} className="w-full max-h-[85vh] max-w-5xl flex flex-col md:flex-row relative bg-white shadow-[12px_12px_0_rgba(0,0,0,1)] border-4 border-black overflow-hidden">
               
               {/* Close Button */}
               <button onClick={() => setViewingProduct(null)} className="absolute top-0 right-0 z-50 p-4 text-black hover:text-[var(--theme-accent)] transition-colors">
@@ -1112,16 +1112,16 @@ function MarketplaceTab() {
               </button>
               
               {/* Large Image Side */}
-              <div className="w-full md:w-1/2 h-1/2 md:h-full bg-gray-50 flex items-center justify-center relative">
-                 <img src={viewingProduct.image} className="w-full h-full object-cover" alt={viewingProduct.name} />
+              <div className="w-full md:w-1/2 bg-gray-50 flex items-center justify-center relative border-b-4 md:border-b-0 md:border-r-4 border-black">
+                 <img src={viewingProduct.image} className="w-full h-full object-cover max-h-[40vh] md:max-h-full" alt={viewingProduct.name} />
               </div>
 
               {/* Details Side */}
-              <div className="w-full md:w-1/2 h-1/2 md:h-full bg-white p-8 md:p-16 lg:p-24 overflow-y-auto flex flex-col justify-center">
-                 <div className="max-w-xl mx-auto w-full">
+              <div className="w-full md:w-1/2 bg-white p-8 md:p-12 overflow-y-auto flex flex-col justify-center brutal-scrollbar">
+                 <div className="w-full">
                     <span className="text-gray-400 font-orbitron font-bold uppercase tracking-[0.3em] text-xs mb-4 block">{viewingProduct.category}</span>
-                    <h2 className="text-5xl lg:text-6xl font-orbitron font-bold uppercase leading-tight text-black mb-6">{viewingProduct.name}</h2>
-                    <p className="font-jakarta text-2xl text-black mb-12">{viewingProduct.priceStr}</p>
+                    <h2 className="text-3xl lg:text-4xl font-orbitron font-bold uppercase leading-tight text-black mb-4">{viewingProduct.name}</h2>
+                    <p className="font-jakarta font-bold text-2xl text-[var(--theme-accent)] mb-8">{viewingProduct.priceStr}</p>
                     
                     <div className="mb-12">
                        <p className="font-jakarta text-lg text-gray-600 leading-relaxed font-light">{viewingProduct.desc}</p>
@@ -1150,16 +1150,16 @@ function MarketplaceTab() {
 
         {/* BATCH CHECKOUT MODAL */}
         {isCheckoutOpen && checkoutItems.length > 0 && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center bg-white p-4 md:p-8">
-            <motion.div initial={{ scale: 0.98, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.98, opacity: 0 }} transition={{ duration: 0.4, ease: "easeOut" }} className="w-full h-full max-w-[1400px] flex flex-col md:flex-row relative bg-white border border-gray-200">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+            <motion.div initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }} transition={{ duration: 0.3, ease: "easeOut" }} className="w-full max-h-[90vh] max-w-6xl flex flex-col md:flex-row relative bg-white shadow-[12px_12px_0_rgba(0,0,0,1)] border-4 border-black overflow-hidden">
               
               <button onClick={() => setIsCheckoutOpen(false)} className="absolute top-4 right-4 z-50 p-4 text-black hover:text-gray-500 transition-colors">
                 <X size={32} strokeWidth={1} />
               </button>
               
               {/* Order Summary Side */}
-              <div className="w-full md:w-5/12 bg-gray-50 p-8 md:p-16 overflow-y-auto border-r border-gray-200">
-                 <h3 className="text-2xl font-orbitron font-bold mb-12 uppercase tracking-[0.2em] text-black">Order Summary</h3>
+              <div className="w-full md:w-5/12 bg-gray-50 p-8 md:p-12 overflow-y-auto border-b-4 md:border-b-0 md:border-r-4 border-black brutal-scrollbar">
+                 <h3 className="text-2xl font-orbitron font-bold mb-8 uppercase tracking-[0.2em] text-black border-b-4 border-black pb-4">Order Summary</h3>
                  
                  <div className="space-y-6 mb-12">
                     {checkoutItems.map((item, idx) => (
@@ -1190,11 +1190,11 @@ function MarketplaceTab() {
               </div>
 
               {/* Checkout Form Side */}
-              <div className="w-full md:w-7/12 p-8 md:p-16 lg:p-24 overflow-y-auto">
-                 <div className="max-w-xl mx-auto">
-                   <h3 className="text-2xl font-orbitron font-bold mb-12 uppercase tracking-[0.2em] text-black">Secure Checkout</h3>
+              <div className="w-full md:w-7/12 p-8 md:p-12 overflow-y-auto brutal-scrollbar">
+                 <div className="w-full">
+                   <h3 className="text-2xl font-orbitron font-bold mb-8 uppercase tracking-[0.2em] text-black border-b-4 border-black pb-4">Secure Checkout</h3>
 
-                   <div className="bg-gray-50 text-black p-6 mb-10 border border-gray-200">
+                   <div className="bg-black text-[var(--theme-cyan)] p-4 mb-8 border-2 border-black">
                      <p className="font-orbitron text-xs font-bold uppercase tracking-[0.2em] mb-2">
                        <AlertTriangle size={14} className="inline mr-2 -mt-1" /> Philippines Only
                      </p>
