@@ -847,90 +847,98 @@ function MarketingDealsTab() {
 
       {/* 2. AGREEMENT VIEW */}
       {viewMode === "agreement" && (
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="brutal-container bg-white border-4 border-black p-8 md:p-16 max-w-4xl mx-auto shadow-[16px_16px_0_var(--theme-accent)]">
-           <button onClick={handleBack} className="mb-8 font-orbitron font-bold uppercase text-black hover:text-[var(--theme-accent)] transition-colors flex items-center gap-2">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="brutal-container bg-white border-4 border-black p-6 md:p-8 w-full max-w-6xl mx-auto shadow-[12px_12px_0_var(--theme-accent)]">
+           <button onClick={handleBack} className="mb-4 font-orbitron font-bold uppercase text-black hover:text-[var(--theme-accent)] transition-colors flex items-center gap-2 text-sm">
               &larr; Go Back
            </button>
            
-           <h2 className="text-4xl md:text-5xl font-orbitron italic font-bold uppercase text-black mb-8 border-b-8 border-black pb-4">
+           <h2 className="text-3xl md:text-4xl font-orbitron italic font-bold uppercase text-black mb-4 border-b-4 border-black pb-2">
               Protocol Rules & Conditions
            </h2>
            
-           <div className="font-jakarta text-lg text-gray-800 space-y-6 mb-12">
+           <div className="font-jakarta text-base text-gray-800 space-y-4 mb-6">
               <p>Before proceeding with your application for the <strong>{selectedDeal}</strong> program, you must read and agree to the following terms and conditions enforced by the REDAI Protocol.</p>
               
-              <ul className="list-disc pl-8 space-y-4 font-bold">
+              <ul className="list-disc pl-8 space-y-2 font-bold">
                  <li>All submissions and applications are subject to a strict manual review process.</li>
                  <li>Any fraudulent claims, fake traffic sources, or bot-generated followers will result in an immediate and permanent ban from the network.</li>
                  <li>Commission payouts are processed strictly according to the schedule. No early withdrawals are permitted.</li>
                  <li>All provided marketing materials and assets remain the intellectual property of REDAI Protocol and must not be altered without permission.</li>
               </ul>
               
-              <div className="bg-black text-white p-6 border-4 border-[var(--theme-accent)] mt-8">
-                 <p className="font-orbitron font-bold uppercase tracking-widest text-sm text-center">Failure to comply with these rules will result in immediate termination of the agreement.</p>
+              <div className="bg-black text-white p-4 border-2 border-[var(--theme-accent)] mt-4">
+                 <p className="font-orbitron font-bold uppercase tracking-widest text-xs text-center">Failure to comply with these rules will result in immediate termination of the agreement.</p>
               </div>
            </div>
 
-           <button onClick={handleAgree} className="w-full bg-[var(--theme-accent)] text-white font-orbitron font-bold py-6 border-4 border-black hover:bg-black hover:border-white hover:shadow-[8px_8px_0_var(--theme-cyan)] transition-all uppercase text-2xl tracking-widest">
-              I Agree & Proceed
-           </button>
+           <form onSubmit={(e) => { e.preventDefault(); handleAgree(); }}>
+               <div className="mb-6 flex flex-col md:flex-row gap-4 items-end">
+                   <div className="flex-1 w-full">
+                       <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black tracking-widest">Signatory Name (I agree to these terms)</label>
+                       <input type="text" required placeholder="Type your full name..." className="w-full border-4 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                   </div>
+                   <button type="submit" className="w-full md:w-auto px-12 bg-[var(--theme-accent)] text-white font-orbitron font-bold py-3 border-4 border-black hover:bg-black hover:border-white transition-all uppercase text-lg tracking-widest whitespace-nowrap shadow-[4px_4px_0_var(--theme-cyan)]">
+                      I Agree & Proceed
+                   </button>
+               </div>
+           </form>
         </motion.div>
       )}
 
       {/* 3. FORM VIEW */}
       {viewMode === "form" && (
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="brutal-container bg-white border-4 border-black p-8 md:p-16 max-w-4xl mx-auto shadow-[16px_16px_0_#000]">
-           <button onClick={handleBack} className="mb-8 font-orbitron font-bold uppercase text-black hover:text-[var(--theme-accent)] transition-colors flex items-center gap-2">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="brutal-container bg-white border-4 border-black p-6 md:p-8 w-full max-w-6xl mx-auto shadow-[12px_12px_0_#000]">
+           <button onClick={handleBack} className="mb-4 font-orbitron font-bold uppercase text-black hover:text-[var(--theme-accent)] transition-colors flex items-center gap-2 text-sm">
               &larr; Go Back
            </button>
 
-           <h2 className="text-4xl font-orbitron italic font-bold uppercase text-black mb-2">
+           <h2 className="text-3xl font-orbitron italic font-bold uppercase text-black mb-2">
               {selectedDeal} Application
            </h2>
-           <p className="font-jakarta font-bold text-[var(--theme-accent)] text-xl mb-8 border-b-4 border-black pb-4">Please fill out all required fields.</p>
+           <p className="font-jakarta font-bold text-[var(--theme-accent)] text-lg mb-6 border-b-4 border-black pb-2">Please fill out all required fields.</p>
 
-           <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); alert('Application submitted successfully. We will reach out via email shortly.'); handleBack(); handleBack(); }}>
+           <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); alert('Application submitted successfully. We will reach out via email shortly.'); handleBack(); handleBack(); }}>
                 
                 {/* PARTNERSHIP FORM */}
                 {selectedDeal === "Partnership" && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="col-span-1 md:col-span-2">
-                      <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black tracking-widest">Brand/Company Name</label>
-                      <input type="text" required className="w-full border-4 border-black p-4 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Brand/Company Name</label>
+                      <input type="text" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
                     </div>
                     <div>
-                      <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black tracking-widest">Contact Email</label>
-                      <input type="email" required className="w-full border-4 border-black p-4 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                      <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Contact Email</label>
+                      <input type="email" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
                     </div>
                     <div>
-                      <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black tracking-widest">Product Link / Website</label>
-                      <input type="url" required className="w-full border-4 border-black p-4 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                      <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Product Link / Website</label>
+                      <input type="url" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
                     </div>
-                    <div className="col-span-1 md:col-span-2">
-                      <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black tracking-widest">Proposed Commission Structure</label>
-                      <textarea required placeholder="Outline your dealership/commission proposal..." className="w-full border-4 border-black p-4 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)] resize-none" rows={5}></textarea>
+                    <div className="col-span-1 md:col-span-3">
+                      <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Proposed Commission Structure</label>
+                      <textarea required placeholder="Outline your dealership/commission proposal..." className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)] resize-none" rows={3}></textarea>
                     </div>
                   </div>
                 )}
 
                 {/* AFFILIATE FORM */}
                 {selectedDeal === "Affiliate" && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="col-span-1 md:col-span-2">
-                      <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black tracking-widest">Full Name</label>
-                      <input type="text" required className="w-full border-4 border-black p-4 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                      <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Full Name</label>
+                      <input type="text" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
                     </div>
                     <div>
-                      <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black tracking-widest">Email Address</label>
-                      <input type="email" required className="w-full border-4 border-black p-4 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                      <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Email Address</label>
+                      <input type="email" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
                     </div>
                     <div>
-                      <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black tracking-widest">Primary Traffic Source</label>
-                      <input type="text" required placeholder="Website URL or Social Media Handle" className="w-full border-4 border-black p-4 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                      <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Primary Traffic Source</label>
+                      <input type="text" required placeholder="URL or Handle" className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
                     </div>
-                    <div className="col-span-1 md:col-span-2">
-                      <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black tracking-widest">Preferred Payout Method</label>
-                      <select required className="w-full border-4 border-black p-4 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]">
+                    <div>
+                      <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Preferred Payout</label>
+                      <select required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]">
                         <option value="">Select Method...</option>
                         <option value="gcash">GCash</option>
                         <option value="bank">Bank Transfer</option>
@@ -941,64 +949,66 @@ function MarketingDealsTab() {
 
                 {/* INFLUENCER FORM */}
                 {selectedDeal === "Influencer" && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="col-span-1 md:col-span-2 bg-[var(--theme-accent)] text-white p-4 border-4 border-black">
-                      <p className="font-jakarta text-sm font-bold uppercase tracking-widest">Scripts and assets will be provided upon approval via email.</p>
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="col-span-1 md:col-span-4 bg-[var(--theme-accent)] text-white p-2 border-2 border-black text-center">
+                      <p className="font-jakarta text-[10px] font-bold uppercase tracking-widest">Scripts and assets will be provided upon approval via email.</p>
                     </div>
                     <div>
-                      <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black tracking-widest">Full Name</label>
-                      <input type="text" required className="w-full border-4 border-black p-4 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                      <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Full Name</label>
+                      <input type="text" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
                     </div>
                     <div>
-                      <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black tracking-widest">Email Address</label>
-                      <input type="email" required className="w-full border-4 border-black p-4 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                      <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Email</label>
+                      <input type="email" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
                     </div>
                     <div>
-                      <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black tracking-widest">Platform</label>
-                      <select required className="w-full border-4 border-black p-4 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]">
+                      <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Platform</label>
+                      <select required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]">
                         <option value="tiktok">TikTok</option>
                         <option value="facebook">Facebook</option>
                       </select>
                     </div>
                     <div>
-                      <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black tracking-widest">Followers</label>
-                      <input type="number" required min="0" placeholder="e.g. 10000" className="w-full border-4 border-black p-4 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                      <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Followers</label>
+                      <input type="number" required min="0" placeholder="e.g. 10000" className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
                     </div>
-                    <div className="col-span-1 md:col-span-2">
-                      <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black tracking-widest">Profile Link</label>
-                      <input type="url" required className="w-full border-4 border-black p-4 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                    <div className="col-span-1 md:col-span-4">
+                      <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Profile Link</label>
+                      <input type="url" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
                     </div>
                   </div>
                 )}
 
                 {/* CREATOR FORM */}
                 {selectedDeal === "Creator" && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="col-span-1 md:col-span-2 bg-black text-[var(--theme-cyan)] p-4 border-4 border-black">
-                      <p className="font-jakarta text-sm font-bold uppercase tracking-widest">We buy cartoon designs for PHP 100.00. Please upload your low-res watermarked design for review.</p>
-                    </div>
-                    <div>
-                      <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black tracking-widest">Creator Name</label>
-                      <input type="text" required className="w-full border-4 border-black p-4 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black tracking-widest">Email Address</label>
-                      <input type="email" required className="w-full border-4 border-black p-4 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="col-span-1 md:col-span-4 bg-black text-[var(--theme-cyan)] p-2 border-2 border-black text-center">
+                      <p className="font-jakarta text-[10px] font-bold uppercase tracking-widest">We buy cartoon designs for PHP 100.00. Upload your low-res watermarked design.</p>
                     </div>
                     <div className="col-span-1 md:col-span-2">
-                      <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black tracking-widest">Portfolio / Social Link</label>
-                      <input type="url" className="w-full border-4 border-black p-4 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                      <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Creator Name</label>
+                      <input type="text" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
                     </div>
                     <div className="col-span-1 md:col-span-2">
-                      <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black tracking-widest">Upload Art File (PNG/JPG)</label>
-                      <input type="file" required accept="image/png, image/jpeg" className="w-full border-4 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black text-sm file:bg-black file:text-white file:border-0 file:px-4 file:py-2 file:font-orbitron file:uppercase file:cursor-pointer hover:file:bg-[var(--theme-accent)] transition-all cursor-pointer" />
+                      <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Email Address</label>
+                      <input type="email" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                    </div>
+                    <div className="col-span-1 md:col-span-2">
+                      <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Portfolio / Social Link</label>
+                      <input type="url" className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                    </div>
+                    <div className="col-span-1 md:col-span-2">
+                      <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Upload Art File (PNG/JPG)</label>
+                      <input type="file" required accept="image/png, image/jpeg" className="w-full border-2 border-black p-2 font-jakarta font-bold outline-none bg-gray-50 text-black text-sm file:bg-black file:text-white file:border-0 file:px-3 file:py-1 file:font-orbitron file:uppercase file:cursor-pointer hover:file:bg-[var(--theme-accent)] transition-all cursor-pointer" />
                     </div>
                   </div>
                 )}
 
-                <button type="submit" className="w-full bg-[var(--theme-accent)] text-white font-orbitron font-bold py-6 border-4 border-black hover:bg-black hover:border-white hover:shadow-[8px_8px_0_var(--theme-cyan)] transition-all uppercase mt-8 text-2xl tracking-widest">
-                  Submit Application
-                </button>
+                <div className="flex justify-end mt-6">
+                  <button type="submit" className="px-12 bg-[var(--theme-accent)] text-white font-orbitron font-bold py-3 border-4 border-black hover:bg-black hover:border-white transition-all uppercase text-lg tracking-widest shadow-[4px_4px_0_var(--theme-cyan)]">
+                    Submit Application
+                  </button>
+                </div>
 
            </form>
         </motion.div>
