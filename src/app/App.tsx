@@ -108,7 +108,9 @@ export default function App() {
                 <div className="mb-6 flex justify-between items-end">
                    <div>
                       <div className="inline-block px-3 py-1 bg-black text-white font-orbitron italic text-xs mb-2">AETERNUM PROTOCOL V4.2</div>
-                      <h2 className="text-4xl font-orbitron italic font-bold uppercase leading-none">Architecting The Truth</h2>
+                      <div>
+                         <h2 className="inline-block bg-[var(--theme-accent)] text-white border-2 border-black px-4 py-1.5 font-orbitron italic font-bold uppercase leading-none text-3xl md:text-4xl shadow-[4px_4px_0_#000] mb-2">Architecting The Truth</h2>
+                      </div>
                    </div>
                 </div>
 
