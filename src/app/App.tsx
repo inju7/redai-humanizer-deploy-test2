@@ -174,18 +174,25 @@ export default function App() {
               </section>
 
               {/* Testimonials (Smaller containers, more users) */}
-              <section className="bg-white border-b-4 border-black py-24 px-6">
+              <section className="bg-white border-b-4 border-black py-12 px-6">
                 <div className="max-w-[1600px] mx-auto">
-                   <h2 className="text-5xl md:text-7xl text-black font-orbitron italic font-bold uppercase text-center mb-20 tracking-tighter">Verified Operations</h2>
-                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                   <h2 className="text-3xl md:text-4xl text-black font-orbitron italic font-bold uppercase text-center mb-10 tracking-tighter shadow-none">Verified Operations</h2>
+                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
                       <TestimonialCard name="Sarah J." role="College Student" text="Bypassed Turnitin instantly. Saved my academic career. 10/10 protocol." />
                       <TestimonialCard name="Mark T." role="SEO Agency" text="We use the API to mass-humanize our programmatic SEO blogs. AdSense approved." />
                       <TestimonialCard name="Elena R." role="Freelance Writer" text="Clients think I spend hours writing these articles. Matches my voice perfectly." />
-                      <TestimonialCard name="David C." role="Content Manager" text="Tested 5 different tools. REDAI is the only one that actually passes Originality 3.0." />
-                      <TestimonialCard name="Priya M." role="Professor" text="The detection is incredibly accurate. I use it to filter out low-effort synthetic submissions." />
-                      <TestimonialCard name="James L." role="Affiliate Marketer" text="My product review sites are flourishing. The rewording tool handles bulk jobs like a dream." />
-                      <TestimonialCard name="Chris W." role="Editor" text="Uncanny cadence matching. The grammar check alone saves my team hours every week." />
+                      <TestimonialCard name="David C." role="Content Manager" text="Tested 5 different tools. REDAI is the only one that passes Originality 3.0." />
+                      <TestimonialCard name="Priya M." role="Professor" text="The detection is incredibly accurate. I use it to filter out low-effort submissions." />
+                      <TestimonialCard name="James L." role="Affiliate Marketer" text="My product review sites are flourishing. The rewording tool handles bulk jobs." />
+                      <TestimonialCard name="Chris W." role="Editor" text="Uncanny cadence matching. The grammar check alone saves my team hours." />
                       <TestimonialCard name="Anna B." role="Student" text="The essay writer provides an amazing starting point without raising any AI flags." />
+                      <TestimonialCard name="Luke D." role="Content Director" text="Streamlined our publishing workflow. AI detection score is now consistently 0%." />
+                      <TestimonialCard name="Sophia V." role="PhD Candidate" text="Flawless academic phrasing. Preserves my original arguments perfectly." />
+                      <TestimonialCard name="Marcus K." role="SEO Specialist" text="Completely revolutionized our local search campaigns. Zero drops in traffic." />
+                      <TestimonialCard name="Chloe P." role="Copywriter" text="The humanizer adds the perfect natural cadence. Feels like a top-tier copywriter." />
+                      <TestimonialCard name="Nate B." role="Digital Agency" text="Passes Copyleaks and GPTZero with ease. Absolutely robust security protocol." />
+                      <TestimonialCard name="Zoe T." role="Blog Owner" text="My readers love the new tone. Natural, engaging, and highly informative." />
+                      <TestimonialCard name="Ethan F." role="Tech Journalist" text="The best paraphraser in the market. Retains context perfectly." />
                    </div>
                 </div>
               </section>
@@ -321,18 +328,20 @@ function WorkspaceProcessor({ activeTool }: { activeTool: string }) {
 
 function TestimonialCard({ name, role, text }: { name: string, role: string, text: string }) {
   return (
-    <div className="brutal-container bg-white border-4 border-black p-6 relative">
-       <div className="flex text-[var(--theme-accent)] mb-3">
-          <Star size={16} fill="currentColor" />
-          <Star size={16} fill="currentColor" />
-          <Star size={16} fill="currentColor" />
-          <Star size={16} fill="currentColor" />
-          <Star size={16} fill="currentColor" />
+    <div className="brutal-container bg-white border-2 border-black p-3 relative flex flex-col justify-between">
+       <div>
+          <div className="flex text-[var(--theme-accent)] mb-1.5">
+             <Star size={10} fill="currentColor" />
+             <Star size={10} fill="currentColor" />
+             <Star size={10} fill="currentColor" />
+             <Star size={10} fill="currentColor" />
+             <Star size={10} fill="currentColor" />
+          </div>
+          <p className="font-jakarta text-[10px] font-bold mb-2 leading-snug text-black">"{text}"</p>
        </div>
-       <p className="font-jakarta text-base font-bold mb-4 leading-tight text-black">"{text}"</p>
-       <div className="border-t-4 border-black pt-3 mt-auto">
-          <p className="font-orbitron font-bold italic uppercase text-sm text-black">{name}</p>
-          <p className="text-xs text-gray-600 font-bold uppercase">{role}</p>
+       <div className="border-t border-black pt-1.5 mt-auto">
+          <p className="font-orbitron font-bold italic uppercase text-[10px] text-black leading-tight">{name}</p>
+          <p className="text-[8px] text-gray-600 font-bold uppercase leading-tight">{role}</p>
        </div>
     </div>
   );
@@ -1124,7 +1133,7 @@ function MarketplaceTab() {
               </div>
   
               {/* Details Side */}
-              <div className="w-full md:w-[65%] md:h-full bg-white p-4 overflow-y-auto flex flex-col justify-center brutal-scrollbar">
+              <div className="w-full md:w-[65%] md:h-full bg-white p-4 overflow-y-auto brutal-scrollbar">
                  <div className="w-full">
                     <span className="text-gray-400 font-orbitron font-bold uppercase tracking-[0.2em] text-[8px] mb-0.5 block">{viewingProduct.category}</span>
                     <h2 className="text-lg lg:text-xl font-orbitron font-bold uppercase leading-tight text-black mb-0.5">{viewingProduct.name}</h2>
@@ -1153,12 +1162,10 @@ function MarketplaceTab() {
  
             </motion.div>
           </motion.div>
-        )}
-
-        {/* BATCH CHECKOUT MODAL */}
+                {/* BATCH CHECKOUT MODAL */}
         {isCheckoutOpen && checkoutItems.length > 0 && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-md p-4">
-            <motion.div initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }} transition={{ duration: 0.3, ease: "easeOut" }} className="w-full h-auto md:h-[340px] max-w-4xl flex flex-col md:flex-row relative bg-white shadow-[4px_4px_0_rgba(0,0,0,1)] border-2 border-black overflow-hidden">
+            <motion.div initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }} transition={{ duration: 0.3, ease: "easeOut" }} className="w-full h-auto md:h-[380px] max-w-4xl flex flex-col md:flex-row relative bg-white shadow-[4px_4px_0_rgba(0,0,0,1)] border-2 border-black overflow-hidden">
               
               <button onClick={() => setIsCheckoutOpen(false)} className="absolute top-2 right-2 z-50 p-2 text-black hover:text-gray-500 transition-colors">
                 <X size={24} strokeWidth={2} />
@@ -1179,7 +1186,7 @@ function MarketplaceTab() {
                        </div>
                     ))}
                  </div>
-
+ 
                  <div className="border-t border-black pt-1.5 space-y-0.5">
                     <div className="flex justify-between items-center text-[8px] font-orbitron font-bold text-gray-600 uppercase tracking-widest">
                        <span>Subtotal</span>
@@ -1195,9 +1202,9 @@ function MarketplaceTab() {
                     </div>
                  </div>
               </div>
-
+ 
               {/* Checkout Form Side */}
-              <div className="w-full md:w-[68%] md:h-full p-4 overflow-y-auto brutal-scrollbar flex flex-col justify-center">
+              <div className="w-full md:w-[68%] md:h-full p-4 overflow-y-auto brutal-scrollbar">
                  <div className="w-full">
                     <h3 className="text-xs font-orbitron font-bold mb-1.5 uppercase tracking-widest text-black border-b-2 border-black pb-0.5">Secure Checkout</h3>
 
