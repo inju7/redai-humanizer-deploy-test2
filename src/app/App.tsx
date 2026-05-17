@@ -147,20 +147,20 @@ export default function App() {
               </div>
 
               {/* Creative 'How to Use It' Guide */}
-              <section className="bg-black border-b-4 border-black py-12 px-6 relative overflow-hidden">
+              <section className="bg-white border-b-4 border-black py-12 px-6 relative overflow-hidden">
                 {/* Cybergrid background details */}
-                <div className="absolute inset-0 opacity-10 bg-[linear-gradient(to_right,#808080_1px,transparent_1px),linear-gradient(to_bottom,#808080_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+                <div className="absolute inset-0 opacity-5 bg-[linear-gradient(to_right,#808080_1px,transparent_1px),linear-gradient(to_bottom,#808080_1px,transparent_1px)] bg-[size:24px_24px]"></div>
                 
                 <div className="max-w-[1200px] mx-auto relative z-10">
                    <div className="text-center mb-10">
                       <span className="text-[var(--theme-accent)] font-orbitron font-bold uppercase tracking-[0.3em] text-[10px] mb-1.5 block">OPERATIONAL PROTOCOL</span>
-                      <h2 className="text-3xl md:text-4xl text-white font-orbitron italic font-bold uppercase tracking-tighter mb-2">How to Use RED<span className="text-[var(--theme-accent)]">AI</span> Humanizer</h2>
-                      <p className="text-xs md:text-sm text-gray-400 font-jakarta max-w-xl mx-auto">Transform robotic AI text into 100% human-grade, undetectable copy in three rapid steps.</p>
+                      <h2 className="inline-block bg-black text-white border-2 border-black px-4 py-1.5 font-orbitron italic font-bold uppercase tracking-tighter text-3xl md:text-4xl mb-3 shadow-[4px_4px_0_var(--theme-accent)]">How to Use RED<span className="text-[var(--theme-accent)]">AI</span> Humanizer</h2>
+                      <p className="text-xs md:text-sm text-black font-jakarta font-bold max-w-xl mx-auto">Transform robotic AI text into 100% human-grade, undetectable copy in three rapid steps.</p>
                    </div>
                    
                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
                       {/* Connecting Line on Desktop */}
-                      <div className="hidden md:block absolute top-[40px] left-[15%] right-[15%] h-0.5 border-t-2 border-dashed border-gray-800 z-0"></div>
+                      <div className="hidden md:block absolute top-[40px] left-[15%] right-[15%] h-0.5 border-t-2 border-dashed border-black z-0"></div>
                       
                       {/* Step 1 */}
                       <div className="brutal-container bg-white border-2 border-black p-5 relative z-10 hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_var(--theme-cyan)] transition-all group">
@@ -168,12 +168,12 @@ export default function App() {
                             01
                          </div>
                          <h3 className="text-base font-orbitron italic font-bold uppercase mb-2 text-black">1. Load Your Content</h3>
-                         <p className="font-jakarta text-[11px] text-gray-600 leading-relaxed mb-3">
+                         <p className="font-jakarta text-[11px] text-black font-semibold leading-relaxed mb-3">
                             Paste raw generations from ChatGPT, Claude, or Gemini into the main editor, or upload your document formats.
                          </p>
                          {/* Mock UI Element */}
-                         <div className="bg-gray-50 border border-black p-1.5 font-mono text-[8px] text-gray-400 rounded-sm">
-                            <span className="text-[var(--theme-cyan)]">&gt;</span> payload_load_successful: 100%
+                         <div className="bg-gray-100 border border-black p-1.5 font-mono text-[8px] text-black font-bold rounded-sm">
+                            <span className="text-[var(--theme-accent)]">&gt;</span> payload_load_successful: 100%
                          </div>
                       </div>
                       
@@ -183,7 +183,7 @@ export default function App() {
                             02
                          </div>
                          <h3 className="text-base font-orbitron italic font-bold uppercase mb-2 text-black">2. Bypass Scan Check</h3>
-                         <p className="font-jakarta text-[11px] text-black leading-relaxed mb-3 font-semibold">
+                         <p className="font-jakarta text-[11px] text-black leading-relaxed mb-3 font-bold">
                             Run neural matching to verify sentence-level signatures and locate precise phrases flagged by detectors.
                          </p>
                          {/* Mock UI Element */}
@@ -194,18 +194,18 @@ export default function App() {
                       </div>
                       
                       {/* Step 3 */}
-                      <div className="brutal-container bg-black border-2 border-white p-5 relative z-10 hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_var(--theme-accent)] transition-all group text-white">
-                         <div className="w-10 h-10 bg-[var(--theme-accent)] text-black border-2 border-white flex items-center justify-center font-orbitron font-bold text-sm mb-3">
+                      <div className="brutal-container bg-white border-2 border-black p-5 relative z-10 hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_var(--theme-accent)] transition-all group text-black">
+                         <div className="w-10 h-10 bg-black text-[var(--theme-cyan)] border-2 border-black flex items-center justify-center font-orbitron font-bold text-sm mb-3">
                             03
                          </div>
-                         <h3 className="text-base font-orbitron italic font-bold uppercase mb-2 text-[var(--theme-cyan)]">3. Humanize & Deploy</h3>
-                         <p className="font-jakarta text-[11px] text-gray-300 leading-relaxed mb-3">
+                         <h3 className="text-base font-orbitron italic font-bold uppercase mb-2 text-black">3. Humanize & Deploy</h3>
+                         <p className="font-jakarta text-[11px] text-black font-semibold leading-relaxed mb-3">
                             Click 'Humanize' to shuffle syntax, randomize vocabulary, and instantly output fully organic-grade text.
                          </p>
                          {/* Mock UI Element */}
-                         <div className="bg-gray-900 border border-white p-1.5 font-mono text-[8px] text-[var(--theme-cyan)] rounded-sm flex justify-between items-center">
+                         <div className="bg-gray-100 border border-black p-1.5 font-mono text-[8px] text-[var(--theme-accent)] rounded-sm flex justify-between items-center font-bold">
                             <span>Human bypass score:</span>
-                            <span className="font-bold text-green-400">100% HUMAN</span>
+                            <span className="font-bold text-green-600">100% HUMAN</span>
                          </div>
                       </div>
                    </div>
