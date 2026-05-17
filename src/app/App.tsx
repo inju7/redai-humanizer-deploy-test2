@@ -4,7 +4,7 @@ import {
   Cpu, Zap, Layers, Shield, Terminal, Code2, 
   TrendingUp, Users, DollarSign, Share2, Tag, 
   ChevronRight, Link, BarChart, PenTool, LayoutTemplate, 
-  Store, Network, MessageSquare, ArrowRight, Activity, Sliders, CheckCircle, Star, Plus, Minus, X, AlertTriangle
+  Store, Network, MessageSquare, ArrowRight, Activity, Sliders, CheckCircle, Star, Plus, Minus, X, AlertTriangle, Award
 } from "lucide-react";
 
 type TabState = "home" | "blog" | "ads" | "marketplace" | "referral" | "career";
@@ -32,6 +32,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<TabState>("home");
   const [activeTool, setActiveTool] = useState<string>("Text Humanizer");
   const [credits] = useState(5);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
     <div className="relative min-h-screen pb-32 bg-[var(--theme-bg)] selection:bg-[var(--theme-accent)] selection:text-white">
@@ -50,7 +51,7 @@ export default function App() {
             </div>
 
             <div className="hidden lg:flex items-center gap-4 xl:gap-6">
-              <NavButton active={activeTab === "home"} onClick={() => { setActiveTab("home"); window.scrollTo(0, 0); }}>DASHBOARD</NavButton>
+              <NavButton active={activeTab === "home"} onClick={() => { setActiveTab("home"); window.scrollTo(0, 0); }}>REDAI HUMANIZER</NavButton>
               <NavButton active={activeTab === "blog"} onClick={() => { setActiveTab("blog"); window.scrollTo(0, 0); }}>BLOG</NavButton>
               <NavButton active={activeTab === "ads"} onClick={() => { setActiveTab("ads"); window.scrollTo(0, 0); }}>MARKETING DEALS</NavButton>
               <NavButton active={activeTab === "marketplace"} onClick={() => { setActiveTab("marketplace"); window.scrollTo(0, 0); }}>MARKETPLACE</NavButton>
@@ -72,28 +73,53 @@ export default function App() {
         </div>
       </nav>
 
-      {/* FIXED LEFT SIDEBAR (Only visible on Dashboard) */}
+      {/* FIXED LEFT SIDEBAR (Collapsible Drawer on Mobile, Docked on Desktop) */}
       {activeTab === "home" && (
-        <aside className="fixed top-20 left-0 bottom-32 w-[240px] bg-white border-r-4 border-black z-40 flex flex-col shadow-[4px_0_0_#000]">
-          <div className="bg-black text-white p-3 border-b-4 border-black text-center">
-             <h3 className="font-orbitron font-bold italic text-sm tracking-wider">AI PROTOCOLS</h3>
-          </div>
-          <div className="flex-1 overflow-y-auto p-2 space-y-1 brutal-scrollbar">
-             {TOOLS_LIST.map((tool) => (
-               <button
-                 key={tool}
-                 onClick={() => setActiveTool(tool)}
-                 className={`w-full text-left px-3 py-2 font-jakarta text-[13px] font-bold uppercase transition-all border-2 ${
-                   activeTool === tool 
-                   ? "bg-[var(--theme-accent)] text-white border-black shadow-[2px_2px_0_#000] translate-x-1" 
-                   : "bg-transparent text-black border-transparent hover:border-black hover:translate-x-1"
-                 }`}
-               >
-                 {tool}
+        <>
+          {/* Backdrop (closes sidebar on tap) */}
+          {isSidebarOpen && (
+            <div 
+              className="fixed inset-0 bg-black/60 z-30 lg:hidden animate-fade-in" 
+              onClick={() => setIsSidebarOpen(false)} 
+            />
+          )}
+
+          {/* Floating Menu Toggle Trigger (Mobile/Tablet Only) */}
+          <button 
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className="fixed left-0 top-[35%] z-30 lg:hidden bg-[var(--theme-accent)] text-white border-2 border-l-0 border-black p-2.5 shadow-[3px_3px_0_#000] active:translate-y-0.5 active:shadow-none hover:bg-black transition-all flex items-center gap-2 rounded-r-lg group"
+          >
+            <Sliders size={13} className="text-white group-hover:rotate-90 transition-transform" />
+            <span className="font-orbitron font-black uppercase text-[8px] tracking-wider select-none">Protocols</span>
+          </button>
+
+          <aside className={`fixed top-20 left-0 bottom-32 w-[240px] bg-white border-r-4 border-black z-40 flex flex-col shadow-[4px_0_0_#000] transition-transform duration-300 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
+            <div className="bg-black text-white p-3 border-b-4 border-black text-center flex items-center justify-between">
+               <h3 className="font-orbitron font-bold italic text-sm tracking-wider mx-auto">AI PROTOCOLS</h3>
+               <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden text-white hover:text-[var(--theme-accent)] transition-colors pr-1">
+                 <X size={16} />
                </button>
-             ))}
-          </div>
-        </aside>
+            </div>
+            <div className="flex-1 overflow-y-auto p-2 space-y-1 brutal-scrollbar">
+               {TOOLS_LIST.map((tool) => (
+                 <button
+                   key={tool}
+                   onClick={() => {
+                     setActiveTool(tool);
+                     setIsSidebarOpen(false);
+                   }}
+                   className={`w-full text-left px-3 py-2 font-jakarta text-[13px] font-bold uppercase transition-all border-2 ${
+                     activeTool === tool 
+                     ? "bg-[var(--theme-accent)] text-white border-black shadow-[2px_2px_0_#000] translate-x-1" 
+                     : "bg-transparent text-black border-transparent hover:border-black hover:translate-x-1"
+                   }`}
+                 >
+                   {tool}
+                 </button>
+               ))}
+            </div>
+          </aside>
+        </>
       )}
 
       {/* MAIN CONTENT AREA */}
@@ -568,22 +594,25 @@ function BlogDetailView({ blog, onBack }: { blog: any, onBack: () => void }) {
 
 function BlogCard({ blog, onClick }: { blog: any, onClick: () => void }) {
   return (
-    <div onClick={onClick} className="brutal-container bg-white border-4 border-black p-4 flex flex-col hover:shadow-[8px_8px_0_#000] transition-all cursor-pointer group h-[400px]">
-       <div className="aspect-video border-2 border-black mb-4 overflow-hidden shrink-0">
-          <img src={blog.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt={blog.title} />
+    <div onClick={onClick} className="brutal-container bg-white border-2 border-black p-2.5 flex flex-col hover:shadow-[4px_4px_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all cursor-pointer group h-[255px]">
+       <div className="h-[95px] border border-black mb-2 overflow-hidden shrink-0 relative">
+          <img src={blog.image} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt={blog.title} />
+          <span className="absolute bottom-1 left-1 bg-black text-white text-[7px] font-orbitron font-bold px-1.5 py-0.5 uppercase tracking-wider">{blog.category}</span>
        </div>
-       <div className="flex-1 flex flex-col">
-         <div className="flex justify-between items-start mb-2">
-           <span className="inline-block bg-black text-white text-[10px] font-bold px-2 py-1 uppercase tracking-wider">{blog.category}</span>
-           <span className="text-[10px] font-bold uppercase text-gray-400">{blog.date || "MAY 16, 2026"}</span>
-         </div>
-         <h3 className="text-xl font-orbitron italic font-bold mb-2 uppercase leading-tight group-hover:text-[var(--theme-accent)] transition-colors text-black">{blog.title}</h3>
-         <p className="font-jakarta font-bold text-xs text-gray-600 line-clamp-3 mb-4">{blog.subtitle}</p>
-         
-         <div className="mt-auto pt-4 border-t-2 border-black flex items-center justify-between">
-           <span className="text-[10px] font-orbitron font-bold uppercase italic text-black">{blog.author}</span>
-           <ArrowRight size={18} className="text-black group-hover:translate-x-2 transition-transform" />
-         </div>
+       <div className="flex-1 flex flex-col justify-between">
+          <div>
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-[7px] font-bold uppercase text-gray-400">{blog.dateStr}</span>
+              <span className="text-[7px] font-bold uppercase italic text-gray-500">{blog.author}</span>
+            </div>
+            <h3 className="text-[11px] font-orbitron italic font-bold mb-1 uppercase leading-tight group-hover:text-[var(--theme-accent)] transition-colors text-black line-clamp-2">{blog.title}</h3>
+            <p className="font-jakarta font-semibold text-[9px] text-gray-500 line-clamp-2 leading-relaxed">{blog.subtitle}</p>
+          </div>
+          
+          <div className="pt-1.5 border-t border-black flex items-center justify-between mt-auto">
+            <span className="text-[8px] font-orbitron font-black uppercase text-black group-hover:text-[var(--theme-accent)]">Read Article</span>
+            <ArrowRight size={10} className="text-black group-hover:translate-x-1 transition-transform" />
+          </div>
        </div>
     </div>
   );
@@ -591,27 +620,143 @@ function BlogCard({ blog, onClick }: { blog: any, onClick: () => void }) {
 
 function BlogTab() {
   const [selectedBlog, setSelectedBlog] = useState<any>(null);
+  const [activeCategory, setActiveCategory] = useState("All");
+  const [sortBy, setSortBy] = useState<"newest" | "oldest">("newest");
 
-  const blogs = Array.from({ length: 12 }).map((_, i) => ({
-    title: `The Future of AI Detection ${i + 1}`,
-    category: i % 2 === 0 ? "SEO & Content" : "Technology",
-    subtitle: "Understanding how neural networks distinguish synthetic text from human writing.",
-    author: ["Jane Doe", "Alex Smith", "Sarah Connor"][i % 3],
-    date: i % 2 === 0 ? "MAY 15, 2026" : "MAY 16, 2026",
-    intro: "As generative models become more advanced, the line between human and machine-generated content continues to blur. In this article, we explore the foundations of AI detection and how neural structures successfully bypass predictive detection layers. AI writing is a powerful tool, maintaining human authenticity is critical for SEO and academic integrity.",
-    discussion: "The core discussion revolves around predictive patterns. LLMs tend to choose highly probable next words, creating a 'bland' cadence. Human writers inject burstiness and perplexity. By analyzing these traits, tools like REDAI can accurately score text. We analyze the neural structures that define human-like writing and how our protocol validates these patterns.",
-    conclusion: "In conclusion, while AI writing is a powerful tool, maintaining human authenticity is critical for SEO and academic integrity. Always verify your content with a robust detection protocol. The REDAI system remains the benchmark for neural verification in the Aeternum Protocol age.",
-    image: `https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80&auto=format&fit=crop`
-  }));
+  const blogs = [
+    {
+      id: 1,
+      title: "Bypassing Turnitin in 2026",
+      category: "Technology",
+      subtitle: "How to safely humanize academic submissions without triggering secondary patterns.",
+      author: "Sarah Connor",
+      dateStr: "MAY 17, 2026",
+      dateVal: new Date("2026-05-17").getTime(),
+      intro: "Academic integrity guidelines are evolving quickly. This article discusses modern Turnitin algorithms.",
+      discussion: "The algorithms now parse syntactic diversity in addition to word frequencies. Bypassing Turnitin requires styling structure variance.",
+      conclusion: "A human-guided rewrite pipeline remains the most secure method for digital work validation.",
+      image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&q=80"
+    },
+    {
+      id: 2,
+      title: "SEO Optimization Tactics",
+      category: "SEO & Content",
+      subtitle: "Why search engines penalize dry, repetitive AI content and how to bypass them.",
+      author: "Alex Smith",
+      dateStr: "MAY 16, 2026",
+      dateVal: new Date("2026-05-16").getTime(),
+      intro: "Google Search's helpful content update targets synthetic blog spam with high severity.",
+      discussion: "To maintain search traffic, programmatic writers must inject perplexity and voice cadence variance.",
+      conclusion: "Investing in content humanization guarantees high visibility on modern search results.",
+      image: "https://images.unsplash.com/photo-1542435503-956c469947f6?w=400&q=80"
+    },
+    {
+      id: 3,
+      title: "Generative Cadence Secrets",
+      category: "Technology",
+      subtitle: "Deep-diving into LLM frequency matching and perplexity variations.",
+      author: "Jane Doe",
+      dateStr: "MAY 15, 2026",
+      dateVal: new Date("2026-05-15").getTime(),
+      intro: "LLMs operate on standard mathematical token prediction, leaving systemic fingerprints.",
+      discussion: "Analyzing token choices allows security scanners to easily flags plain generations.",
+      conclusion: "Breaking predictions using organic humanized layers is the absolute protocol.",
+      image: "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=400&q=80"
+    },
+    {
+      id: 4,
+      title: "Google AdSense Approval Loop",
+      category: "SEO & Content",
+      subtitle: "Bypassing the low-value content flag for programmatic SEO websites.",
+      author: "Alex Smith",
+      dateStr: "MAY 14, 2026",
+      dateVal: new Date("2026-05-14").getTime(),
+      intro: "Getting approved for AdSense requires highly engaging content that doesn't feel robotic.",
+      discussion: "AdSense checkers verify the structural integrity of your blogs before allowing banner spots.",
+      conclusion: "Humanizing your mass-generated copy results in instant approvals.",
+      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&q=80"
+    },
+    {
+      id: 5,
+      title: "ChatGPT vs Claude: Detection Rules",
+      category: "Technology",
+      subtitle: "An editorial analysis of standard output structures and bypass ratings.",
+      author: "Sarah Connor",
+      dateStr: "MAY 13, 2026",
+      dateVal: new Date("2026-05-13").getTime(),
+      intro: "Different models maintain distinct stylistic fingerprints under normal prompts.",
+      discussion: "Claude uses highly formal, structured prose, whereas ChatGPT is predictable and repetitive.",
+      conclusion: "Adapting your humanizing settings to the source model delivers highly stealth results.",
+      image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&q=80"
+    },
+    {
+      id: 6,
+      title: "Scaling Programmatic Blogs",
+      category: "SEO & Content",
+      subtitle: "How to mass-humanize thousands of landing pages using our automated pipeline API.",
+      author: "Jane Doe",
+      dateStr: "MAY 12, 2026",
+      dateVal: new Date("2026-05-12").getTime(),
+      intro: "Programmatic SEO allows rapid scaling, but content quality must remain premium.",
+      discussion: "Our batch processing engine humanizes thousands of records at rapid speeds with high integrity.",
+      conclusion: "Automation coupled with premium detection scanning is the roadmap to programmatic success.",
+      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&q=80"
+    }
+  ];
+
+  const categories = ["All", "SEO & Content", "Technology"];
+
+  const filteredBlogs = blogs
+    .filter(b => activeCategory === "All" || b.category === activeCategory)
+    .sort((a, b) => sortBy === "newest" ? b.dateVal - a.dateVal : a.dateVal - b.dateVal);
 
   if (selectedBlog) {
     return <BlogDetailView blog={selectedBlog} onBack={() => setSelectedBlog(null)} />;
   }
 
   return (
-    <TabContainer title="BLOG & SEO CONTENT" gridClass="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {blogs.map((b, i) => <BlogCard key={i} blog={b} onClick={() => setSelectedBlog(b)} />)}
-    </TabContainer>
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }} className="space-y-6 max-w-7xl mx-auto px-4">
+      {/* Reduced Header Container */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between border-b-2 border-black pb-4 gap-4">
+         <div>
+            <h2 className="text-2xl md:text-3xl text-black font-orbitron italic font-bold uppercase">BLOG & SEO CONTENT</h2>
+            <p className="text-[10px] text-gray-500 font-jakarta font-bold uppercase tracking-wider">AETERNUM KNOWLEDGE REPOSITORY</p>
+         </div>
+
+         {/* Compact Filtering & Date Sorting Bar */}
+         <div className="flex flex-wrap items-center gap-3">
+            {/* Categories */}
+            <div className="flex bg-gray-100 p-1 border-2 border-black">
+               {categories.map((c) => (
+                  <button 
+                     key={c} 
+                     onClick={() => setActiveCategory(c)}
+                     className={`px-3 py-1 font-orbitron font-bold text-[8px] uppercase transition-colors ${activeCategory === c ? 'bg-black text-white' : 'text-black hover:bg-gray-200'}`}
+                  >
+                     {c}
+                  </button>
+               ))}
+            </div>
+
+            {/* Date Sorting Trigger */}
+            <div className="flex border-2 border-black p-1 bg-white">
+               <button 
+                  onClick={() => setSortBy(sortBy === "newest" ? "oldest" : "newest")}
+                  className="px-3 py-1 bg-[var(--theme-accent)] text-white font-orbitron font-bold text-[8px] uppercase tracking-wider shadow-[2px_2px_0_#000] active:translate-y-0.5 active:shadow-none hover:bg-black transition-all"
+               >
+                  Sort: {sortBy === "newest" ? "Latest First" : "Oldest First"}
+               </button>
+            </div>
+         </div>
+      </div>
+
+      {/* High-density grid for compact bloghs */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+         {filteredBlogs.map((b) => (
+            <BlogCard key={b.id} blog={b} onClick={() => setSelectedBlog(b)} />
+         ))}
+      </div>
+    </motion.div>
   );
 }
 
@@ -683,45 +828,74 @@ function ReferralTab() {
   return (
     <div className="space-y-16 pb-20">
       {/* How it Works Section */}
-      <section className="brutal-container bg-[var(--theme-cyan)] border-4 border-black p-8">
-        <h2 className="text-4xl font-orbitron italic font-bold uppercase mb-6 text-black border-b-4 border-black pb-4 inline-block">How The Referral Program Works</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          <div className="bg-white border-4 border-black p-8 shadow-[12px_12px_0_#000] relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-[var(--theme-accent)] -mr-12 -mt-12 rotate-45 group-hover:scale-150 transition-transform"></div>
-            <h3 className="text-2xl font-orbitron font-bold uppercase mb-6 text-black border-b-4 border-black pb-2 flex items-center gap-3">
-              <DollarSign size={24} className="text-[var(--theme-accent)]" /> The Reward
-            </h3>
-            <p className="font-jakarta font-bold text-black leading-relaxed text-lg mb-6">
-              If you refer and the other party did install or purchase a product, you will earn a commission. 
-            </p>
-            <div className="bg-black text-[var(--theme-accent)] p-6 text-center border-2 border-black shadow-[4px_4px_0_var(--theme-accent)]">
-               <p className="font-orbitron italic font-bold text-3xl">50.00 + 100.00</p>
-               <p className="font-orbitron font-bold uppercase text-xs tracking-widest mt-1 text-white">Bonus Per Referral</p>
+      <section className="brutal-container bg-[var(--theme-cyan)] border-4 border-black p-6 md:p-8 shadow-[8px_8px_0_#000] relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--theme-accent)] -mr-16 -mt-16 rotate-45 opacity-20 pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white -ml-12 -mb-12 rotate-12 opacity-10 pointer-events-none"></div>
+
+        <div className="border-b-4 border-black pb-4 mb-6">
+           <h2 className="text-3xl md:text-4xl font-orbitron italic font-bold uppercase text-black tracking-tight flex items-center gap-3">
+              <Zap size={32} className="text-black fill-black" />
+              How The Referral Program Works
+           </h2>
+           <p className="font-jakarta font-bold text-[10px] uppercase tracking-wider text-black mt-1">REDAI VERIFIED DISTRIBUTION ENGINE v1.2</p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 relative z-10">
+          {/* Left Column: The Reward */}
+          <div className="bg-white border-4 border-black p-6 md:p-8 shadow-[8px_8px_0_#000] flex flex-col justify-between group hover:shadow-[4px_4px_0_#000] hover:translate-x-1 hover:translate-y-1 transition-all">
+            <div>
+              <h3 className="text-xl font-orbitron font-bold uppercase mb-4 text-black border-b-2 border-black pb-2 flex items-center gap-2.5">
+                <DollarSign size={20} className="text-[var(--theme-accent)]" /> The Reward Structure
+              </h3>
+              <p className="font-jakarta font-bold text-gray-800 leading-relaxed text-xs mb-6">
+                Unlock robust passive revenue streams by promoting the REDAI ecosystem! When you introduce a developer, content creator, or digital agency to our humanization engine and they install our local tools or purchase any premium product, you instantly qualify for a direct, uncapped payout!
+              </p>
+            </div>
+            
+            <div className="bg-black text-[var(--theme-accent)] p-5 text-center border-2 border-black shadow-[4px_4px_0_var(--theme-accent)] mt-auto">
+               <p className="font-orbitron italic font-bold text-2xl md:text-3xl tracking-wide text-white">PHP 50.00 + PHP 100.00</p>
+               <p className="font-orbitron font-bold uppercase text-[9px] tracking-widest mt-1 text-white">Bonus Per Referral & Product Purchase</p>
             </div>
           </div>
           
-          <div className="bg-white border-4 border-black p-8 shadow-[12px_12px_0_black]">
-            <h3 className="text-2xl font-orbitron font-bold uppercase mb-6 text-black border-b-4 border-black pb-2 flex items-center gap-3">
-              <Zap size={24} className="text-[var(--theme-cyan)]" /> The Process
-            </h3>
-            <ol className="font-jakarta font-bold text-black space-y-4">
-              <li className="flex gap-4 items-start">
-                <span className="w-8 h-8 bg-black text-white flex items-center justify-center shrink-0 font-orbitron text-sm">01</span>
-                <span>Fill up the Referral Claim Form below.</span>
-              </li>
-              <li className="flex gap-4 items-start">
-                <span className="w-8 h-8 bg-black text-white flex items-center justify-center shrink-0 font-orbitron text-sm">02</span>
-                <span>Indicate how many referrals you have successfully made.</span>
-              </li>
-              <li className="flex gap-4 items-start">
-                <span className="w-8 h-8 bg-black text-white flex items-center justify-center shrink-0 font-orbitron text-sm">03</span>
-                <span>Provide proof of successful referral with purchase (Screenshots).</span>
-              </li>
-              <li className="flex gap-4 items-start">
-                <span className="w-8 h-8 bg-black text-white flex items-center justify-center shrink-0 font-orbitron text-sm">04</span>
-                <span>Receive your money from REDAI via your chosen brand account.</span>
-              </li>
-            </ol>
+          {/* Right Column: The Process */}
+          <div className="bg-white border-4 border-black p-6 md:p-8 shadow-[8px_8px_0_black] flex flex-col justify-between hover:shadow-[4px_4px_0_black] hover:translate-x-1 hover:translate-y-1 transition-all">
+            <div>
+              <h3 className="text-xl font-orbitron font-bold uppercase mb-4 text-black border-b-2 border-black pb-2 flex items-center gap-2.5">
+                <Award size={20} className="text-[var(--theme-cyan)]" /> The Verification Process
+              </h3>
+              
+              <ol className="font-jakarta font-bold text-xs text-gray-800 space-y-4">
+                <li className="flex gap-3.5 items-start">
+                  <span className="w-6 h-6 bg-black text-white flex items-center justify-center shrink-0 font-orbitron text-[10px] font-black border border-black shadow-[1px_1px_0_var(--theme-cyan)]">01</span>
+                  <div>
+                    <strong className="block text-black uppercase tracking-wider text-[9px] font-orbitron">Claim Initiation</strong>
+                    <span className="text-[11px] text-gray-600 font-medium">Scroll down and populate the formal Referral Claim Form with your active credentials.</span>
+                  </div>
+                </li>
+                <li className="flex gap-3.5 items-start">
+                  <span className="w-6 h-6 bg-black text-white flex items-center justify-center shrink-0 font-orbitron text-[10px] font-black border border-black shadow-[1px_1px_0_var(--theme-cyan)]">02</span>
+                  <div>
+                    <strong className="block text-black uppercase tracking-wider text-[9px] font-orbitron">Volume Disclosure</strong>
+                    <span className="text-[11px] text-gray-600 font-medium">State the exact volume of successful installations and purchases generated through your custom link.</span>
+                  </div>
+                </li>
+                <li className="flex gap-3.5 items-start">
+                  <span className="w-6 h-6 bg-black text-white flex items-center justify-center shrink-0 font-orbitron text-[10px] font-black border border-black shadow-[1px_1px_0_var(--theme-cyan)]">03</span>
+                  <div>
+                    <strong className="block text-black uppercase tracking-wider text-[9px] font-orbitron">Proof Verification</strong>
+                    <span className="text-[11px] text-gray-600 font-medium">Attach clear screenshots as structural evidence of the referred lead's installation or active purchase.</span>
+                  </div>
+                </li>
+                <li className="flex gap-3.5 items-start">
+                  <span className="w-6 h-6 bg-black text-white flex items-center justify-center shrink-0 font-orbitron text-[10px] font-black border border-black shadow-[1px_1px_0_var(--theme-cyan)]">04</span>
+                  <div>
+                    <strong className="block text-black uppercase tracking-wider text-[9px] font-orbitron">Liquidity Disbursement</strong>
+                    <span className="text-[11px] text-gray-600 font-medium">Receive direct payouts from our finance treasury sent straight to your chosen partner brand account!</span>
+                  </div>
+                </li>
+              </ol>
+            </div>
           </div>
         </div>
       </section>
@@ -832,6 +1006,8 @@ function CareerTab() {
 function MarketingDealsTab() {
   const [viewMode, setViewMode] = useState<"cards" | "agreement" | "form">("cards");
   const [selectedDeal, setSelectedDeal] = useState<string | null>(null);
+  const [dealsMode, setDealsMode] = useState<"opportunities" | "history">("opportunities");
+  const [agreedToRules, setAgreedToRules] = useState(false);
 
   const handleSelectDeal = (deal: string) => {
     setSelectedDeal(deal);
@@ -847,78 +1023,113 @@ function MarketingDealsTab() {
     else {
       setViewMode("cards");
       setSelectedDeal(null);
+      setAgreedToRules(false);
     }
   };
 
   return (
-    <div className="space-y-16">
+    <div className="space-y-6 max-w-7xl mx-auto px-4">
       
       {/* 1. CARDS VIEW */}
       {viewMode === "cards" && (
         <>
-          <TabContainer title="MARKETING DEALS & CONSIGMENTS" gridClass="grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
-            <BrutalCard 
-              badge="PARTNERSHIP" 
-              title="BE PARTNERS WITH US" 
-              desc="We will promote your product in our blogs, carousel, and ad spaces. Dealership commission structure available." 
-              icon={<Shield size={28} className="text-white" />} 
-              onClick={() => handleSelectDeal("Partnership")}
-            />
-            <BrutalCard 
-              badge="AFFILIATE" 
-              title="BE REDAI'S AFFILIATE" 
-              desc="Market and earn consignment on every deal and product purchased. Receive 20% commission per sale." 
-              icon={<TrendingUp size={28} className="text-white" />} 
-              onClick={() => handleSelectDeal("Affiliate")}
-            />
-            <BrutalCard 
-              badge="INFLUENCER" 
-              title="SOCIAL MEDIA INFLUENCER" 
-              desc="Post TikTok or Facebook content with positive reviews to earn 100.00 per platform. Get free credits, clothing, and bags. Scripts and assets provided." 
-              icon={<Users size={28} className="text-white" />} 
-              onClick={() => handleSelectDeal("Influencer")}
-            />
-            <BrutalCard 
-              badge="CREATOR" 
-              title="SUBMIT ART & BLOGS" 
-              desc="Showcase your work (cartoons, abstract art) with our logo. Earn 5% commission on sales. We buy cartoon designs for PHP 100.00 to support local artists." 
-              icon={<PenTool size={28} className="text-white" />} 
-              onClick={() => handleSelectDeal("Creator")}
-            />
-          </TabContainer>
-
-          {/* History Table */}
-          <section className="brutal-container bg-white border-4 border-black p-8 max-w-5xl mx-auto shadow-[12px_12px_0_#000]">
-             <h3 className="text-3xl font-orbitron italic font-bold uppercase mb-6 text-black border-b-4 border-black pb-2">Affiliate Earnings History</h3>
-             <div className="overflow-x-auto">
-                <table className="w-full text-left font-jakarta text-sm font-bold text-black border-collapse">
-                   <thead>
-                      <tr className="bg-black text-white border-2 border-black">
-                         <th className="p-4 uppercase tracking-wider">Affiliate Name</th>
-                         <th className="p-4 uppercase tracking-wider">Recent Purchase</th>
-                         <th className="p-4 uppercase tracking-wider">Commission Earned</th>
-                      </tr>
-                   </thead>
-                   <tbody>
-                      <tr className="border-b-2 border-black">
-                         <td className="p-4">Alex Mercer</td>
-                         <td className="p-4">RedAI Premium API</td>
-                         <td className="p-4 text-[var(--theme-accent)]">PHP 1,250.00</td>
-                      </tr>
-                      <tr className="border-b-2 border-black bg-gray-50">
-                         <td className="p-4">Jane Doe</td>
-                         <td className="p-4">Goofy Mood Hoodie</td>
-                         <td className="p-4 text-[var(--theme-accent)]">PHP 450.00</td>
-                      </tr>
-                      <tr className="border-b-2 border-black">
-                         <td className="p-4">Local Artist Co.</td>
-                         <td className="p-4">Cartoon Design Buyout</td>
-                         <td className="p-4 text-[var(--theme-accent)]">PHP 100.00</td>
-                      </tr>
-                   </tbody>
-                </table>
+          {/* Compact Header with Sub-tab Switcher */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between border-b-2 border-black pb-4 mb-4 gap-4">
+             <div>
+                <h2 className="text-2xl md:text-3xl text-black font-orbitron italic font-bold uppercase">MARKETING DEALS & CONSIGNMENTS</h2>
+                <p className="text-[10px] text-gray-500 font-jakarta font-bold uppercase tracking-wider">AETERNUM COLLABORATION PROTOCOL</p>
              </div>
-          </section>
+
+             <div className="flex bg-gray-100 p-1 border-2 border-black">
+                <button 
+                   onClick={() => setDealsMode("opportunities")}
+                   className={`px-3 py-1 font-orbitron font-bold text-[8px] uppercase transition-colors ${dealsMode === "opportunities" ? 'bg-black text-white' : 'text-black hover:bg-gray-200'}`}
+                >
+                   Active Programs
+                </button>
+                <button 
+                   onClick={() => setDealsMode("history")}
+                   className={`px-3 py-1 font-orbitron font-bold text-[8px] uppercase transition-colors ${dealsMode === "history" ? 'bg-black text-white' : 'text-black hover:bg-gray-200'}`}
+                >
+                   Earnings History
+                </button>
+             </div>
+          </div>
+
+          {dealsMode === "opportunities" ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              <BrutalCard 
+                badge="PARTNERSHIP" 
+                title="BE PARTNERS WITH US" 
+                desc="We will promote your product in our blogs, carousel, and ad spaces. Dealership commission structure available." 
+                icon={<Shield size={18} className="text-white" />} 
+                onClick={() => handleSelectDeal("Partnership")}
+                compact={true}
+              />
+              <BrutalCard 
+                badge="AFFILIATE" 
+                title="BE REDAI'S AFFILIATE" 
+                desc="Market and earn consignment on every deal and product purchased. Receive 20% commission per sale." 
+                icon={<TrendingUp size={18} className="text-white" />} 
+                onClick={() => handleSelectDeal("Affiliate")}
+                compact={true}
+              />
+              <BrutalCard 
+                badge="INFLUENCER" 
+                title="SOCIAL MEDIA INFLUENCER" 
+                desc="Post TikTok or Facebook content with positive reviews to earn 100.00 per platform. Get free credits, clothing, and bags. Scripts and assets provided." 
+                icon={<Users size={18} className="text-white" />} 
+                onClick={() => handleSelectDeal("Influencer")}
+                compact={true}
+              />
+              <BrutalCard 
+                badge="CREATOR" 
+                title="SUBMIT ART & BLOGS" 
+                desc="Showcase your work (cartoons, abstract art) with our logo. Earn 5% commission on sales. We buy cartoon designs for PHP 100.00 to support local artists." 
+                icon={<PenTool size={18} className="text-white" />} 
+                onClick={() => handleSelectDeal("Creator")}
+                compact={true}
+              />
+            </div>
+          ) : (
+            /* Compact History Table */
+            <div className="max-w-4xl mx-auto">
+              <section className="brutal-container bg-white border-2 border-black p-4 shadow-[4px_4px_0_#000] relative">
+                 <div className="flex items-center justify-between border-b-2 border-black pb-2 mb-4">
+                    <h3 className="text-base font-orbitron italic font-bold uppercase text-black">Affiliate Earnings History</h3>
+                    <span className="text-[7px] font-orbitron font-bold uppercase tracking-wider bg-black text-white px-2 py-0.5">Verified Ledger</span>
+                 </div>
+                 <div className="overflow-x-auto">
+                    <table className="w-full text-left font-jakarta text-xs font-bold text-black border-collapse">
+                       <thead>
+                          <tr className="bg-black text-white border border-black">
+                             <th className="p-2.5 uppercase tracking-wider text-[9px]">Affiliate Name</th>
+                             <th className="p-2.5 uppercase tracking-wider text-[9px]">Recent Purchase</th>
+                             <th className="p-2.5 uppercase tracking-wider text-[9px]">Commission Earned</th>
+                          </tr>
+                       </thead>
+                       <tbody>
+                          <tr className="border-b border-black hover:bg-gray-50 transition-colors">
+                             <td className="p-2.5">Alex Mercer</td>
+                             <td className="p-2.5">RedAI Premium API</td>
+                             <td className="p-2.5 text-[var(--theme-accent)] font-extrabold">PHP 1,250.00</td>
+                          </tr>
+                          <tr className="border-b border-black bg-gray-50/50 hover:bg-gray-50 transition-colors">
+                             <td className="p-2.5">Jane Doe</td>
+                             <td className="p-2.5">Goofy Mood Hoodie</td>
+                             <td className="p-2.5 text-[var(--theme-accent)] font-extrabold">PHP 450.00</td>
+                          </tr>
+                          <tr className="border-b border-black hover:bg-gray-50 transition-colors">
+                             <td className="p-2.5">Local Artist Co.</td>
+                             <td className="p-2.5">Cartoon Design Buyout</td>
+                             <td className="p-2.5 text-[var(--theme-accent)] font-extrabold">PHP 100.00</td>
+                          </tr>
+                       </tbody>
+                    </table>
+                 </div>
+              </section>
+            </div>
+          )}
         </>
       )}
 
@@ -943,8 +1154,18 @@ function MarketingDealsTab() {
                  <li>All provided marketing materials and assets remain the intellectual property of REDAI Protocol and must not be altered without permission.</li>
               </ul>
               
-              <div className="bg-black text-white p-3 border border-[var(--theme-accent)] mt-3">
-                 <p className="font-orbitron font-bold uppercase tracking-widest text-[10px] text-center">Failure to comply with these rules will result in immediate termination of the agreement.</p>
+              <div className="bg-black text-white p-3 border border-[var(--theme-accent)] mt-3 flex items-center gap-3">
+                 <input 
+                   type="checkbox" 
+                   id="ruleCheckbox"
+                   required
+                   checked={agreedToRules}
+                   onChange={(e) => setAgreedToRules(e.target.checked)}
+                   className="w-4.5 h-4.5 border-2 border-white bg-transparent text-white accent-[var(--theme-accent)] cursor-pointer flex-shrink-0"
+                 />
+                 <label htmlFor="ruleCheckbox" className="font-orbitron font-bold uppercase tracking-wider text-[9px] cursor-pointer text-white leading-normal select-none">
+                    Failure to comply with these rules will result in immediate termination of the agreement.
+                 </label>
               </div>
            </div>
 
@@ -1095,8 +1316,8 @@ function MarketingDealsTab() {
   );
 }
 
-// --- PRODUCT CARD COMPONENT WITH AUTO LOOP PREVIEWS ---
-function ProductCard({ product, onClick }: { product: any, onClick: () => void }) {
+// --- PRODUCT CARD COMPONENT WITH AUTO LOOP PREVIEWS & QUICK ACTIONS ---
+function ProductCard({ product, onClick, onAddToCart, onBuyNow }: { product: any, onClick: () => void, onAddToCart: (p: any) => void, onBuyNow: (p: any) => void }) {
   const [imgIndex, setImgIndex] = useState(0);
 
   useEffect(() => {
@@ -1109,7 +1330,7 @@ function ProductCard({ product, onClick }: { product: any, onClick: () => void }
   return (
     <div 
       onClick={onClick} 
-      className="brutal-container bg-white border-2 border-black p-1.5 cursor-pointer hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0_var(--theme-accent)] transition-all flex flex-col justify-between h-[180px]"
+      className="brutal-container bg-white border-2 border-black p-1.5 cursor-pointer hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0_var(--theme-accent)] transition-all flex flex-col justify-between h-auto min-h-[220px] w-full max-w-[240px] mx-auto"
     >
        <div className="aspect-[1/1] w-full bg-gray-50 overflow-hidden relative border border-gray-200 flex-shrink-0">
           <img 
@@ -1122,13 +1343,34 @@ function ProductCard({ product, onClick }: { product: any, onClick: () => void }
           </div>
        </div>
        <div className="flex flex-col justify-between flex-grow mt-1.5">
-          <div>
+          <div className="mb-1">
              <h3 className="font-orbitron font-bold uppercase text-[9px] leading-tight text-black line-clamp-1 mb-0.5">{product.name}</h3>
-             <p className="font-jakarta text-[7px] text-gray-500 font-bold uppercase tracking-wider mb-1">{product.category}</p>
+             <div className="flex justify-between items-center">
+                <span className="font-jakarta text-[7px] text-gray-500 font-bold uppercase tracking-wider">{product.category}</span>
+                <span className="font-jakarta font-black text-[9px] text-[var(--theme-accent)]">{product.priceStr}</span>
+             </div>
           </div>
-          <div className="flex items-center justify-between border-t border-gray-200 pt-1 mt-auto">
-             <span className="font-jakarta font-black text-[9px] text-[var(--theme-accent)]">{product.priceStr}</span>
-             <span className="font-orbitron text-[6px] font-black text-gray-400 uppercase tracking-widest">Quick View</span>
+
+          {/* Quick Actions Inline */}
+          <div className="flex gap-1 border-t border-gray-200 pt-1.5 mt-auto">
+             <button 
+                onClick={(e) => { 
+                   e.stopPropagation(); 
+                   onAddToCart(product); 
+                }} 
+                className="flex-1 bg-white hover:bg-gray-100 text-black border border-black py-0.5 font-orbitron font-bold text-[7px] uppercase tracking-wider text-center"
+             >
+                + Bag
+             </button>
+             <button 
+                onClick={(e) => { 
+                   e.stopPropagation(); 
+                   onBuyNow(product); 
+                }} 
+                className="flex-1 bg-black hover:bg-gray-900 text-white border border-black py-0.5 font-orbitron font-bold text-[7px] uppercase tracking-wider text-center"
+             >
+                Buy
+             </button>
           </div>
        </div>
     </div>
@@ -1280,7 +1522,7 @@ function MarketplaceTab() {
   const totalCheckoutPrice = checkoutItems.reduce((sum, item) => sum + item.price, 0);
 
   return (
-    <div className="space-y-12 relative">
+    <div className="space-y-8 relative max-w-6xl mx-auto px-4">
       {/* Cart Floating Button */}
       {cart.length > 0 && (
         <button 
@@ -1292,27 +1534,27 @@ function MarketplaceTab() {
         </button>
       )}
 
-      <div className="text-center mb-16">
-        <h2 className="text-5xl md:text-6xl text-black font-orbitron italic mb-4">RED<span className="text-[var(--theme-accent)]">AI</span>'S <span className="text-[var(--theme-accent)]">MARKETPLACE</span></h2>
+      <div className="text-center mb-8">
+        <h2 className="text-4xl md:text-5xl text-black font-orbitron italic mb-4">RED<span className="text-[var(--theme-accent)]">AI</span>'S <span className="text-[var(--theme-accent)]">MARKETPLACE</span></h2>
       </div>
 
       {/* Filter Bar */}
-      <div className="flex flex-wrap gap-4 justify-center mb-12">
+      <div className="flex flex-wrap gap-2.5 justify-center mb-8">
         {filters.map(f => (
           <button 
             key={f} 
             onClick={() => setActiveFilter(f)}
-            className={`px-6 py-2 font-orbitron font-bold uppercase border-2 transition-all ${activeFilter === f ? 'bg-black text-white border-black shadow-[4px_4px_0_var(--theme-accent)] translate-y-[-2px]' : 'bg-white text-black border-black hover:bg-gray-100'}`}
+            className={`px-4 py-1.5 font-orbitron font-bold uppercase text-[10px] border-2 transition-all ${activeFilter === f ? 'bg-black text-white border-black shadow-[2px_2px_0_var(--theme-accent)] translate-y-[-1px]' : 'bg-white text-black border-black hover:bg-gray-100'}`}
           >
             {f}
           </button>
         ))}
       </div>
 
-      {/* Product Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3">
+      {/* Premium Product Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
         {filteredProducts.map((p) => (
-          <ProductCard key={p.id} product={p} onClick={() => setViewingProduct(p)} />
+          <ProductCard key={p.id} product={p} onClick={() => setViewingProduct(p)} onAddToCart={addToCart} onBuyNow={buyNow} />
         ))}
       </div>
 
@@ -1497,21 +1739,21 @@ function TabContainer({ title, subtitle, children, gridClass = "grid-cols-1 md:g
   );
 }
 
-function BrutalCard({ title, desc, icon, badge, descClass, onClick }: { title: string, desc: string, icon: React.ReactNode, badge?: string, descClass?: string, onClick?: () => void }) {
+function BrutalCard({ title, desc, icon, badge, descClass, onClick, compact = false }: { title: string, desc: string, icon: React.ReactNode, badge?: string, descClass?: string, onClick?: () => void, compact?: boolean }) {
   return (
-    <div onClick={onClick} className="brutal-container p-8 bg-white flex flex-col justify-between group cursor-pointer hover:bg-black hover:text-white transition-colors min-h-[300px]">
+    <div onClick={onClick} className={`brutal-container bg-white flex flex-col justify-between group cursor-pointer hover:bg-black hover:text-white transition-all border-2 border-black ${compact ? 'p-3 min-h-[140px]' : 'p-4 min-h-[180px]'}`}>
       <div>
-        <div className="flex justify-between items-start mb-6">
-           <div className="w-14 h-14 bg-black border-2 border-black flex items-center justify-center shadow-[2px_2px_0_#000] group-hover:bg-[var(--theme-accent)] group-hover:border-white transition-colors">
+        <div className={`flex justify-between items-start ${compact ? 'mb-2' : 'mb-3'}`}>
+           <div className={`${compact ? 'w-6 h-6' : 'w-8 h-8'} bg-black border border-black flex items-center justify-center shadow-[1px_1px_0_#000] group-hover:bg-[var(--theme-accent)] group-hover:border-white transition-colors`}>
              {icon}
            </div>
-           {badge && <span className="brutal-badge group-hover:border-white group-hover:text-black">{badge}</span>}
+           {badge && <span className={`brutal-badge font-orbitron font-bold uppercase text-[7px] border border-black group-hover:border-white group-hover:text-black px-1 py-0.5 ${compact ? 'text-[6px]' : 'text-[8px]'}`}>{badge}</span>}
         </div>
-        <h3 className="text-2xl font-orbitron italic font-bold mb-4 leading-tight uppercase group-hover:text-white">{title}</h3>
-        <p className={`font-jakarta group-hover:text-white/80 ${descClass ? descClass : 'text-gray-700'}`}>{desc}</p>
+        <h3 className={`font-orbitron italic font-bold leading-tight uppercase group-hover:text-white mb-1.5 text-black ${compact ? 'text-[10px]' : 'text-xs'}`}>{title}</h3>
+        <p className={`font-jakarta text-gray-700 group-hover:text-white/80 leading-normal ${compact ? 'text-[8px]' : 'text-[10px]'} ${descClass ? descClass : ''}`}>{desc}</p>
       </div>
-      <div className="mt-8 pt-4 border-t-2 border-black group-hover:border-white flex justify-end">
-        <ArrowRight size={24} className="text-black group-hover:text-[var(--theme-accent)]" />
+      <div className={`border-t border-black group-hover:border-white flex justify-end ${compact ? 'mt-2 pt-1' : 'mt-3 pt-1.5'}`}>
+        <ArrowRight size={compact ? 10 : 12} className="text-black group-hover:text-[var(--theme-accent)]" />
       </div>
     </div>
   );
