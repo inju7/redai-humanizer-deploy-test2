@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "motion/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Cpu, Zap, Layers, Shield, Terminal, Code2, 
   TrendingUp, Users, DollarSign, Share2, Tag, 
@@ -1093,6 +1093,46 @@ function MarketingDealsTab() {
   );
 }
 
+// --- PRODUCT CARD COMPONENT WITH AUTO LOOP PREVIEWS ---
+function ProductCard({ product, onClick }: { product: any, onClick: () => void }) {
+  const [imgIndex, setImgIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setImgIndex((prev) => (prev + 1) % product.images.length);
+    }, 2500);
+    return () => clearInterval(timer);
+  }, [product.images.length]);
+
+  return (
+    <div 
+      onClick={onClick} 
+      className="brutal-container bg-white border-2 border-black p-1.5 cursor-pointer hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0_var(--theme-accent)] transition-all flex flex-col justify-between h-[180px]"
+    >
+       <div className="aspect-[1/1] w-full bg-gray-50 overflow-hidden relative border border-gray-200 flex-shrink-0">
+          <img 
+             src={product.images[imgIndex]} 
+             className="w-full h-full object-cover transition-all duration-700 ease-in-out" 
+             alt={product.name} 
+          />
+          <div className="absolute bottom-1 right-1 bg-black/80 text-[var(--theme-cyan)] px-1 py-0.5 font-mono text-[6px] tracking-widest uppercase">
+             Preview {imgIndex + 1}/{product.images.length}
+          </div>
+       </div>
+       <div className="flex flex-col justify-between flex-grow mt-1.5">
+          <div>
+             <h3 className="font-orbitron font-bold uppercase text-[9px] leading-tight text-black line-clamp-1 mb-0.5">{product.name}</h3>
+             <p className="font-jakarta text-[7px] text-gray-500 font-bold uppercase tracking-wider mb-1">{product.category}</p>
+          </div>
+          <div className="flex items-center justify-between border-t border-gray-200 pt-1 mt-auto">
+             <span className="font-jakarta font-black text-[9px] text-[var(--theme-accent)]">{product.priceStr}</span>
+             <span className="font-orbitron text-[6px] font-black text-gray-400 uppercase tracking-widest">Quick View</span>
+          </div>
+       </div>
+    </div>
+  );
+}
+
 function MarketplaceTab() {
   const [viewingProduct, setViewingProduct] = useState<any>(null);
   const [cart, setCart] = useState<any[]>([]);
@@ -1102,14 +1142,118 @@ function MarketplaceTab() {
   const [paymentMethod, setPaymentMethod] = useState("GCash");
 
   const products = [
-    { id: 1, name: "REDAI Protocol Hoodie", category: "Cool Hoodies", price: 1500, priceStr: "PHP 1,500.00", image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&q=80", desc: "Premium heavy-weight cotton hoodie featuring the exclusive Aeternum matrix print. Perfect for late-night coding sessions." },
-    { id: 2, name: "The Goofy Mood Perfume", category: "Perfumes", price: 800, priceStr: "PHP 800.00", image: "https://images.unsplash.com/photo-1594035910387-fea47794261f?w=400&q=80", desc: "A chaotic blend of citrus and synthetic musk. Smells like success and syntax errors." },
-    { id: 3, name: "Aeternum Matrix T-Shirt", category: "T-Shirts", price: 600, priceStr: "PHP 600.00", image: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=400&q=80", desc: "Breathable, high-contrast t-shirt. The official uniform of the neural network elite." },
-    { id: 4, name: "Neural Verify Mug", category: "Mugs", price: 350, priceStr: "PHP 350.00", image: "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=400&q=80", desc: "Holds 16oz of pure caffeine. Engineered to keep your coffee hot during endless deploys." },
-    { id: 5, name: "Goofy Mood Oversized Tee", category: "T-Shirts", price: 750, priceStr: "PHP 750.00", image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&q=80", desc: "Comfortable oversized fit for ultimate relaxation. Graphic design is our passion." },
-    { id: 6, name: "Syntax Error Coffee Mug", category: "Mugs", price: 300, priceStr: "PHP 300.00", image: "https://images.unsplash.com/photo-1481833759220-4183c509b5dc?w=400&q=80", desc: "For those days when nothing compiles. A classic ceramic mug with a painful message." },
-    { id: 7, name: "Cyberpunk Zip-Up Hoodie", category: "Cool Hoodies", price: 1800, priceStr: "PHP 1,800.00", image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&q=80", desc: "High-collar zip-up with reflective accents. Stay stealthy in the neon glow." },
-    { id: 8, name: "Abstract Neural Print", category: "Art", price: 1200, priceStr: "PHP 1,200.00", image: "https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=400&q=80", desc: "High-quality poster print of an AI's dream state. Perfect for brutalist office spaces." }
+    { 
+      id: 1, 
+      name: "REDAI Protocol Hoodie", 
+      category: "Cool Hoodies", 
+      price: 1500, 
+      priceStr: "PHP 1,500.00", 
+      image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&q=80", 
+      images: [
+        "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&q=80", 
+        "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=400&q=80", 
+        "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=400&q=80"
+      ],
+      desc: "Premium heavy-weight cotton hoodie featuring the exclusive Aeternum matrix print. Perfect for late-night coding sessions." 
+    },
+    { 
+      id: 2, 
+      name: "The Goofy Mood Perfume", 
+      category: "Perfumes", 
+      price: 800, 
+      priceStr: "PHP 800.00", 
+      image: "https://images.unsplash.com/photo-1594035910387-fea47794261f?w=400&q=80", 
+      images: [
+        "https://images.unsplash.com/photo-1594035910387-fea47794261f?w=400&q=80", 
+        "https://images.unsplash.com/photo-1547887537-6158d64c35b3?w=400&q=80", 
+        "https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=400&q=80"
+      ],
+      desc: "A chaotic blend of citrus and synthetic musk. Smells like success and syntax errors." 
+    },
+    { 
+      id: 3, 
+      name: "Aeternum Matrix T-Shirt", 
+      category: "T-Shirts", 
+      price: 600, 
+      priceStr: "PHP 600.00", 
+      image: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=400&q=80", 
+      images: [
+        "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=400&q=80", 
+        "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&q=80", 
+        "https://images.unsplash.com/photo-1562157873-818bc0726f68?w=400&q=80"
+      ],
+      desc: "Breathable, high-contrast t-shirt. The official uniform of the neural network elite." 
+    },
+    { 
+      id: 4, 
+      name: "Neural Verify Mug", 
+      category: "Mugs", 
+      price: 350, 
+      priceStr: "PHP 350.00", 
+      image: "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=400&q=80", 
+      images: [
+        "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=400&q=80", 
+        "https://images.unsplash.com/photo-1577937927133-66ef06acdf18?w=400&q=80", 
+        "https://images.unsplash.com/photo-1539254722305-d6504e963b5b?w=400&q=80"
+      ],
+      desc: "Holds 16oz of pure caffeine. Engineered to keep your coffee hot during endless deploys." 
+    },
+    { 
+      id: 5, 
+      name: "Goofy Mood Oversized Tee", 
+      category: "T-Shirts", 
+      price: 750, 
+      priceStr: "PHP 750.00", 
+      image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&q=80", 
+      images: [
+        "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&q=80", 
+        "https://images.unsplash.com/photo-1562157873-818bc0726f68?w=400&q=80", 
+        "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=400&q=80"
+      ],
+      desc: "Comfortable oversized fit for ultimate relaxation. Graphic design is our passion." 
+    },
+    { 
+      id: 6, 
+      name: "Syntax Error Coffee Mug", 
+      category: "Mugs", 
+      price: 300, 
+      priceStr: "PHP 300.00", 
+      image: "https://images.unsplash.com/photo-1481833759220-4183c509b5dc?w=400&q=80", 
+      images: [
+        "https://images.unsplash.com/photo-1481833759220-4183c509b5dc?w=400&q=80", 
+        "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=400&q=80", 
+        "https://images.unsplash.com/photo-1577937927133-66ef06acdf18?w=400&q=80"
+      ],
+      desc: "For those days when nothing compiles. A classic ceramic mug with a painful message." 
+    },
+    { 
+      id: 7, 
+      name: "Cyberpunk Zip-Up Hoodie", 
+      category: "Cool Hoodies", 
+      price: 1800, 
+      priceStr: "PHP 1,800.00", 
+      image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&q=80", 
+      images: [
+        "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&q=80", 
+        "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=400&q=80", 
+        "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=400&q=80"
+      ],
+      desc: "High-collar zip-up with reflective accents. Stay stealthy in the neon glow." 
+    },
+    { 
+      id: 8, 
+      name: "Abstract Neural Print", 
+      category: "Art", 
+      price: 1200, 
+      priceStr: "PHP 1,200.00", 
+      image: "https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=400&q=80", 
+      images: [
+        "https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=400&q=80", 
+        "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&q=80", 
+        "https://images.unsplash.com/photo-1604871000636-074fa5117945?w=400&q=80"
+      ],
+      desc: "High-quality poster print of an AI's dream state. Perfect for brutalist office spaces." 
+    }
   ];
 
   const filters = ["All", ...Array.from(new Set(products.map(p => p.category)))];
@@ -1147,7 +1291,7 @@ function MarketplaceTab() {
       )}
 
       <div className="text-center mb-16">
-        <h2 className="text-5xl md:text-6xl text-black font-orbitron italic mb-4">MARKETPLACE</h2>
+        <h2 className="text-5xl md:text-6xl text-black font-orbitron italic mb-4">RED<span className="text-[var(--theme-accent)]">AI</span>'S <span className="text-[var(--theme-accent)]">MARKETPLACE</span></h2>
       </div>
 
       {/* Filter Bar */}
@@ -1164,21 +1308,9 @@ function MarketplaceTab() {
       </div>
 
       {/* Product Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-x-4 gap-y-8">
-        {filteredProducts.map((p, i) => (
-          <div key={i} onClick={() => setViewingProduct(p)} className="group cursor-pointer flex flex-col">
-            <div className="aspect-[4/5] bg-gray-50 mb-3 overflow-hidden relative border border-gray-200">
-               <img src={p.image} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" alt={p.name} />
-               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-500 flex items-center justify-center">
-                  <span className="opacity-0 group-hover:opacity-100 bg-white/90 backdrop-blur-sm text-black font-orbitron font-bold px-3 py-2 uppercase tracking-widest text-[8px] transition-opacity duration-300">Quick View</span>
-               </div>
-            </div>
-            <div className="flex flex-col items-start">
-               <h3 className="text-sm font-orbitron font-bold uppercase leading-tight text-black mb-1">{p.name}</h3>
-               <span className="text-gray-500 text-[9px] font-bold uppercase tracking-widest mb-1">{p.category}</span>
-               <p className="font-jakarta font-bold text-sm text-black">{p.priceStr}</p>
-            </div>
-          </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3">
+        {filteredProducts.map((p) => (
+          <ProductCard key={p.id} product={p} onClick={() => setViewingProduct(p)} />
         ))}
       </div>
 
