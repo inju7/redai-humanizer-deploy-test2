@@ -1111,7 +1111,7 @@ function MarketplaceTab() {
         {/* PREMIUM PRODUCT DETAIL MODAL */}
         {viewingProduct && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-md p-2">
-            <motion.div initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }} transition={{ duration: 0.3, ease: "easeOut" }} className="w-full max-h-[70vh] max-w-4xl flex flex-col md:flex-row relative bg-white shadow-[6px_6px_0_rgba(0,0,0,1)] border-4 border-black overflow-hidden">
+            <motion.div initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }} transition={{ duration: 0.3, ease: "easeOut" }} className="w-full max-h-[55vh] max-w-4xl flex flex-col md:flex-row relative bg-white shadow-[6px_6px_0_rgba(0,0,0,1)] border-4 border-black overflow-hidden">
               
               {/* Close Button */}
               <button onClick={() => setViewingProduct(null)} className="absolute top-0 right-0 z-50 p-4 text-black hover:text-[var(--theme-accent)] transition-colors">
@@ -1120,11 +1120,11 @@ function MarketplaceTab() {
               
               {/* Large Image Side */}
               <div className="w-full md:w-1/2 bg-gray-50 flex items-center justify-center relative border-b-4 md:border-b-0 md:border-r-4 border-black">
-                 <img src={viewingProduct.image} className="w-full h-full object-contain max-h-[30vh] md:max-h-[60vh] p-2" alt={viewingProduct.name} />
+                 <img src={viewingProduct.image} className="w-full h-full object-contain max-h-[25vh] md:max-h-[50vh] p-2" alt={viewingProduct.name} />
               </div>
 
               {/* Details Side */}
-              <div className="w-full md:w-1/2 bg-white p-4 md:p-6 overflow-y-auto flex flex-col justify-center brutal-scrollbar">
+              <div className="w-full md:w-1/2 bg-white p-4 overflow-y-auto flex flex-col justify-center brutal-scrollbar">
                  <div className="w-full">
                     <span className="text-gray-400 font-orbitron font-bold uppercase tracking-[0.2em] text-[10px] mb-2 block">{viewingProduct.category}</span>
                     <h2 className="text-2xl lg:text-3xl font-orbitron font-bold uppercase leading-tight text-black mb-3">{viewingProduct.name}</h2>
@@ -1158,20 +1158,20 @@ function MarketplaceTab() {
         {/* BATCH CHECKOUT MODAL */}
         {isCheckoutOpen && checkoutItems.length > 0 && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-md p-2">
-            <motion.div initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }} transition={{ duration: 0.3, ease: "easeOut" }} className="w-full max-h-[75vh] max-w-4xl flex flex-col md:flex-row relative bg-white shadow-[6px_6px_0_rgba(0,0,0,1)] border-4 border-black overflow-hidden">
+            <motion.div initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }} transition={{ duration: 0.3, ease: "easeOut" }} className="w-full max-h-[60vh] max-w-4xl flex flex-col md:flex-row relative bg-white shadow-[6px_6px_0_rgba(0,0,0,1)] border-4 border-black overflow-hidden">
               
-              <button onClick={() => setIsCheckoutOpen(false)} className="absolute top-4 right-4 z-50 p-4 text-black hover:text-gray-500 transition-colors">
-                <X size={32} strokeWidth={1} />
+              <button onClick={() => setIsCheckoutOpen(false)} className="absolute top-2 right-2 z-50 p-2 text-black hover:text-gray-500 transition-colors">
+                <X size={24} strokeWidth={2} />
               </button>
               
               {/* Order Summary Side */}
-              <div className="w-full md:w-5/12 bg-gray-50 p-4 md:p-6 overflow-y-auto border-b-4 md:border-b-0 md:border-r-4 border-black brutal-scrollbar">
-                 <h3 className="text-lg font-orbitron font-bold mb-4 uppercase tracking-widest text-black border-b-4 border-black pb-2">Order Summary</h3>
+              <div className="w-full md:w-5/12 bg-gray-50 p-4 overflow-y-auto border-b-4 md:border-b-0 md:border-r-4 border-black brutal-scrollbar">
+                 <h3 className="text-sm font-orbitron font-bold mb-3 uppercase tracking-widest text-black border-b-4 border-black pb-1">Order Summary</h3>
                  
-                 <div className="space-y-2 mb-4">
+                 <div className="space-y-2 mb-3">
                     {checkoutItems.map((item, idx) => (
-                       <div key={idx} className="flex items-center gap-3">
-                          <img src={item.image} className="w-12 h-16 object-cover bg-gray-200 border border-black" alt={item.name} />
+                       <div key={idx} className="flex items-center gap-2">
+                          <img src={item.image} className="w-10 h-12 object-cover bg-gray-200 border border-black" alt={item.name} />
                           <div>
                              <p className="font-orbitron font-bold text-[10px] uppercase mb-1">{item.name}</p>
                              <p className="font-jakarta text-sm text-[var(--theme-accent)] font-bold">{item.priceStr}</p>
@@ -1180,16 +1180,16 @@ function MarketplaceTab() {
                     ))}
                  </div>
 
-                 <div className="border-t-4 border-black pt-3 space-y-1">
-                    <div className="flex justify-between items-center text-[9px] font-orbitron font-bold text-gray-600 uppercase tracking-widest">
+                 <div className="border-t-4 border-black pt-2 space-y-1">
+                    <div className="flex justify-between items-center text-[8px] font-orbitron font-bold text-gray-600 uppercase tracking-widest">
                        <span>Subtotal</span>
                        <span>PHP {totalCheckoutPrice.toLocaleString()}</span>
                     </div>
-                    <div className="flex justify-between items-center text-[9px] font-orbitron font-bold text-gray-600 uppercase tracking-widest">
+                    <div className="flex justify-between items-center text-[8px] font-orbitron font-bold text-gray-600 uppercase tracking-widest">
                        <span>Shipping</span>
                        <span>Via Email</span>
                     </div>
-                    <div className="flex justify-between items-center pt-2 text-sm font-orbitron font-bold uppercase tracking-widest text-black">
+                    <div className="flex justify-between items-center pt-1 text-xs font-orbitron font-bold uppercase tracking-widest text-black">
                        <span>Total</span>
                        <span className="text-[var(--theme-accent)]">PHP {totalCheckoutPrice.toLocaleString()}</span>
                     </div>
@@ -1197,59 +1197,59 @@ function MarketplaceTab() {
               </div>
 
               {/* Checkout Form Side */}
-              <div className="w-full md:w-7/12 p-4 md:p-6 overflow-y-auto brutal-scrollbar">
+              <div className="w-full md:w-7/12 p-4 overflow-y-auto brutal-scrollbar">
                  <div className="w-full">
-                   <h3 className="text-lg font-orbitron font-bold mb-4 uppercase tracking-widest text-black border-b-4 border-black pb-2">Secure Checkout</h3>
+                   <h3 className="text-sm font-orbitron font-bold mb-3 uppercase tracking-widest text-black border-b-4 border-black pb-1">Secure Checkout</h3>
 
-                   <div className="bg-black text-[var(--theme-cyan)] p-2 mb-4 border-2 border-black">
-                     <p className="font-orbitron text-[9px] font-bold uppercase tracking-widest mb-1">
-                       <AlertTriangle size={10} className="inline mr-1 -mt-1" /> Philippines Only
+                   <div className="bg-black text-[var(--theme-cyan)] p-1.5 mb-3 border-2 border-black">
+                     <p className="font-orbitron text-[8px] font-bold uppercase tracking-widest mb-0.5">
+                       <AlertTriangle size={8} className="inline mr-1 -mt-1" /> Philippines Only
                      </p>
-                     <p className="font-jakarta text-[9px] text-gray-300 leading-relaxed">
+                     <p className="font-jakarta text-[8px] text-gray-300 leading-tight">
                        Orders are manually verified. Confirmation emailed.
                      </p>
                    </div>
 
-                   <form className="space-y-3" onSubmit={(e) => { 
+                   <form className="space-y-2" onSubmit={(e) => { 
                      e.preventDefault(); 
                      alert('Purchase submitted! Confirmation details will be emailed to you.'); 
                      setIsCheckoutOpen(false); 
                      setCart([]); 
                    }}>
-                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                        <div>
-                         <label className="block text-[9px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Full Name</label>
-                         <input type="text" required className="w-full border-2 border-black p-1.5 font-jakarta bg-gray-50 text-black focus:border-[var(--theme-accent)] outline-none transition-colors text-xs" />
+                         <label className="block text-[8px] font-orbitron font-bold uppercase mb-0.5 text-black tracking-widest">Full Name</label>
+                         <input type="text" required className="w-full border-2 border-black p-1 font-jakarta bg-gray-50 text-black focus:border-[var(--theme-accent)] outline-none transition-colors text-[10px]" />
                        </div>
                        <div>
-                         <label className="block text-[9px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Email</label>
-                         <input type="email" required className="w-full border-2 border-black p-1.5 font-jakarta bg-gray-50 text-black focus:border-[var(--theme-accent)] outline-none transition-colors text-xs" />
+                         <label className="block text-[8px] font-orbitron font-bold uppercase mb-0.5 text-black tracking-widest">Email</label>
+                         <input type="email" required className="w-full border-2 border-black p-1 font-jakarta bg-gray-50 text-black focus:border-[var(--theme-accent)] outline-none transition-colors text-[10px]" />
                        </div>
                      </div>
                      
                      <div>
-                       <label className="block text-[9px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Shipping Address</label>
-                       <input type="text" required placeholder="Street, City, Province, Zip" className="w-full border-2 border-black p-1.5 font-jakarta bg-gray-50 text-black focus:border-[var(--theme-accent)] outline-none transition-colors text-xs" />
+                       <label className="block text-[8px] font-orbitron font-bold uppercase mb-0.5 text-black tracking-widest">Shipping Address</label>
+                       <input type="text" required placeholder="Street, City, Province, Zip" className="w-full border-2 border-black p-1 font-jakarta bg-gray-50 text-black focus:border-[var(--theme-accent)] outline-none transition-colors text-[10px]" />
                      </div>
 
                      {/* Payment Toggle */}
                      <div>
-                        <label className="block text-[9px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Payment Method</label>
-                        <div className="flex gap-2">
-                           <button type="button" onClick={() => setPaymentMethod("GCash")} className={`flex-1 py-2 border-2 font-orbitron font-bold text-[9px] uppercase tracking-widest transition-all ${paymentMethod === "GCash" ? "bg-black text-[var(--theme-cyan)] border-black shadow-[2px_2px_0_var(--theme-accent)]" : "bg-white text-black border-black hover:bg-gray-100"}`}>GCash</button>
-                           <button type="button" onClick={() => setPaymentMethod("Bank")} className={`flex-1 py-2 border-2 font-orbitron font-bold text-[9px] uppercase tracking-widest transition-all ${paymentMethod === "Bank" ? "bg-black text-[var(--theme-cyan)] border-black shadow-[2px_2px_0_var(--theme-accent)]" : "bg-white text-black border-black hover:bg-gray-100"}`}>Bank Transfer</button>
+                        <label className="block text-[8px] font-orbitron font-bold uppercase mb-0.5 text-black tracking-widest">Payment Method</label>
+                        <div className="flex gap-1.5">
+                           <button type="button" onClick={() => setPaymentMethod("GCash")} className={`flex-1 py-1.5 border-2 font-orbitron font-bold text-[8px] uppercase tracking-widest transition-all ${paymentMethod === "GCash" ? "bg-black text-[var(--theme-cyan)] border-black shadow-[2px_2px_0_var(--theme-accent)]" : "bg-white text-black border-black hover:bg-gray-100"}`}>GCash</button>
+                           <button type="button" onClick={() => setPaymentMethod("Bank")} className={`flex-1 py-1.5 border-2 font-orbitron font-bold text-[8px] uppercase tracking-widest transition-all ${paymentMethod === "Bank" ? "bg-black text-[var(--theme-cyan)] border-black shadow-[2px_2px_0_var(--theme-accent)]" : "bg-white text-black border-black hover:bg-gray-100"}`}>Bank Transfer</button>
                         </div>
                      </div>
 
-                     <div className="bg-gray-100 p-3 border-2 border-dashed border-black">
-                       <p className="text-[9px] font-orbitron font-bold uppercase text-black mb-1 tracking-widest">Transfer Details</p>
+                     <div className="bg-gray-100 p-2 border-2 border-dashed border-black">
+                       <p className="text-[8px] font-orbitron font-bold uppercase text-black mb-0.5 tracking-widest">Transfer Details</p>
                        {paymentMethod === "GCash" ? (
-                          <div className="font-jakarta text-[10px] text-gray-800 space-y-0.5">
+                          <div className="font-jakarta text-[9px] text-gray-800 space-y-0.5">
                              <p>Number: <span className="font-bold text-black tracking-widest ml-1">0917-123-4567</span></p>
                              <p>Name: <span className="font-bold text-black ml-1">REDAI Protocol</span></p>
                           </div>
                        ) : (
-                          <div className="font-jakarta text-[10px] text-gray-800 space-y-0.5">
+                          <div className="font-jakarta text-[9px] text-gray-800 space-y-0.5">
                              <p>Bank: <span className="font-bold text-black ml-1">REDAI GLOBAL BANK</span></p>
                              <p>Name: <span className="font-bold text-black ml-1">REDAI Protocol</span></p>
                              <p>Acct: <span className="font-bold text-black tracking-widest ml-1">1234-5678-9012</span></p>
@@ -1258,11 +1258,11 @@ function MarketplaceTab() {
                      </div>
 
                      <div>
-                       <label className="block text-[9px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Upload Receipt</label>
-                       <input type="file" required className="w-full border-2 border-black p-1 font-jakarta text-[10px] bg-gray-50 text-black file:bg-black file:text-white file:border-0 file:px-3 file:py-1 file:font-orbitron file:uppercase file:text-[9px] file:tracking-widest file:cursor-pointer hover:file:bg-[var(--theme-accent)] transition-all cursor-pointer" />
+                       <label className="block text-[8px] font-orbitron font-bold uppercase mb-0.5 text-black tracking-widest">Upload Receipt</label>
+                       <input type="file" required className="w-full border-2 border-black p-0.5 font-jakarta text-[9px] bg-gray-50 text-black file:bg-black file:text-white file:border-0 file:px-2 file:py-0.5 file:font-orbitron file:uppercase file:text-[8px] file:tracking-widest file:cursor-pointer hover:file:bg-[var(--theme-accent)] transition-all cursor-pointer" />
                      </div>
                      
-                     <button type="submit" className="w-full bg-[var(--theme-accent)] text-white font-orbitron font-bold py-3 border-4 border-black hover:bg-black hover:text-white transition-colors uppercase mt-4 text-xs tracking-widest shadow-[4px_4px_0_var(--theme-cyan)]">
+                     <button type="submit" className="w-full bg-[var(--theme-accent)] text-white font-orbitron font-bold py-2 border-2 border-black hover:bg-black hover:text-white transition-colors uppercase mt-3 text-[10px] tracking-widest shadow-[3px_3px_0_var(--theme-cyan)]">
                        Complete Order
                      </button>
                    </form>
