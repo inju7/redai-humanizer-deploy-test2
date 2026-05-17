@@ -39,14 +39,14 @@ export default function App() {
     <div className="relative min-h-screen pb-32 bg-[var(--theme-bg)] selection:bg-[var(--theme-accent)] selection:text-white">
       
       {/* High-Contrast Navbar */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-black border-b-[4px] border-black text-white h-20">
-        <div className="max-w-full mx-auto h-full flex items-center justify-between px-6">
-          <div className="flex items-center gap-12">
-            <div className="flex items-center gap-3 cursor-pointer" onClick={() => { setActiveTab("home"); window.scrollTo(0, 0); }}>
-              <div className="w-10 h-10 flex items-center justify-center bg-white border-2 border-white">
-                <Cpu size={24} className="text-black" />
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-black border-b-[4px] border-black text-white h-16 lg:h-20">
+        <div className="w-full max-w-full mx-auto h-full flex items-center justify-between px-3 sm:px-6">
+          <div className="flex items-center gap-4 lg:gap-12">
+            <div className="flex items-center gap-2 lg:gap-3 cursor-pointer" onClick={() => { setActiveTab("home"); window.scrollTo(0, 0); }}>
+              <div className="w-8 h-8 lg:w-10 lg:h-10 flex items-center justify-center bg-white border-2 border-white">
+                <Cpu className="text-black size-[18px] lg:size-[24px]" />
               </div>
-              <span className="text-3xl font-orbitron italic font-bold tracking-tighter text-white uppercase">
+              <span className="text-xl sm:text-2xl lg:text-3xl font-orbitron italic font-bold tracking-tighter text-white uppercase">
                 RED<span className="text-[var(--theme-accent)]">AI</span>
               </span>
             </div>
@@ -62,19 +62,19 @@ export default function App() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3 sm:gap-6">
+          <div className="flex items-center gap-2 sm:gap-6">
             <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-black border-2 border-white">
               <Zap size={16} className="text-[var(--theme-cyan)]" />
               <span className="text-sm font-orbitron italic font-bold text-white">{credits} UNITS</span>
             </div>
-            <button className="brutal-button bg-[var(--theme-accent)] hover:bg-[var(--theme-cyan)] border-white text-white hover:text-black">
+            <button className="brutal-button bg-[var(--theme-accent)] hover:bg-[var(--theme-cyan)] border-white text-white hover:text-black !px-3 !py-1.5 lg:!px-6 lg:!py-3 !text-[11px] lg:!text-sm">
               SIGN IN
             </button>
             <button 
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
-              className="lg:hidden w-9 h-9 flex items-center justify-center bg-black border-2 border-white text-white hover:bg-[var(--theme-accent)] transition-colors active:translate-y-0.5"
+              className="lg:hidden w-8 h-8 lg:w-9 lg:h-9 flex items-center justify-center bg-black border-2 border-white text-white hover:bg-[var(--theme-accent)] transition-colors active:translate-y-0.5"
             >
-              {isMobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
+              {isMobileMenuOpen ? <X size={16} /> : <Menu size={16} />}
             </button>
           </div>
         </div>
@@ -88,7 +88,7 @@ export default function App() {
             animate={{ opacity: 1, y: 0 }} 
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="fixed top-20 left-0 right-0 bg-black border-b-4 border-black z-50 p-3 lg:hidden flex flex-col gap-1.5 shadow-[0_8px_0_#000]"
+            className="fixed top-16 lg:top-20 left-0 right-0 bg-black border-b-4 border-black z-50 p-3 lg:hidden flex flex-col gap-1.5 shadow-[0_8px_0_#000]"
           >
             {[
               { id: "home", label: "REDAI HUMANIZER" },
@@ -138,7 +138,7 @@ export default function App() {
             <span className="font-orbitron font-black uppercase text-[8px] tracking-wider select-none">Protocols</span>
           </button>
 
-          <aside className={`fixed top-20 left-0 bottom-32 w-[240px] bg-white border-r-4 border-black z-40 flex flex-col shadow-[4px_0_0_#000] transition-transform duration-300 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
+          <aside className={`fixed top-16 lg:top-20 left-0 bottom-32 w-[240px] bg-white border-r-4 border-black z-40 flex flex-col shadow-[4px_0_0_#000] transition-transform duration-300 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
             <div className="bg-black text-white p-3 border-b-4 border-black text-center flex items-center justify-between">
                <h3 className="font-orbitron font-bold italic text-sm tracking-wider mx-auto">AI PROTOCOLS</h3>
                <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden text-white hover:text-[var(--theme-accent)] transition-colors pr-1">
@@ -168,7 +168,7 @@ export default function App() {
       )}
 
       {/* MAIN CONTENT AREA */}
-      <main className={`relative z-10 pt-20 min-h-[80vh] ${activeTab === "home" ? "lg:pl-[240px]" : ""}`}>
+      <main className={`relative z-10 pt-16 lg:pt-20 min-h-[80vh] ${activeTab === "home" ? "lg:pl-[240px]" : ""}`}>
         <AnimatePresence mode="wait">
           {activeTab === "home" && (
             <motion.div key="home" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="pb-0">
