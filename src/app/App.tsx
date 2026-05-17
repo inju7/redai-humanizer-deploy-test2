@@ -1158,7 +1158,7 @@ function MarketplaceTab() {
         {/* BATCH CHECKOUT MODAL */}
         {isCheckoutOpen && checkoutItems.length > 0 && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-md p-2">
-            <motion.div initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }} transition={{ duration: 0.3, ease: "easeOut" }} className="w-full max-h-[60vh] max-w-4xl flex flex-col md:flex-row relative bg-white shadow-[6px_6px_0_rgba(0,0,0,1)] border-4 border-black overflow-hidden">
+            <motion.div initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }} transition={{ duration: 0.3, ease: "easeOut" }} className="w-full max-h-[85vh] max-w-4xl flex flex-col md:flex-row relative bg-white shadow-[6px_6px_0_rgba(0,0,0,1)] border-4 border-black overflow-hidden">
               
               <button onClick={() => setIsCheckoutOpen(false)} className="absolute top-2 right-2 z-50 p-2 text-black hover:text-gray-500 transition-colors">
                 <X size={24} strokeWidth={2} />
