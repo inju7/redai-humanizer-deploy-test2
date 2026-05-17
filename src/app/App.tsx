@@ -1111,7 +1111,7 @@ function MarketplaceTab() {
         {/* PREMIUM PRODUCT DETAIL MODAL */}
         {viewingProduct && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-md p-2">
-            <motion.div initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }} transition={{ duration: 0.3, ease: "easeOut" }} className="w-full max-h-[55vh] max-w-4xl flex flex-col md:flex-row relative bg-white shadow-[6px_6px_0_rgba(0,0,0,1)] border-4 border-black overflow-hidden">
+            <motion.div initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }} transition={{ duration: 0.3, ease: "easeOut" }} className="w-full max-h-[85vh] max-w-4xl flex flex-col md:flex-row relative bg-white shadow-[6px_6px_0_rgba(0,0,0,1)] border-4 border-black overflow-hidden">
               
               {/* Close Button */}
               <button onClick={() => setViewingProduct(null)} className="absolute top-0 right-0 z-50 p-4 text-black hover:text-[var(--theme-accent)] transition-colors">
@@ -1119,32 +1119,32 @@ function MarketplaceTab() {
               </button>
               
               {/* Large Image Side */}
-              <div className="w-full md:w-1/2 bg-gray-50 flex items-center justify-center relative border-b-4 md:border-b-0 md:border-r-4 border-black">
-                 <img src={viewingProduct.image} className="w-full h-full object-contain max-h-[25vh] md:max-h-[50vh] p-2" alt={viewingProduct.name} />
+              <div className="w-full md:w-1/2 bg-gray-50 flex items-center justify-center relative border-b-4 md:border-b-0 md:border-r-4 border-black min-h-[250px]">
+                 <img src={viewingProduct.image} className="w-full h-full object-contain p-4" alt={viewingProduct.name} />
               </div>
 
               {/* Details Side */}
-              <div className="w-full md:w-1/2 bg-white p-4 overflow-y-auto flex flex-col justify-center brutal-scrollbar">
+              <div className="w-full md:w-1/2 bg-white p-6 overflow-y-auto flex flex-col justify-center brutal-scrollbar">
                  <div className="w-full">
                     <span className="text-gray-400 font-orbitron font-bold uppercase tracking-[0.2em] text-[10px] mb-2 block">{viewingProduct.category}</span>
-                    <h2 className="text-2xl lg:text-3xl font-orbitron font-bold uppercase leading-tight text-black mb-3">{viewingProduct.name}</h2>
-                    <p className="font-jakarta font-bold text-xl text-[var(--theme-accent)] mb-6">{viewingProduct.priceStr}</p>
+                    <h2 className="text-2xl lg:text-3xl font-orbitron font-bold uppercase leading-tight text-black mb-2">{viewingProduct.name}</h2>
+                    <p className="font-jakarta font-bold text-xl text-[var(--theme-accent)] mb-4">{viewingProduct.priceStr}</p>
                     
-                    <div className="mb-8">
+                    <div className="mb-4">
                        <p className="font-jakarta text-sm text-gray-600 leading-relaxed font-light">{viewingProduct.desc}</p>
                     </div>
 
-                    <ul className="space-y-2 mb-8 font-jakarta text-xs text-gray-500 uppercase tracking-widest border-t border-gray-200 pt-6">
+                    <ul className="space-y-2 mb-6 font-jakarta text-xs text-gray-500 uppercase tracking-widest border-t border-gray-200 pt-4">
                        <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 bg-black rounded-full"></span> Premium Quality Materials</li>
                        <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 bg-black rounded-full"></span> Exclusive Protocol Branding</li>
                        <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 bg-black rounded-full"></span> Limited Batch Release</li>
                     </ul>
 
-                    <div className="flex flex-col gap-3">
-                       <button onClick={() => addToCart(viewingProduct)} className="w-full bg-white text-black font-orbitron font-bold py-3 border-2 border-black hover:bg-gray-50 transition-colors uppercase text-xs tracking-[0.2em] shadow-[4px_4px_0_#000]">
+                    <div className="flex flex-row gap-3">
+                       <button onClick={() => addToCart(viewingProduct)} className="flex-1 bg-white text-black font-orbitron font-bold py-3 border-2 border-black hover:bg-gray-50 transition-colors uppercase text-xs tracking-[0.1em] shadow-[3px_3px_0_#000]">
                          Add to Bag
                        </button>
-                       <button onClick={() => buyNow(viewingProduct)} className="w-full bg-black text-white font-orbitron font-bold py-3 border-2 border-black hover:bg-gray-900 transition-colors uppercase text-xs tracking-[0.2em] shadow-[4px_4px_0_var(--theme-cyan)]">
+                       <button onClick={() => buyNow(viewingProduct)} className="flex-1 bg-black text-white font-orbitron font-bold py-3 border-2 border-black hover:bg-gray-900 transition-colors uppercase text-xs tracking-[0.1em] shadow-[3px_3px_0_var(--theme-cyan)]">
                          Purchase Now
                        </button>
                     </div>
