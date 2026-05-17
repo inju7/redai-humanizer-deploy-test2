@@ -1,0 +1,358 @@
+/* The Spectrum Palette - Hierarchical Section System */
+
+/* ============================================
+   HERO SECTION
+   ============================================
+   Role: Primary Core
+   Background: #1F1C3D (Deep Indigo)
+   Main Title: Bebas Neue in #FF6B6B (Coral)
+   Sub-headline: Raleway in #E0F7FA (Ice Blue)
+   CTA Button: #FF6B6B background with Bebas Neue
+*/
+.hero-section {
+  background-color: var(--spectrum-indigo);
+  padding: 4rem 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(255, 107, 107, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.hero-section h1 {
+  font-family: var(--font-heading-primary);
+  font-size: clamp(2.5rem, 8vw, 4.5rem);
+  font-weight: 700;
+  color: var(--spectrum-coral);
+  margin-bottom: 1rem;
+  position: relative;
+  z-index: 1;
+  line-height: 1.1;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+}
+
+.hero-section .subtitle {
+  font-family: var(--font-body);
+  font-size: clamp(1rem, 2vw, 1.5rem);
+  font-weight: 400;
+  color: var(--spectrum-ice-blue);
+  position: relative;
+  z-index: 1;
+  max-width: 600px;
+}
+
+.hero-section .cta-button {
+  background-color: var(--spectrum-coral);
+  color: var(--spectrum-indigo);
+  font-family: var(--font-heading-primary);
+  font-weight: 700;
+  padding: 1rem 2.5rem;
+  font-size: 1.125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-block;
+  margin-top: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-section .cta-button:hover {
+  background-color: var(--spectrum-soft-rose);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(255, 107, 107, 0.3);
+}
+
+/* ============================================
+   CONTENT CONTAINERS / CARDS
+   ============================================
+   Role: Feature Accent & Deep Contrast
+   Container Background: #1A120B (Espresso)
+   Card Titles: Signika in #5C5A84 (Slate Blue)
+   Card Body: Raleway in #E0F7FA
+*/
+.card,
+.content-container {
+  background-color: var(--spectrum-espresso);
+  border: 1px solid rgba(224, 247, 250, 0.1);
+  border-radius: 0.5rem;
+  padding: 2rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(224, 247, 250, 0.05),
+    transparent
+  );
+  transition: left 0.3s ease;
+  pointer-events: none;
+}
+
+.card:hover {
+  border-color: rgba(224, 247, 250, 0.2);
+  box-shadow: 0 8px 16px rgba(255, 107, 107, 0.1);
+  transform: translateY(-4px);
+}
+
+.card:hover::before {
+  left: 100%;
+}
+
+.card h2,
+.card h3,
+.content-container h2,
+.content-container h3 {
+  font-family: var(--font-heading-secondary);
+  color: var(--spectrum-slate-blue);
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.card p,
+.content-container p {
+  font-family: var(--font-body);
+  color: var(--spectrum-ice-blue);
+  font-weight: 400;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+/* ============================================
+   EDITORIAL / QUOTE SECTION
+   ============================================
+   Role: Elegant Highlight
+   Background: Subtle gradient from Indigo to Slate Blue
+   Quote Text: Prata (Serif) in #E8A7A7 (Soft Rose)
+*/
+.editorial-section,
+.quote-section {
+  background: linear-gradient(
+    135deg,
+    var(--spectrum-indigo) 0%,
+    var(--spectrum-slate-blue) 100%
+  );
+  padding: 4rem 2rem;
+  position: relative;
+  overflow: hidden;
+  border-left: 4px solid var(--spectrum-coral);
+}
+
+.editorial-section::before,
+.quote-section::before {
+  content: '"';
+  position: absolute;
+  font-size: 8rem;
+  color: rgba(224, 247, 250, 0.1);
+  font-family: var(--font-serif-accent);
+  left: -20px;
+  top: -30px;
+  pointer-events: none;
+}
+
+.editorial-section blockquote,
+.quote-section blockquote {
+  font-family: var(--font-serif-accent);
+  font-size: clamp(1.25rem, 3vw, 2.25rem);
+  color: var(--spectrum-soft-rose);
+  font-weight: 400;
+  line-height: 1.6;
+  margin: 0;
+  position: relative;
+  z-index: 1;
+  font-style: italic;
+}
+
+.editorial-section .attribution,
+.quote-section .attribution {
+  font-family: var(--font-body);
+  color: var(--spectrum-ice-blue);
+  font-size: 0.95rem;
+  margin-top: 1.5rem;
+  font-weight: 500;
+}
+
+.editorial-section .attribution::before {
+  content: '— ';
+}
+
+/* ============================================
+   TECHNICAL / FOOTER SECTION
+   ============================================
+   Role: Tech/Detail
+   Background: #1F1C3D (Deep Indigo)
+   Text: Anonymous Pro in #5C5A84 (Slate Blue)
+*/
+footer {
+  background-color: var(--spectrum-indigo);
+  border-top: 1px solid rgba(224, 247, 250, 0.1);
+  padding: 3rem 2rem;
+  margin-top: 4rem;
+}
+
+footer .legal,
+footer .copyright,
+footer .metadata {
+  font-family: var(--font-monospace);
+  color: var(--spectrum-slate-blue);
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+footer .legal a,
+footer .copyright a,
+footer .metadata a {
+  color: var(--spectrum-coral);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+footer .legal a:hover,
+footer .copyright a:hover,
+footer .metadata a:hover {
+  color: var(--spectrum-soft-rose);
+}
+
+/* ============================================
+   FEATURE/ACCENT ELEMENTS
+   ============================================
+*/
+.accent-text {
+  color: var(--spectrum-soft-rose);
+  font-family: var(--font-serif-accent);
+}
+
+.tech-label,
+.metadata-text {
+  font-family: var(--font-monospace);
+  color: var(--spectrum-slate-blue);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 500;
+}
+
+.code-snippet {
+  font-family: var(--font-monospace);
+  color: var(--spectrum-ice-blue);
+  background-color: rgba(26, 18, 11, 0.5);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+}
+
+/* ============================================
+   BUTTON STYLES
+   ============================================
+*/
+.btn-primary {
+  background-color: var(--spectrum-coral);
+  color: var(--spectrum-indigo);
+  font-family: var(--font-heading-primary);
+  font-weight: 700;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.btn-primary:hover {
+  background-color: var(--spectrum-soft-rose);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(255, 107, 107, 0.2);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--spectrum-ice-blue);
+  font-family: var(--font-body);
+  border: 2px solid var(--spectrum-slate-blue);
+  padding: 0.5rem 1.25rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.btn-secondary:hover {
+  background-color: rgba(92, 90, 132, 0.1);
+  border-color: var(--spectrum-coral);
+  color: var(--spectrum-coral);
+}
+
+/* ============================================
+   DIVIDERS & SEPARATORS
+   ============================================
+*/
+.section-divider {
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--spectrum-coral),
+    transparent
+  );
+  margin: 3rem 0;
+}
+
+hr {
+  border: none;
+  height: 1px;
+  background: rgba(224, 247, 250, 0.1);
+}
+
+/* ============================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================
+*/
+@media (max-width: 768px) {
+  .hero-section {
+    padding: 3rem 1.5rem;
+  }
+
+  .hero-section h1 {
+    font-size: 2.25rem;
+  }
+
+  .editorial-section,
+  .quote-section {
+    padding: 2.5rem 1.5rem;
+  }
+
+  .editorial-section blockquote,
+  .quote-section blockquote {
+    font-size: 1.5rem;
+  }
+
+  .card,
+  .content-container {
+    padding: 1.5rem;
+  }
+}

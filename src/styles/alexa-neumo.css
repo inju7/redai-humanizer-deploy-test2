@@ -1,0 +1,143 @@
+/* Alexa/gaara premium neumorphism layer (used to remove harsh highlights/rings)
+   Drop-in utilities: .neo-surface, .neo-surface-pressed, .neo-surface-raised,
+   .neo-input, .neo-btn-primary, .neo-btn-ghost
+*/
+
+:root {
+  --neo-radius: 18px;
+  --neo-border: rgba(255, 255, 255, 0.08);
+  --neo-border-strong: rgba(255, 200, 92, 0.18);
+
+  /* Premium "gaara" subtle glow */
+  --neo-glow: rgba(152, 37, 152, 0.22);
+  --neo-glow-2: rgba(255, 101, 63, 0.14);
+  --neo-void: rgba(0, 0, 0, 0.55);
+}
+
+.neo-surface,
+.neo-card {
+  border-radius: var(--neo-radius);
+  border: 1px solid var(--neo-border);
+  background: rgba(26, 16, 78, 0.58);
+
+  /* Raised neumorphism: convex */
+  box-shadow:
+    10px 10px 24px rgba(0, 0, 0, 0.35),
+    -10px -10px 24px rgba(255, 255, 255, 0.03),
+    0 0 0 1px rgba(0, 0, 0, 0.15),
+    0 0 24px var(--neo-glow);
+
+  backdrop-filter: blur(10px);
+}
+
+.neo-surface-raised {
+  box-shadow:
+    12px 12px 26px rgba(0, 0, 0, 0.38),
+    -12px -12px 26px rgba(255, 255, 255, 0.03),
+    0 0 0 1px rgba(0, 0, 0, 0.15),
+    0 0 26px var(--neo-glow);
+}
+
+.neo-surface-pressed {
+  border-color: rgba(255, 255, 255, 0.06);
+  background: rgba(26, 16, 78, 0.46);
+
+  /* Pressed neumorphism: concave */
+  box-shadow:
+    inset 10px 10px 22px rgba(0, 0, 0, 0.46),
+    inset -10px -10px 22px rgba(255, 255, 255, 0.02),
+    0 0 18px var(--neo-glow-2);
+}
+
+.neo-input,
+.neo-textarea,
+.neo-select {
+  width: 100%;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(13, 14, 38, 0.35);
+  color: rgba(241, 233, 233, 0.95);
+
+  padding: 14px 16px;
+  box-shadow:
+    inset 6px 6px 14px rgba(0, 0, 0, 0.42),
+    inset -6px -6px 14px rgba(255, 255, 255, 0.03);
+
+  outline: none;
+  transition: box-shadow 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+
+.neo-input::placeholder,
+.neo-textarea::placeholder {
+  color: rgba(241, 233, 233, 0.35);
+}
+
+.neo-input:focus,
+.neo-textarea:focus,
+.neo-select:focus {
+  border-color: rgba(152, 37, 152, 0.38);
+  box-shadow:
+    inset 6px 6px 14px rgba(0, 0, 0, 0.42),
+    inset -6px -6px 14px rgba(255, 255, 255, 0.03),
+    0 0 0 3px rgba(152, 37, 152, 0.18);
+}
+
+.neo-btn {
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 12px 18px;
+  cursor: pointer;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: transform 140ms ease, box-shadow 140ms ease, background 140ms ease;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+
+.neo-btn-primary {
+  background: rgba(152, 37, 152, 0.16);
+  box-shadow:
+    10px 10px 22px rgba(0, 0, 0, 0.35),
+    -10px -10px 22px rgba(255, 255, 255, 0.03),
+    0 0 30px rgba(152, 37, 152, 0.18);
+  color: rgba(241, 233, 233, 0.98);
+}
+
+.neo-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    12px 12px 26px rgba(0, 0, 0, 0.40),
+    -12px -12px 26px rgba(255, 255, 255, 0.03),
+    0 0 36px rgba(255, 101, 63, 0.14);
+}
+
+.neo-btn-primary:active {
+  transform: translateY(0px) scale(0.99);
+  box-shadow:
+    inset 10px 10px 22px rgba(0, 0, 0, 0.45),
+    inset -10px -10px 22px rgba(255, 255, 255, 0.02);
+}
+
+.neo-btn-ghost {
+  background: rgba(13, 14, 38, 0.10);
+  color: rgba(241, 233, 233, 0.90);
+  box-shadow:
+    inset 8px 8px 20px rgba(0, 0, 0, 0.40),
+    inset -8px -8px 20px rgba(255, 255, 255, 0.02);
+}
+
+.neo-btn-ghost:hover {
+  transform: translateY(-2px);
+  background: rgba(13, 14, 38, 0.18);
+}
+
+.neo-no-highlight {
+  /* Explicitly suppress "highlight"/ring visuals for internal tiles */
+  outline: none !important;
+  box-shadow: none !important;
+  border-color: rgba(255, 255, 255, 0.06) !important;
+}
+

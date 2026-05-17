@@ -1,1300 +1,1378 @@
 import { motion, AnimatePresence } from "motion/react";
 import { useState } from "react";
 import {
-  Sparkles, FileText, Shield, CheckCircle, Mail, Menu, X,
-  Zap, Crown, ChevronRight, TrendingUp, Users, Award, ArrowRight
+  Cpu, Zap, Layers, Shield, Terminal, Code2, 
+  TrendingUp, Users, DollarSign, Share2, Tag, 
+  ChevronRight, Link, BarChart, PenTool, LayoutTemplate, 
+  Store, Network, MessageSquare, ArrowRight, Activity, Sliders, CheckCircle, Star, Plus, Minus, X, AlertTriangle
 } from "lucide-react";
 
-type Tab = "dashboard" | "pricing" | "about";
-type Tool = "essay" | "detection" | "grammar" | "email";
+type TabState = "home" | "blog" | "ads" | "marketplace" | "referral" | "career";
+
+const TOOLS_LIST = [
+  "Text Humanizer",
+  "AI Detector",
+  "Plagiarism Checker",
+  "Humanize Email",
+  "Grammar Check",
+  "Citation Check",
+  "Essay Writer",
+  "Paragraph Rewriter",
+  "Article Rewriter",
+  "Sentence Rewriter",
+  "Rewording Tool",
+  "Detect AI Content",
+  "Detector Teachers",
+  "Detector College",
+  "Detector Academic",
+  "Detector Professors"
+];
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<Tab>("dashboard");
-  const [activeTool, setActiveTool] = useState<Tool>("essay");
-  const [credits, setCredits] = useState(5);
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  const [essayInput, setEssayInput] = useState("");
-  const [essayOutput, setEssayOutput] = useState("");
-  const [detectionInput, setDetectionInput] = useState("");
-  const [detectionScore, setDetectionScore] = useState<number | null>(null);
-  const [grammarInput, setGrammarInput] = useState("");
-  const [grammarOutput, setGrammarOutput] = useState("");
-  const [emailType, setEmailType] = useState("job-application");
-  const [emailOutput, setEmailOutput] = useState("");
-  const [isProcessing, setIsProcessing] = useState(false);
-
-  const useCredit = () => {
-    if (credits > 0) {
-      setCredits(credits - 1);
-      if (credits - 1 === 0) {
-        setTimeout(() => setShowUpgradeModal(true), 1000);
-      }
-      return true;
-    } else {
-      setShowUpgradeModal(true);
-      return false;
-    }
-  };
-
-  const handleEssayHumanize = () => {
-    if (!essayInput.trim() || !useCredit()) return;
-    setIsProcessing(true);
-    setTimeout(() => {
-      setEssayOutput(
-        essayInput
-          .replace(/Moreover/g, "Also")
-          .replace(/Furthermore/g, "Plus")
-          .replace(/In conclusion/g, "So")
-          .replace(/Therefore/g, "That's why")
-          .replace(/Consequently/g, "As a result")
-      );
-      setIsProcessing(false);
-    }, 2000);
-  };
-
-  const handleDetectionScan = () => {
-    if (!detectionInput.trim() || !useCredit()) return;
-    setIsProcessing(true);
-    setTimeout(() => {
-      const score = Math.floor(Math.random() * 25) + 10;
-      setDetectionScore(score);
-      setIsProcessing(false);
-    }, 2500);
-  };
-
-  const handleGrammarCheck = () => {
-    if (!grammarInput.trim() || !useCredit()) return;
-    setIsProcessing(true);
-    setTimeout(() => {
-      setGrammarOutput(
-        grammarInput
-          .replace(/\bi\b/g, "I")
-          .replace(/  +/g, " ")
-          .replace(/\s,/g, ",")
-          .trim()
-      );
-      setIsProcessing(false);
-    }, 1800);
-  };
-
-  const handleEmailGenerate = () => {
-    if (!useCredit()) return;
-    setIsProcessing(true);
-    setTimeout(() => {
-      const templates: Record<string, string> = {
-        "job-application":
-          "Dear Hiring Manager,\n\nI am writing to express my strong interest in the position at your company. With my background and skills, I believe I would be a valuable addition to your team.\n\nI would welcome the opportunity to discuss how my experience aligns with your needs.\n\nBest regards,\n[Your Name]",
-        "follow-up":
-          "Hi [Name],\n\nI wanted to follow up on my previous email regarding our discussion. I'm very interested in moving forward and would love to hear your thoughts.\n\nLooking forward to your response.\n\nBest,\n[Your Name]",
-        "business-proposal":
-          "Dear [Name],\n\nI am reaching out to discuss a potential partnership opportunity that I believe would be mutually beneficial for both our organizations.\n\nI would appreciate the chance to present this proposal in more detail at your convenience.\n\nWarm regards,\n[Your Name]",
-        "customer-support":
-          "Hello,\n\nThank you for contacting us. I understand your concern and I'm here to help resolve this issue for you.\n\nCould you please provide more details so I can assist you better?\n\nBest regards,\n[Support Team]",
-      };
-      setEmailOutput(templates[emailType] || "");
-      setIsProcessing(false);
-    }, 1500);
-  };
-
-  const tabs = [
-    { id: "dashboard", label: "Dashboard" },
-    { id: "pricing", label: "Pricing" },
-    { id: "about", label: "About" },
-  ] as const;
+  const [activeTab, setActiveTab] = useState<TabState>("home");
+  const [activeTool, setActiveTool] = useState<string>("Text Humanizer");
+  const [credits] = useState(5);
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden">
-      {/* Soft Gradient Orbs */}
-      <motion.div
-        className="fixed top-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full opacity-30 pointer-events-none blur-3xl"
-        style={{ background: "radial-gradient(circle, #EC5840 0%, transparent 70%)" }}
-        animate={{
-          y: [0, -25, 0],
-          x: [0, 15, 0],
-          scale: [1, 1.1, 1],
-        }}
-        transition={{
-          duration: 12,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
-      <motion.div
-        className="fixed bottom-[-15%] left-[-10%] w-[450px] h-[450px] rounded-full opacity-25 pointer-events-none blur-3xl"
-        style={{ background: "radial-gradient(circle, #61587D 0%, transparent 70%)" }}
-        animate={{
-          y: [0, 25, 0],
-          x: [0, -15, 0],
-          scale: [1, 1.15, 1],
-        }}
-        transition={{
-          duration: 14,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
-
-      {/* Navbar - Neumorphic */}
-      <motion.nav
-        className="fixed top-0 left-0 right-0 z-50"
-        style={{
-          background: "#F9F7F2",
-          boxShadow: "8px 8px 16px #E0DCD0, -8px -8px 16px #FFFFFF",
-          borderBottom: "1px solid rgba(45, 30, 47, 0.05)",
-        }}
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-      >
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <motion.div
-              className="flex items-center gap-3 cursor-pointer"
-              onClick={() => setActiveTab("dashboard")}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <motion.div
-                animate={{
-                  rotate: [0, 5, -5, 0],
-                }}
-                transition={{
-                  duration: 4,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              >
-                <Sparkles className="w-7 h-7 text-[#EC5840]" />
-              </motion.div>
-              <span className="text-xl font-['Bodoni_Moda'] font-bold text-[#2D1E2F]">
-                Red's AI Humanizer
+    <div className="relative min-h-screen pb-32 bg-[var(--theme-bg)] selection:bg-[var(--theme-accent)] selection:text-white">
+      
+      {/* High-Contrast Navbar */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-black border-b-[4px] border-black text-white h-20">
+        <div className="max-w-full mx-auto h-full flex items-center justify-between px-6">
+          <div className="flex items-center gap-12">
+            <div className="flex items-center gap-3 cursor-pointer" onClick={() => { setActiveTab("home"); window.scrollTo(0, 0); }}>
+              <div className="w-10 h-10 flex items-center justify-center bg-white border-2 border-white">
+                <Cpu size={24} className="text-black" />
+              </div>
+              <span className="text-3xl font-orbitron italic font-bold tracking-tighter text-white uppercase">
+                RED<span className="text-[var(--theme-accent)]">AI</span>
               </span>
-            </motion.div>
-
-            {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center gap-3">
-              {tabs.map((tab) => (
-                <motion.button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as Tab)}
-                  className={`px-7 py-3 rounded-full text-sm font-medium transition-all ${
-                    activeTab === tab.id ? "text-[#F9F7F2]" : "text-[#2D1E2F]"
-                  }`}
-                  style={
-                    activeTab === tab.id
-                      ? {
-                          background: "linear-gradient(135deg, #EC5840, #D84A36)",
-                          boxShadow: "4px 4px 12px #E0DCD0, -2px -2px 8px #FFFFFF",
-                        }
-                      : {
-                          background: "#F9F7F2",
-                          boxShadow: "inset 3px 3px 8px #E0DCD0, inset -3px -3px 8px #FFFFFF",
-                        }
-                  }
-                  whileHover={{ y: -2, scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  {tab.label}
-                </motion.button>
-              ))}
-
-              {/* Credits Display - Neumorphic */}
-              <motion.div
-                className="ml-4 px-6 py-3 rounded-full flex items-center gap-2"
-                style={{
-                  background: "#F9F7F2",
-                  boxShadow: "inset 4px 4px 10px #E0DCD0, inset -4px -4px 10px #FFFFFF",
-                }}
-                animate={{
-                  boxShadow: [
-                    "inset 4px 4px 10px #E0DCD0, inset -4px -4px 10px #FFFFFF",
-                    "inset 5px 5px 12px #E0DCD0, inset -5px -5px 12px #FFFFFF",
-                    "inset 4px 4px 10px #E0DCD0, inset -4px -4px 10px #FFFFFF",
-                  ],
-                }}
-                transition={{ duration: 2, repeat: Infinity }}
-              >
-                <Zap className="w-4 h-4 text-[#EC5840]" />
-                <span className="text-[#2D1E2F] font-bold">{credits}</span>
-                <span className="text-[#61587D] text-sm">credits</span>
-              </motion.div>
-
-              <motion.button
-                onClick={() => setShowUpgradeModal(true)}
-                className="ml-2 px-7 py-3 rounded-full font-semibold flex items-center gap-2"
-                style={{
-                  background: "linear-gradient(135deg, #E5D3B3, #D4C4A3)",
-                  color: "#2D1E2F",
-                  boxShadow: "4px 4px 12px #E0DCD0, -2px -2px 8px #FFFFFF",
-                }}
-                whileHover={{
-                  scale: 1.05,
-                  boxShadow: "6px 6px 16px #E0DCD0, -3px -3px 10px #FFFFFF",
-                }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <Crown className="w-4 h-4" />
-                Upgrade Pro
-              </motion.button>
             </div>
 
-            {/* Mobile Menu Button */}
-            <button
-              className="lg:hidden text-[#2D1E2F]"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
-              {mobileMenuOpen ? <X /> : <Menu />}
+            <div className="hidden lg:flex items-center gap-4 xl:gap-6">
+              <NavButton active={activeTab === "home"} onClick={() => { setActiveTab("home"); window.scrollTo(0, 0); }}>DASHBOARD</NavButton>
+              <NavButton active={activeTab === "blog"} onClick={() => { setActiveTab("blog"); window.scrollTo(0, 0); }}>BLOG</NavButton>
+              <NavButton active={activeTab === "ads"} onClick={() => { setActiveTab("ads"); window.scrollTo(0, 0); }}>MARKETING DEALS</NavButton>
+              <NavButton active={activeTab === "marketplace"} onClick={() => { setActiveTab("marketplace"); window.scrollTo(0, 0); }}>MARKETPLACE</NavButton>
+              <NavButton active={activeTab === "referral"} onClick={() => { setActiveTab("referral"); window.scrollTo(0, 0); }}>REFERRAL</NavButton>
+              <NavButton active={activeTab === "career"} onClick={() => { setActiveTab("career"); window.scrollTo(0, 0); }}>CAREER</NavButton>
+              <div className="w-8"></div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-6">
+            <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-black border-2 border-white">
+              <Zap size={16} className="text-[var(--theme-cyan)]" />
+              <span className="text-sm font-orbitron italic font-bold text-white">{credits} UNITS</span>
+            </div>
+            <button className="brutal-button bg-[var(--theme-accent)] hover:bg-[var(--theme-cyan)] border-white text-white hover:text-black">
+              SIGN IN
             </button>
           </div>
         </div>
+      </nav>
 
-        {/* Mobile Menu */}
-        <AnimatePresence>
-          {mobileMenuOpen && (
-            <motion.div
-              className="lg:hidden px-6 py-4 space-y-3"
-              style={{ background: "#F9F7F2" }}
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-            >
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => {
-                    setActiveTab(tab.id as Tab);
-                    setMobileMenuOpen(false);
-                  }}
-                  className={`block w-full text-left px-4 py-2 rounded-2xl ${
-                    activeTab === tab.id
-                      ? "bg-[#EC5840] text-[#F9F7F2]"
-                      : "text-[#2D1E2F]"
-                  }`}
-                  style={
-                    activeTab !== tab.id
-                      ? { boxShadow: "inset 2px 2px 6px #E0DCD0, inset -2px -2px 6px #FFFFFF" }
-                      : {}
-                  }
-                >
-                  {tab.label}
-                </button>
-              ))}
+      {/* FIXED LEFT SIDEBAR (Only visible on Dashboard) */}
+      {activeTab === "home" && (
+        <aside className="fixed top-20 left-0 bottom-32 w-[240px] bg-white border-r-4 border-black z-40 flex flex-col shadow-[4px_0_0_#000]">
+          <div className="bg-black text-white p-3 border-b-4 border-black text-center">
+             <h3 className="font-orbitron font-bold italic text-sm tracking-wider">AI PROTOCOLS</h3>
+          </div>
+          <div className="flex-1 overflow-y-auto p-2 space-y-1 brutal-scrollbar">
+             {TOOLS_LIST.map((tool) => (
+               <button
+                 key={tool}
+                 onClick={() => setActiveTool(tool)}
+                 className={`w-full text-left px-3 py-2 font-jakarta text-[13px] font-bold uppercase transition-all border-2 ${
+                   activeTool === tool 
+                   ? "bg-[var(--theme-accent)] text-white border-black shadow-[2px_2px_0_#000] translate-x-1" 
+                   : "bg-transparent text-black border-transparent hover:border-black hover:translate-x-1"
+                 }`}
+               >
+                 {tool}
+               </button>
+             ))}
+          </div>
+        </aside>
+      )}
+
+      {/* MAIN CONTENT AREA */}
+      <main className={`relative z-10 pt-20 min-h-[80vh] ${activeTab === "home" ? "lg:pl-[240px]" : ""}`}>
+        <AnimatePresence mode="wait">
+          {activeTab === "home" && (
+            <motion.div key="home" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="pb-0">
+              
+              {/* --- SMART WORKSPACE --- */}
+              <section className="max-w-[1600px] mx-auto px-6 md:px-8 py-8">
+                
+                <div className="mb-6 flex justify-between items-end">
+                   <div>
+                      <div className="inline-block px-3 py-1 bg-black text-white font-orbitron italic text-xs mb-2">AETERNUM PROTOCOL V4.2</div>
+                      <h2 className="text-4xl font-orbitron italic font-bold uppercase leading-none">Architecting The Truth</h2>
+                   </div>
+                </div>
+
+                {/* Two-Pane Workspace */}
+                <WorkspaceProcessor activeTool={activeTool} />
+
+              </section>
+
+              {/* --- LANDING PAGE EXTENSIONS --- */}
+              
+              {/* Companies Carousel */}
+              <div className="border-y-4 border-black bg-white overflow-hidden py-8">
+                <div className="flex overflow-hidden">
+                   <div className="animate-infinite-scroll flex gap-16 items-center px-6">
+                      {Array(10).fill(["ACME CORP", "GLOBEX", "SOYLENT", "INITECH", "UMBRELLA", "STARK IND"]).flat().map((company, i) => (
+                         <span key={i} className="text-3xl font-black uppercase text-gray-300 mx-8 tracking-widest">{company}</span>
+                      ))}
+                   </div>
+                </div>
+              </div>
+
+              {/* Involved & Partnership Carousel */}
+              <div className="border-b-4 border-black bg-red-600 overflow-hidden py-6">
+                <div className="flex overflow-hidden">
+                   <div className="animate-infinite-scroll flex gap-16 items-center px-6">
+                      {Array(10).fill(["PARTNER PROTOCOL", "GLOBAL TECH", "SYNERGY AI", "CORE SYSTEMS", "NEXUS LABS", "VENTURE RED"]).flat().map((item, i) => (
+                         <div key={i} className="flex items-center gap-4 mx-8">
+                           <div className="w-8 h-8 bg-white border-2 border-black rotate-45 flex items-center justify-center">
+                              <Cpu size={14} className="text-black -rotate-45" />
+                           </div>
+                           <span className="text-2xl font-black uppercase text-white tracking-tighter italic">{item}</span>
+                         </div>
+                      ))}
+                   </div>
+                </div>
+              </div>
+
+              {/* How it Works / Proof (Updated Text & Darker Font) */}
+              <section className="bg-[var(--theme-accent)] border-b-4 border-black py-24 px-6">
+                <div className="max-w-[1400px] mx-auto">
+                   <div className="text-center mb-20">
+                      <h2 className="text-5xl md:text-6xl text-black font-orbitron italic font-bold uppercase tracking-tighter mb-4 shadow-none">How to Detect AI With RED<span className="text-[var(--theme-cyan)]">AI</span></h2>
+                      <p className="text-2xl text-black font-jakarta font-bold">Check any text for AI-generated content in three simple steps</p>
+                   </div>
+                   <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+                      <div className="brutal-container bg-white border-4 border-black p-8 relative group">
+                         <div className="absolute -top-6 -left-6 w-12 h-12 bg-[var(--theme-cyan)] border-4 border-black flex items-center justify-center font-orbitron font-bold text-xl">1</div>
+                         <h3 className="text-2xl font-orbitron italic font-bold uppercase mb-4 mt-2">Paste or upload your text</h3>
+                         <p className="font-jakarta font-bold text-black">Paste your text directly or upload a PDF, Word, or TXT file. Check up to 15,000 words in one scan.</p>
+                      </div>
+                      <div className="brutal-container bg-black text-white border-4 border-white p-8 relative group">
+                         <div className="absolute -top-6 -left-6 w-12 h-12 bg-[var(--theme-accent)] border-4 border-white flex items-center justify-center font-orbitron font-bold text-xl">2</div>
+                         <h3 className="text-2xl font-orbitron italic font-bold uppercase mb-4 mt-2 text-[var(--theme-cyan)]">Run the scan</h3>
+                         <p className="font-jakarta font-bold text-gray-300">Click Detect AI and get your results in seconds. REDAI checks your text against output patterns from ChatGPT, GPT-5, Claude, Gemini, DeepSeek, and more.</p>
+                      </div>
+                      <div className="brutal-container bg-white border-4 border-black p-8 relative group">
+                         <div className="absolute -top-6 -left-6 w-12 h-12 bg-[var(--theme-cyan)] border-4 border-black flex items-center justify-center font-orbitron font-bold text-xl">3</div>
+                         <h3 className="text-2xl font-orbitron italic font-bold uppercase mb-4 mt-2">See the report and fix what was flagged</h3>
+                         <p className="font-jakarta font-bold text-black">Review sentence-level results to see what triggered detection. Rewrite flagged parts with the AI Humanizer, then rescan to confirm everything looks right.</p>
+                      </div>
+                   </div>
+                </div>
+              </section>
+
+              {/* Testimonials (Smaller containers, more users) */}
+              <section className="bg-white border-b-4 border-black py-24 px-6">
+                <div className="max-w-[1600px] mx-auto">
+                   <h2 className="text-5xl md:text-7xl text-black font-orbitron italic font-bold uppercase text-center mb-20 tracking-tighter">Verified Operations</h2>
+                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                      <TestimonialCard name="Sarah J." role="College Student" text="Bypassed Turnitin instantly. Saved my academic career. 10/10 protocol." />
+                      <TestimonialCard name="Mark T." role="SEO Agency" text="We use the API to mass-humanize our programmatic SEO blogs. AdSense approved." />
+                      <TestimonialCard name="Elena R." role="Freelance Writer" text="Clients think I spend hours writing these articles. Matches my voice perfectly." />
+                      <TestimonialCard name="David C." role="Content Manager" text="Tested 5 different tools. REDAI is the only one that actually passes Originality 3.0." />
+                      <TestimonialCard name="Priya M." role="Professor" text="The detection is incredibly accurate. I use it to filter out low-effort synthetic submissions." />
+                      <TestimonialCard name="James L." role="Affiliate Marketer" text="My product review sites are flourishing. The rewording tool handles bulk jobs like a dream." />
+                      <TestimonialCard name="Chris W." role="Editor" text="Uncanny cadence matching. The grammar check alone saves my team hours every week." />
+                      <TestimonialCard name="Anna B." role="Student" text="The essay writer provides an amazing starting point without raising any AI flags." />
+                   </div>
+                </div>
+              </section>
+
             </motion.div>
           )}
+
+          {activeTab === "blog" && <PageWrapper key="blog"><BlogTab /></PageWrapper>}
+          {activeTab === "ads" && <PageWrapper key="ads"><MarketingDealsTab /></PageWrapper>}
+          {activeTab === "marketplace" && <PageWrapper key="marketplace"><MarketplaceTab /></PageWrapper>}
+          {activeTab === "referral" && <PageWrapper key="referral"><ReferralTab /></PageWrapper>}
+          {activeTab === "career" && <PageWrapper key="career"><CareerTab /></PageWrapper>}
         </AnimatePresence>
-      </motion.nav>
+      </main>
 
-      {/* Main Content */}
-      <div className="pt-24 relative z-10">
-        {activeTab === "dashboard" && (
-          <DashboardSection
-            activeTool={activeTool}
-            setActiveTool={setActiveTool}
-            essayInput={essayInput}
-            setEssayInput={setEssayInput}
-            essayOutput={essayOutput}
-            handleEssayHumanize={handleEssayHumanize}
-            detectionInput={detectionInput}
-            setDetectionInput={setDetectionInput}
-            detectionScore={detectionScore}
-            handleDetectionScan={handleDetectionScan}
-            grammarInput={grammarInput}
-            setGrammarInput={setGrammarInput}
-            grammarOutput={grammarOutput}
-            handleGrammarCheck={handleGrammarCheck}
-            emailType={emailType}
-            setEmailType={setEmailType}
-            emailOutput={emailOutput}
-            handleEmailGenerate={handleEmailGenerate}
-            credits={credits}
-            isProcessing={isProcessing}
-          />
-        )}
-        {activeTab === "pricing" && <PricingSection setShowUpgradeModal={setShowUpgradeModal} />}
-        {activeTab === "about" && <AboutSection />}
+      <div className={activeTab === "home" ? "lg:pl-[240px]" : ""}>
+        <Footer />
       </div>
-
-      {/* Upgrade Modal */}
-      <AnimatePresence>
-        {showUpgradeModal && <UpgradeModal onClose={() => setShowUpgradeModal(false)} />}
-      </AnimatePresence>
-
-      {/* Footer */}
-      <Footer />
+      
+      {/* FULL-LENGTH BOTTOM AD CONTAINER */}
+      <BottomAdBar />
+      
     </div>
   );
 }
 
-function DashboardSection({
-  activeTool,
-  setActiveTool,
-  essayInput,
-  setEssayInput,
-  essayOutput,
-  handleEssayHumanize,
-  detectionInput,
-  setDetectionInput,
-  detectionScore,
-  handleDetectionScan,
-  grammarInput,
-  setGrammarInput,
-  grammarOutput,
-  handleGrammarCheck,
-  emailType,
-  setEmailType,
-  emailOutput,
-  handleEmailGenerate,
-  credits,
-  isProcessing,
-}: any) {
-  const tools = [
-    {
-      id: "essay",
-      icon: <FileText className="w-6 h-6" />,
-      name: "Essay Humanizer",
-      description: "Transform AI essays into natural writing",
-      color: "#EC5840",
-    },
-    {
-      id: "detection",
-      icon: <Shield className="w-6 h-6" />,
-      name: "AI Detection",
-      description: "Check AI probability score",
-      color: "#61587D",
-    },
-    {
-      id: "grammar",
-      icon: <CheckCircle className="w-6 h-6" />,
-      name: "Grammar Check",
-      description: "Fix grammar & spelling errors",
-      color: "#E5D3B3",
-    },
-    {
-      id: "email",
-      icon: <Mail className="w-6 h-6" />,
-      name: "Email Generator",
-      description: "Create professional emails",
-      color: "#2D1E2F",
-    },
-  ];
+// --- WORKSPACE COMPONENTS ---
+
+function WorkspaceProcessor({ activeTool }: { activeTool: string }) {
+  const [input, setInput] = useState("");
+  const [output, setOutput] = useState("");
+  const [status, setStatus] = useState<"idle" | "scanning" | "processing" | "complete">("idle");
+  const [activeParam, setActiveParam] = useState("Standard");
+
+  // Force reset when tool changes
+  useState(() => {
+    setStatus("idle");
+    setInput("");
+    setOutput("");
+  });
+
+  const handleProcess = () => {
+    if (!input.trim() || status !== "idle") return;
+    setStatus("scanning");
+
+    setTimeout(() => {
+      setStatus("complete");
+      setOutput(`[${activeTool.toUpperCase()} REPORT]\n\nAnalysis complete against ChatGPT, Claude, and Gemini models.\n\nResult:\nHuman cadence verified. The neural structures in this text successfully bypass predictive detection layers. AdSense compatibility is extremely high.`);
+    }, 1500);
+  };
 
   return (
-    <section className="py-12 px-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Hero Section */}
-        <motion.div
-          className="text-center mb-16"
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <motion.div
-            className="inline-block px-6 py-2 rounded-full mb-6"
-            style={{
-              background: "#F9F7F2",
-              boxShadow: "inset 3px 3px 8px #E0DCD0, inset -3px -3px 8px #FFFFFF",
-            }}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 }}
-          >
-            <span className="text-sm font-semibold" style={{ color: "#EC5840" }}>
-              ✨ Trusted by 50,000+ Creators
-            </span>
-          </motion.div>
-
-          <motion.h1
-            className="text-5xl md:text-7xl font-['Bodoni_Moda'] font-bold mb-6 leading-tight"
-            style={{ color: "#2D1E2F" }}
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 1 }}
-          >
-            Transform AI Into
-            <br />
-            <span
-              className="bg-gradient-to-r from-[#EC5840] via-[#D84A36] to-[#61587D] bg-clip-text text-transparent"
+    <div className="brutal-container bg-white border-4 border-black flex flex-col">
+      
+      {/* Top Parameter Nav */}
+      <div className="bg-black p-3 border-b-4 border-black flex flex-wrap gap-2">
+         {["Free", "Standard", "Academic", "Simple", "Flowing", "Informal", "Formal", "Expand", "Shorten", "Custom"].map(param => (
+            <button 
+               key={param}
+               onClick={() => setActiveParam(param)}
+               className={`px-4 py-2 font-orbitron font-bold text-sm uppercase transition-colors ${
+                  activeParam === param ? "bg-[var(--theme-cyan)] text-black border-2 border-[var(--theme-cyan)]" : "bg-transparent text-white border-2 border-transparent hover:border-white"
+               }`}
             >
-              Authentic Human Writing
-            </span>
-          </motion.h1>
-
-          <motion.p
-            className="text-lg md:text-xl opacity-70 max-w-3xl mx-auto mb-8"
-            style={{ color: "#2D1E2F" }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.7 }}
-            transition={{ delay: 0.5 }}
-          >
-            Make your AI-generated content sound natural, bypass detectors, and maintain perfect grammar
-          </motion.p>
-        </motion.div>
-
-        {/* Tool Selector Grid */}
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-12"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-        >
-          {tools.map((tool, index) => (
-            <motion.button
-              key={tool.id}
-              onClick={() => setActiveTool(tool.id)}
-              className={`p-6 rounded-3xl text-left transition-all ${
-                activeTool === tool.id ? "ring-2" : ""
-              }`}
-              style={
-                activeTool === tool.id
-                  ? {
-                      background: "#F9F7F2",
-                      boxShadow: "8px 8px 20px #E0DCD0, -8px -8px 20px #FFFFFF",
-                      ringColor: tool.color,
-                    }
-                  : {
-                      background: "#F9F7F2",
-                      boxShadow: "inset 4px 4px 10px #E0DCD0, inset -4px -4px 10px #FFFFFF",
-                    }
-              }
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7 + index * 0.1 }}
-              whileHover={{
-                y: -4,
-                boxShadow: "10px 10px 24px #E0DCD0, -10px -10px 24px #FFFFFF",
-              }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <div
-                className="inline-block p-3 rounded-2xl mb-4"
-                style={{
-                  background: `${tool.color}20`,
-                  color: tool.color,
-                }}
-              >
-                {tool.icon}
-              </div>
-              <h3 className="text-lg font-['Bodoni_Moda'] font-semibold mb-1" style={{ color: "#2D1E2F" }}>
-                {tool.name}
-              </h3>
-              <p className="text-sm opacity-60" style={{ color: "#2D1E2F" }}>
-                {tool.description}
-              </p>
-            </motion.button>
-          ))}
-        </motion.div>
-
-        {/* Active Tool Interface */}
-        <AnimatePresence mode="wait">
-          {activeTool === "essay" && (
-            <EssayTool
-              key="essay"
-              essayInput={essayInput}
-              setEssayInput={setEssayInput}
-              essayOutput={essayOutput}
-              handleEssayHumanize={handleEssayHumanize}
-              credits={credits}
-              isProcessing={isProcessing}
-            />
-          )}
-          {activeTool === "detection" && (
-            <DetectionTool
-              key="detection"
-              detectionInput={detectionInput}
-              setDetectionInput={setDetectionInput}
-              detectionScore={detectionScore}
-              handleDetectionScan={handleDetectionScan}
-              credits={credits}
-              isProcessing={isProcessing}
-            />
-          )}
-          {activeTool === "grammar" && (
-            <GrammarTool
-              key="grammar"
-              grammarInput={grammarInput}
-              setGrammarInput={setGrammarInput}
-              grammarOutput={grammarOutput}
-              handleGrammarCheck={handleGrammarCheck}
-              credits={credits}
-              isProcessing={isProcessing}
-            />
-          )}
-          {activeTool === "email" && (
-            <EmailTool
-              key="email"
-              emailType={emailType}
-              setEmailType={setEmailType}
-              emailOutput={emailOutput}
-              handleEmailGenerate={handleEmailGenerate}
-              credits={credits}
-              isProcessing={isProcessing}
-            />
-          )}
-        </AnimatePresence>
+               {param}
+            </button>
+         ))}
       </div>
-    </section>
-  );
-}
 
-function EssayTool({ essayInput, setEssayInput, essayOutput, handleEssayHumanize, credits, isProcessing }: any) {
-  return (
-    <motion.div
-      className="p-8 rounded-[40px]"
-      style={{
-        background: "#F9F7F2",
-        boxShadow: "12px 12px 24px #E0DCD0, -12px -12px 24px #FFFFFF",
-      }}
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-      transition={{ duration: 0.4 }}
-    >
-      <h2 className="text-3xl font-['Bodoni_Moda'] font-bold mb-8" style={{ color: "#2D1E2F" }}>
-        AI Essay Humanizer
-      </h2>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <div>
-          <label className="block mb-3 font-semibold" style={{ color: "#2D1E2F" }}>
-            AI-Generated Text
-          </label>
-          <textarea
-            value={essayInput}
-            onChange={(e) => setEssayInput(e.target.value)}
-            placeholder="Paste your AI-generated essay here..."
-            className="w-full h-80 p-6 rounded-3xl resize-none"
-            style={{
-              background: "#F9F7F2",
-              boxShadow: "inset 6px 6px 12px #E0DCD0, inset -6px -6px 12px #FFFFFF",
-              border: "none",
-              color: "#2D1E2F",
-            }}
-          />
-        </div>
-        <div>
-          <label className="block mb-3 font-semibold" style={{ color: "#2D1E2F" }}>
-            Humanized Output
-          </label>
-          <div
-            className="w-full h-80 p-6 rounded-3xl overflow-y-auto"
-            style={{
-              background: "#F9F7F2",
-              boxShadow: "inset 6px 6px 12px #E0DCD0, inset -6px -6px 12px #FFFFFF",
-              color: "#2D1E2F",
-            }}
-          >
-            {isProcessing ? (
-              <div className="flex items-center justify-center h-full">
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                >
-                  <Zap className="w-8 h-8 text-[#EC5840]" />
-                </motion.div>
-              </div>
-            ) : (
-              <p className="whitespace-pre-wrap">{essayOutput || "Humanized text will appear here..."}</p>
-            )}
-          </div>
-        </div>
-      </div>
-      <motion.button
-        onClick={handleEssayHumanize}
-        disabled={credits === 0 || !essayInput.trim() || isProcessing}
-        className="px-10 py-4 rounded-full font-semibold flex items-center gap-3 disabled:opacity-50"
-        style={{
-          background: "linear-gradient(135deg, #EC5840, #D84A36)",
-          color: "#F9F7F2",
-          boxShadow: "6px 6px 16px #E0DCD0, -4px -4px 12px #FFFFFF",
-        }}
-        whileHover={{ scale: 1.03, boxShadow: "8px 8px 20px #E0DCD0, -6px -6px 16px #FFFFFF" }}
-        whileTap={{ scale: 0.98 }}
-      >
-        <Zap className="w-5 h-5" />
-        Humanize Text ({credits} credits)
-      </motion.button>
-    </motion.div>
-  );
-}
-
-function DetectionTool({ detectionInput, setDetectionInput, detectionScore, handleDetectionScan, credits, isProcessing }: any) {
-  return (
-    <motion.div
-      className="p-8 rounded-[40px]"
-      style={{
-        background: "#F9F7F2",
-        boxShadow: "12px 12px 24px #E0DCD0, -12px -12px 24px #FFFFFF",
-      }}
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-    >
-      <h2 className="text-3xl font-['Bodoni_Moda'] font-bold mb-8" style={{ color: "#2D1E2F" }}>
-        AI Detection Scanner
-      </h2>
-      <textarea
-        value={detectionInput}
-        onChange={(e) => setDetectionInput(e.target.value)}
-        placeholder="Paste text to scan for AI detection..."
-        className="w-full h-64 p-6 rounded-3xl resize-none mb-6"
-        style={{
-          background: "#F9F7F2",
-          boxShadow: "inset 6px 6px 12px #E0DCD0, inset -6px -6px 12px #FFFFFF",
-          border: "none",
-          color: "#2D1E2F",
-        }}
-      />
-
-      {detectionScore !== null && !isProcessing && (
-        <motion.div
-          className="mb-6 p-8 rounded-3xl text-center"
-          style={{
-            background: "#F9F7F2",
-            boxShadow: "8px 8px 20px #E0DCD0, -8px -8px 20px #FFFFFF",
-          }}
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-        >
-          <p className="text-sm font-semibold mb-3 opacity-60" style={{ color: "#2D1E2F" }}>
-            AI Detection Score
-          </p>
-          <motion.div
-            className="text-7xl font-['Bodoni_Moda'] font-bold mb-3"
-            style={{ color: detectionScore < 30 ? "#10B981" : "#EC5840" }}
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: "spring", stiffness: 200 }}
-          >
-            {detectionScore}%
-          </motion.div>
-          <p style={{ color: "#61587D" }}>
-            {detectionScore < 30 ? "✓ Likely Human-Written" : "⚠ May Appear AI-Generated"}
-          </p>
-        </motion.div>
-      )}
-
-      {isProcessing && (
-        <div className="mb-6 p-8 rounded-3xl flex items-center justify-center">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          >
-            <Shield className="w-10 h-10 text-[#61587D]" />
-          </motion.div>
-        </div>
-      )}
-
-      <motion.button
-        onClick={handleDetectionScan}
-        disabled={credits === 0 || !detectionInput.trim() || isProcessing}
-        className="px-10 py-4 rounded-full font-semibold flex items-center gap-3 disabled:opacity-50"
-        style={{
-          background: "linear-gradient(135deg, #61587D, #4F4868)",
-          color: "#F9F7F2",
-          boxShadow: "6px 6px 16px #E0DCD0, -4px -4px 12px #FFFFFF",
-        }}
-        whileHover={{ scale: 1.03 }}
-        whileTap={{ scale: 0.98 }}
-      >
-        <Shield className="w-5 h-5" />
-        Scan for AI ({credits} credits)
-      </motion.button>
-    </motion.div>
-  );
-}
-
-function GrammarTool({ grammarInput, setGrammarInput, grammarOutput, handleGrammarCheck, credits, isProcessing }: any) {
-  return (
-    <motion.div
-      className="p-8 rounded-[40px]"
-      style={{
-        background: "#F9F7F2",
-        boxShadow: "12px 12px 24px #E0DCD0, -12px -12px 24px #FFFFFF",
-      }}
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-    >
-      <h2 className="text-3xl font-['Bodoni_Moda'] font-bold mb-8" style={{ color: "#2D1E2F" }}>
-        Grammar & Spelling Assistant
-      </h2>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <div>
-          <label className="block mb-3 font-semibold" style={{ color: "#2D1E2F" }}>
-            Original Text
-          </label>
-          <textarea
-            value={grammarInput}
-            onChange={(e) => setGrammarInput(e.target.value)}
-            placeholder="Paste your text here to check grammar..."
-            className="w-full h-80 p-6 rounded-3xl resize-none"
-            style={{
-              background: "#F9F7F2",
-              boxShadow: "inset 6px 6px 12px #E0DCD0, inset -6px -6px 12px #FFFFFF",
-              border: "none",
-              color: "#2D1E2F",
-            }}
-          />
-        </div>
-        <div>
-          <label className="block mb-3 font-semibold" style={{ color: "#2D1E2F" }}>
-            Corrected Text
-          </label>
-          <div
-            className="w-full h-80 p-6 rounded-3xl overflow-y-auto"
-            style={{
-              background: "#F9F7F2",
-              boxShadow: "inset 6px 6px 12px #E0DCD0, inset -6px -6px 12px #FFFFFF",
-              color: "#2D1E2F",
-            }}
-          >
-            {isProcessing ? (
-              <div className="flex items-center justify-center h-full">
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                >
-                  <CheckCircle className="w-8 h-8 text-[#E5D3B3]" />
-                </motion.div>
-              </div>
-            ) : (
-              <p className="whitespace-pre-wrap">{grammarOutput || "Corrected text will appear here..."}</p>
-            )}
-          </div>
-        </div>
-      </div>
-      <motion.button
-        onClick={handleGrammarCheck}
-        disabled={credits === 0 || !grammarInput.trim() || isProcessing}
-        className="px-10 py-4 rounded-full font-semibold flex items-center gap-3 disabled:opacity-50"
-        style={{
-          background: "linear-gradient(135deg, #E5D3B3, #D4C4A3)",
-          color: "#2D1E2F",
-          boxShadow: "6px 6px 16px #E0DCD0, -4px -4px 12px #FFFFFF",
-        }}
-        whileHover={{ scale: 1.03 }}
-        whileTap={{ scale: 0.98 }}
-      >
-        <CheckCircle className="w-5 h-5" />
-        Check Grammar ({credits} credits)
-      </motion.button>
-    </motion.div>
-  );
-}
-
-function EmailTool({ emailType, setEmailType, emailOutput, handleEmailGenerate, credits, isProcessing }: any) {
-  return (
-    <motion.div
-      className="p-8 rounded-[40px]"
-      style={{
-        background: "#F9F7F2",
-        boxShadow: "12px 12px 24px #E0DCD0, -12px -12px 24px #FFFFFF",
-      }}
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-    >
-      <h2 className="text-3xl font-['Bodoni_Moda'] font-bold mb-8" style={{ color: "#2D1E2F" }}>
-        Email Generator & Script Builder
-      </h2>
-      <div className="mb-6">
-        <label className="block mb-3 font-semibold" style={{ color: "#2D1E2F" }}>
-          Email Type
-        </label>
-        <select
-          value={emailType}
-          onChange={(e) => setEmailType(e.target.value)}
-          className="w-full p-4 rounded-3xl"
-          style={{
-            background: "#F9F7F2",
-            boxShadow: "inset 4px 4px 10px #E0DCD0, inset -4px -4px 10px #FFFFFF",
-            border: "none",
-            color: "#2D1E2F",
-          }}
-        >
-          <option value="job-application">Job Application</option>
-          <option value="follow-up">Follow-up Email</option>
-          <option value="business-proposal">Business Proposal</option>
-          <option value="customer-support">Customer Support</option>
-        </select>
-      </div>
-      <div className="mb-6">
-        <label className="block mb-3 font-semibold" style={{ color: "#2D1E2F" }}>
-          Generated Email
-        </label>
-        <div
-          className="w-full h-80 p-6 rounded-3xl overflow-y-auto"
-          style={{
-            background: "#F9F7F2",
-            boxShadow: "inset 6px 6px 12px #E0DCD0, inset -6px -6px 12px #FFFFFF",
-            color: "#2D1E2F",
-          }}
-        >
-          {isProcessing ? (
-            <div className="flex items-center justify-center h-full">
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-              >
-                <Mail className="w-8 h-8 text-[#2D1E2F]" />
-              </motion.div>
+      {/* Split Input / Output Panes */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 h-[500px] divide-y-4 lg:divide-y-0 lg:divide-x-4 divide-black">
+         
+         {/* Left Pane: Input */}
+         <div className="flex flex-col bg-gray-50 relative p-4 group">
+            <div className="flex justify-between items-center mb-2">
+               <span className="font-bold text-xs text-black uppercase">Paste your text here — English</span>
+               <span className="font-bold text-xs bg-[var(--theme-accent)] text-white px-2 py-1">{input.split(/\s+/).filter(Boolean).length} WORDS</span>
             </div>
-          ) : (
-            <p className="whitespace-pre-wrap">{emailOutput || "Click generate to create your email..."}</p>
-          )}
-        </div>
+            <textarea
+              value={input} onChange={(e) => setInput(e.target.value)} disabled={status !== "idle" && status !== "complete"}
+              placeholder="Start typing or paste your document..."
+              className="flex-1 w-full bg-transparent resize-none outline-none font-jakarta text-lg leading-relaxed text-black"
+            />
+            
+            <div className="absolute bottom-6 right-6 flex gap-4">
+               {input.length === 0 && (
+                  <button onClick={() => setInput("The rapid advancement of artificial intelligence has created new paradigms in digital communication. Many organizations are now exploring generative models to automate their content pipelines.")} className="bg-white border-2 border-black px-4 py-2 font-bold text-sm hover:bg-black hover:text-white transition-colors shadow-[2px_2px_0_#000] text-black">
+                     Try a sample ✦
+                  </button>
+               )}
+               <button 
+                 onClick={handleProcess} disabled={status === "scanning" || status === "processing" || !input.trim()}
+                 className={`brutal-button px-6 py-3 text-lg transition-all ${status === "idle" || status === "complete" ? "bg-[var(--theme-cyan)] hover:bg-[var(--theme-accent)]" : "bg-gray-300 cursor-not-allowed"}`}
+               >
+                 {status === "scanning" || status === "processing" ? "SCANNING..." : `EXECUTE ${activeTool.toUpperCase()}`}
+               </button>
+            </div>
+         </div>
+
+         {/* Right Pane: Output */}
+         <div className={`flex flex-col bg-white p-4 transition-colors ${status === "complete" ? "bg-[var(--theme-cyan)]/10" : ""}`}>
+            <div className="flex justify-between items-center mb-2">
+               <span className="font-bold text-xs text-black uppercase">Output will appear here</span>
+               {status === "complete" && <span className="font-bold text-xs bg-black text-[var(--theme-cyan)] px-2 py-1">ANALYSIS READY</span>}
+            </div>
+            {status === "idle" && (
+               <div className="flex-1 flex items-center justify-center text-gray-400 font-bold uppercase text-center p-8">
+                  Awaiting Input Stream...
+               </div>
+            )}
+            {(status === "scanning" || status === "processing") && (
+               <div className="flex-1 flex flex-col items-center justify-center text-black">
+                  <Activity size={48} className="animate-pulse mb-4 text-[var(--theme-accent)]" />
+                  <p className="font-orbitron font-bold italic uppercase animate-pulse">Running Neural Check...</p>
+               </div>
+            )}
+            {status === "complete" && (
+               <textarea
+                 value={output}
+                 readOnly
+                 className="flex-1 w-full bg-transparent resize-none outline-none font-jakarta text-lg leading-relaxed text-black font-medium"
+               />
+            )}
+         </div>
+
       </div>
-      <motion.button
-        onClick={handleEmailGenerate}
-        disabled={credits === 0 || isProcessing}
-        className="px-10 py-4 rounded-full font-semibold flex items-center gap-3 disabled:opacity-50"
-        style={{
-          background: "linear-gradient(135deg, #2D1E2F, #1F1520)",
-          color: "#F9F7F2",
-          boxShadow: "6px 6px 16px #E0DCD0, -4px -4px 12px #FFFFFF",
-        }}
-        whileHover={{ scale: 1.03 }}
-        whileTap={{ scale: 0.98 }}
-      >
-        <Mail className="w-5 h-5" />
-        Generate Email ({credits} credits)
-      </motion.button>
+
+    </div>
+  );
+}
+
+// --- LANDING PAGE COMPONENTS ---
+
+function TestimonialCard({ name, role, text }: { name: string, role: string, text: string }) {
+  return (
+    <div className="brutal-container bg-white border-4 border-black p-6 relative">
+       <div className="flex text-[var(--theme-accent)] mb-3">
+          <Star size={16} fill="currentColor" />
+          <Star size={16} fill="currentColor" />
+          <Star size={16} fill="currentColor" />
+          <Star size={16} fill="currentColor" />
+          <Star size={16} fill="currentColor" />
+       </div>
+       <p className="font-jakarta text-base font-bold mb-4 leading-tight text-black">"{text}"</p>
+       <div className="border-t-4 border-black pt-3 mt-auto">
+          <p className="font-orbitron font-bold italic uppercase text-sm text-black">{name}</p>
+          <p className="text-xs text-gray-600 font-bold uppercase">{role}</p>
+       </div>
+    </div>
+  );
+}
+
+function BottomAdBar() {
+  return (
+    <div className="fixed bottom-0 left-0 right-0 h-32 bg-black border-t-4 border-white z-50 flex items-center overflow-hidden">
+      <div className="w-12 h-full bg-[var(--theme-accent)] border-r-4 border-white flex flex-col items-center justify-center flex-shrink-0">
+         <span className="text-white font-orbitron italic font-bold tracking-widest text-[10px] uppercase rotate-[-90deg] whitespace-nowrap">SPONSORED</span>
+      </div>
+      <div className="flex-1 h-full grid grid-cols-4 divide-x-4 divide-white">
+         {[1, 2, 3, 4].map((slot) => (
+            <div key={slot} className="relative h-full bg-gray-900 group">
+               <div className="absolute inset-0 flex items-center justify-center opacity-50 font-orbitron font-bold text-white text-xs z-0 uppercase tracking-widest">
+                 Ad Slot {slot}
+               </div>
+               {/* Autoplaying, muted, looping ad placeholder video */}
+               <video 
+                 src="https://www.w3schools.com/html/mov_bbb.mp4" 
+                 autoPlay 
+                 loop 
+                 muted 
+                 playsInline 
+                 className="w-full h-full object-cover opacity-80 mix-blend-luminosity group-hover:mix-blend-normal group-hover:opacity-100 transition-all z-10 relative pointer-events-none"
+               />
+               <div className="absolute bottom-1 right-2 z-20">
+                 <span className="bg-black text-white text-[9px] font-bold px-1 uppercase border border-white">AD</span>
+               </div>
+            </div>
+         ))}
+      </div>
+    </div>
+  );
+}
+
+// --- SHARED WRAPPERS ---
+
+function PageWrapper({ children }: { children: React.ReactNode }) {
+  return (
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="max-w-[1600px] mx-auto px-6 md:px-12 py-16 pb-24">
+      {children}
     </motion.div>
   );
 }
 
-function PricingSection({ setShowUpgradeModal }: { setShowUpgradeModal: (show: boolean) => void }) {
-  const plans = [
-    {
-      name: "Free",
-      price: "$0",
-      period: "forever",
-      credits: "5 credits",
-      features: ["5 free credits", "All 4 tools", "Basic support", "Community access"],
-      cta: "Get Started",
-      popular: false,
-    },
-    {
-      name: "Pro",
-      price: "$19",
-      period: "per month",
-      credits: "500 credits/month",
-      features: [
-        "500 credits monthly",
-        "All premium tools",
-        "Priority support",
-        "No watermarks",
-        "API access",
-        "Advanced features",
-      ],
-      cta: "Upgrade to Pro",
-      popular: true,
-    },
-    {
-      name: "Unlimited",
-      price: "$49",
-      period: "per month",
-      credits: "Unlimited",
-      features: [
-        "Unlimited credits",
-        "All features unlocked",
-        "24/7 support",
-        "White-label option",
-        "Custom integrations",
-        "Team collaboration",
-      ],
-      cta: "Go Unlimited",
-      popular: false,
-    },
-  ];
-
+function NavButton({ active, children, onClick }: any) {
   return (
-    <section className="min-h-screen py-16 px-6">
-      <div className="max-w-7xl mx-auto">
-        <motion.div
-          className="text-center mb-16"
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <h1 className="text-5xl md:text-7xl font-['Bodoni_Moda'] font-bold mb-4" style={{ color: "#2D1E2F" }}>
-            Simple Pricing
-          </h1>
-          <p className="text-xl opacity-70" style={{ color: "#2D1E2F" }}>
-            Choose the plan that fits your needs
-          </p>
-        </motion.div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {plans.map((plan, index) => (
-            <motion.div
-              key={index}
-              className={`p-8 rounded-[40px] relative ${plan.popular ? "ring-4 ring-[#EC5840]" : ""}`}
-              style={{
-                background: "#F9F7F2",
-                boxShadow: plan.popular
-                  ? "12px 12px 28px #E0DCD0, -12px -12px 28px #FFFFFF"
-                  : "8px 8px 20px #E0DCD0, -8px -8px 20px #FFFFFF",
-              }}
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              whileHover={{ y: -8, boxShadow: "14px 14px 32px #E0DCD0, -14px -14px 32px #FFFFFF" }}
-            >
-              {plan.popular && (
-                <div
-                  className="absolute -top-4 left-1/2 -translate-x-1/2 px-6 py-2 rounded-full text-sm font-semibold"
-                  style={{
-                    background: "linear-gradient(135deg, #EC5840, #D84A36)",
-                    color: "#F9F7F2",
-                  }}
-                >
-                  Most Popular
-                </div>
-              )}
-              <h3 className="text-2xl font-['Bodoni_Moda'] font-semibold mb-2" style={{ color: "#2D1E2F" }}>
-                {plan.name}
-              </h3>
-              <div className="mb-2">
-                <span className="text-sm font-semibold" style={{ color: "#EC5840" }}>
-                  {plan.credits}
-                </span>
-              </div>
-              <div className="mb-6">
-                <span className="text-5xl font-bold" style={{ color: "#2D1E2F" }}>
-                  {plan.price}
-                </span>
-                <span className="opacity-60 ml-2" style={{ color: "#2D1E2F" }}>
-                  /{plan.period}
-                </span>
-              </div>
-              <motion.button
-                onClick={() => setShowUpgradeModal(true)}
-                className={`w-full py-4 rounded-full font-semibold mb-8 ${
-                  plan.popular ? "text-[#F9F7F2]" : "text-[#2D1E2F]"
-                }`}
-                style={
-                  plan.popular
-                    ? {
-                        background: "linear-gradient(135deg, #EC5840, #D84A36)",
-                        boxShadow: "4px 4px 12px #E0DCD0, -2px -2px 8px #FFFFFF",
-                      }
-                    : {
-                        background: "#F9F7F2",
-                        boxShadow: "inset 3px 3px 8px #E0DCD0, inset -3px -3px 8px #FFFFFF",
-                      }
-                }
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                {plan.cta}
-              </motion.button>
-              <div className="space-y-3">
-                {plan.features.map((feature, i) => (
-                  <div key={i} className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: "#EC5840" }} />
-                    <span style={{ color: "#2D1E2F" }}>{feature}</span>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
+    <button onClick={onClick} className={`text-sm font-orbitron uppercase tracking-widest italic transition-colors ${active ? 'text-[var(--theme-cyan)] font-bold' : 'text-white hover:text-[var(--theme-cyan)]'}`}>
+      {children}
+    </button>
   );
 }
 
-function AboutSection() {
+// --- TABS (REUSED FROM PREVIOUS) ---
+
+function MiniAdContainer() {
   return (
-    <section className="min-h-screen py-16 px-6">
+    <div className="relative w-full h-24 mt-4 bg-black border-2 border-black overflow-hidden group shrink-0">
+      <video src="https://www.w3schools.com/html/mov_bbb.mp4" autoPlay loop muted playsInline className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute top-1 left-1 bg-[var(--theme-accent)] text-white text-[9px] font-bold px-1 uppercase z-10">SPONSORED</div>
+    </div>
+  );
+}
+
+function BlogDetailView({ blog, onBack }: { blog: any, onBack: () => void }) {
+  return (
+    <div className="bg-white border-4 border-black p-8 md:p-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <button onClick={onBack} className="mb-8 flex items-center gap-2 font-orbitron font-bold uppercase text-sm hover:text-[var(--theme-accent)] transition-colors">
+        <ArrowRight size={20} className="rotate-180" /> Back to Blogs
+      </button>
+
       <div className="max-w-4xl mx-auto">
-        <motion.div
-          className="text-center mb-16"
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <h1 className="text-5xl md:text-7xl font-['Bodoni_Moda'] font-bold mb-6" style={{ color: "#2D1E2F" }}>
-            About Red's AI Humanizer
-          </h1>
-          <p className="text-2xl opacity-70 leading-relaxed" style={{ color: "#2D1E2F" }}>
-            Transform AI content into authentic human writing
-          </p>
-        </motion.div>
+        <div className="flex items-center gap-4 mb-6">
+          <span className="bg-black text-white px-3 py-1 text-xs font-bold uppercase tracking-widest">{blog.category}</span>
+          <span className="text-gray-500 font-bold uppercase text-xs">{blog.date || "MAY 16, 2026"}</span>
+        </div>
 
-        <motion.div
-          className="p-12 rounded-[40px] mb-12"
-          style={{
-            background: "#F9F7F2",
-            boxShadow: "12px 12px 24px #E0DCD0, -12px -12px 24px #FFFFFF",
-          }}
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          <h2 className="text-3xl font-['Bodoni_Moda'] font-bold mb-6" style={{ color: "#2D1E2F" }}>
-            Our Story
-          </h2>
-          <div className="space-y-4 text-lg opacity-80 leading-relaxed" style={{ color: "#2D1E2F" }}>
-            <p>
-              Red's AI Humanizer was created to solve a critical problem: making AI-generated content sound genuinely
-              human while maintaining quality and meaning.
-            </p>
-            <p>
-              We built 4 powerful tools that work together to transform robotic AI text into natural, engaging content
-              that resonates with real people and bypasses AI detectors.
-            </p>
-            <p>
-              Trusted by over 50,000 creators, students, marketers, and professionals who need their AI content to
-              sound authentic and pass as human-written.
-            </p>
+        <h1 className="text-5xl md:text-7xl font-orbitron italic font-bold uppercase leading-none mb-4">{blog.title}</h1>
+        <p className="text-2xl font-jakarta font-bold text-gray-700 mb-12">{blog.subtitle}</p>
+
+        <div className="flex items-center gap-3 mb-12 border-y-4 border-black py-4">
+          <div className="w-12 h-12 bg-black flex items-center justify-center text-white font-orbitron font-bold">
+            {blog.author[0]}
           </div>
-        </motion.div>
+          <div>
+            <p className="text-xs font-bold uppercase text-gray-500 leading-none mb-1">Written By</p>
+            <p className="font-orbitron font-bold uppercase italic text-lg">{blog.author}</p>
+          </div>
+        </div>
 
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-3 gap-6"
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-        >
-          {[
-            { label: "Active Users", value: "50K+", icon: <Users className="w-8 h-8" /> },
-            { label: "Success Rate", value: "98%", icon: <TrendingUp className="w-8 h-8" /> },
-            { label: "Premium Tools", value: "4", icon: <Award className="w-8 h-8" /> },
-          ].map((stat, index) => (
-            <div
-              key={index}
-              className="p-8 rounded-[40px] text-center"
-              style={{
-                background: "#F9F7F2",
-                boxShadow: "8px 8px 20px #E0DCD0, -8px -8px 20px #FFFFFF",
-              }}
-            >
-              <div className="inline-block mb-4" style={{ color: "#EC5840" }}>
-                {stat.icon}
-              </div>
-              <div className="text-4xl font-['Bodoni_Moda'] font-bold mb-2" style={{ color: "#EC5840" }}>
-                {stat.value}
-              </div>
-              <div className="opacity-70" style={{ color: "#2D1E2F" }}>
-                {stat.label}
-              </div>
+        <div className="space-y-12">
+          <div className="aspect-video border-4 border-black overflow-hidden bg-gray-100 shadow-[8px_8px_0_#000]">
+            <img src={blog.image} className="w-full h-full object-cover" alt={blog.title} />
+          </div>
+
+          <div className="prose prose-xl max-w-none font-jakarta text-black">
+            <h2 className="text-3xl font-orbitron italic font-bold uppercase mb-4 border-l-8 border-black pl-4">Introduction</h2>
+            <p className="leading-relaxed mb-8">{blog.intro}</p>
+            
+            <div className="my-12 aspect-[21/9] border-4 border-black overflow-hidden shadow-[8px_8px_0_var(--theme-cyan)]">
+               <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&auto=format&fit=crop&q=80" className="w-full h-full object-cover" alt="Detail Image 1" />
+            </div>
+
+            <h2 className="text-3xl font-orbitron italic font-bold uppercase mb-4 border-l-8 border-[var(--theme-accent)] pl-4">Deep Dive Discussion</h2>
+            <p className="leading-relaxed mb-8">{blog.discussion}</p>
+
+            <div className="my-12 aspect-[21/9] border-4 border-black overflow-hidden shadow-[8px_8px_0_var(--theme-accent)]">
+               <img src="https://images.unsplash.com/photo-1620712943543-bcc4628c9757?w=1200&auto=format&fit=crop&q=80" className="w-full h-full object-cover" alt="Detail Image 2" />
+            </div>
+
+            <div className="bg-gray-50 border-4 border-black p-8 mb-12">
+               <h2 className="text-2xl font-orbitron italic font-bold uppercase mb-4">Summary</h2>
+               <p className="italic text-gray-700">The neural structures in this text successfully bypass predictive detection layers. AI writing is a powerful tool, maintaining human authenticity is critical for SEO and academic integrity. Always verify your content with a robust detection protocol.</p>
+            </div>
+
+            <h2 className="text-3xl font-orbitron italic font-bold uppercase mb-4 border-l-8 border-[var(--theme-cyan)] pl-4">Conclusion</h2>
+            <p className="leading-relaxed mb-12">{blog.conclusion}</p>
+          </div>
+        </div>
+
+        {/* Row of 4 Ads */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 border-t-4 border-black pt-12">
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="aspect-video border-2 border-black relative overflow-hidden group">
+              <video src="https://media.w3.org/2010/05/sintel/trailer.mp4" autoPlay loop muted playsInline className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" />
+              <div className="absolute top-1 left-1 bg-black text-white text-[8px] px-1 font-bold">AD {i}</div>
             </div>
           ))}
-        </motion.div>
+        </div>
+
+        {/* Aesthetic Ad Container */}
+        <div className="mt-24 pt-12 border-t-4 border-black">
+           <div className="brutal-container bg-black text-white p-12 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--theme-accent)] opacity-20 blur-[100px] -mr-32 -mt-32 transition-all group-hover:opacity-40 group-hover:scale-150"></div>
+              <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                 <div>
+                    <span className="inline-block px-3 py-1 bg-[var(--theme-accent)] text-white text-[10px] font-bold uppercase tracking-widest mb-4">SPONSORED PROTOCOL</span>
+                    <h3 className="text-4xl font-orbitron italic font-bold uppercase mb-6 leading-none">Upgrade Your Neural Network</h3>
+                    <p className="font-jakarta text-gray-400 mb-8 font-bold">Secure the most advanced AI humanization layers today. REDAI Premium is now available with 50% discount for early adopters.</p>
+                    <button className="brutal-button bg-white text-black border-white hover:bg-[var(--theme-cyan)] hover:text-white px-8 py-4 text-xl">
+                       ENROLL NOW
+                    </button>
+                 </div>
+                 <div className="aspect-square border-4 border-white overflow-hidden relative">
+                    <video src="https://www.w3schools.com/html/mov_bbb.mp4" autoPlay loop muted playsInline className="w-full h-full object-cover opacity-80 mix-blend-screen" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+                 </div>
+              </div>
+           </div>
+        </div>
       </div>
-    </section>
+    </div>
   );
 }
 
-function UpgradeModal({ onClose }: { onClose: () => void }) {
+function BlogCard({ blog, onClick }: { blog: any, onClick: () => void }) {
   return (
-    <motion.div
-      className="fixed inset-0 z-[100] flex items-center justify-center p-6"
-      style={{
-        background: "rgba(45, 30, 47, 0.8)",
-        backdropFilter: "blur(12px)",
-      }}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      onClick={onClose}
-    >
-      <motion.div
-        className="max-w-2xl w-full p-12 rounded-[40px] relative"
-        style={{
-          background: "#F9F7F2",
-          boxShadow: "16px 16px 32px #E0DCD0, -16px -16px 32px #FFFFFF",
-        }}
-        initial={{ scale: 0.9, y: 20 }}
-        animate={{ scale: 1, y: 0 }}
-        exit={{ scale: 0.9, y: 20 }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <button
-          onClick={onClose}
-          className="absolute top-6 right-6 transition-colors"
-          style={{ color: "#2D1E2F" }}
-        >
-          <X className="w-6 h-6" />
-        </button>
+    <div onClick={onClick} className="brutal-container bg-white border-4 border-black p-4 flex flex-col hover:shadow-[8px_8px_0_#000] transition-all cursor-pointer group h-[400px]">
+       <div className="aspect-video border-2 border-black mb-4 overflow-hidden shrink-0">
+          <img src={blog.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt={blog.title} />
+       </div>
+       <div className="flex-1 flex flex-col">
+         <div className="flex justify-between items-start mb-2">
+           <span className="inline-block bg-black text-white text-[10px] font-bold px-2 py-1 uppercase tracking-wider">{blog.category}</span>
+           <span className="text-[10px] font-bold uppercase text-gray-400">{blog.date || "MAY 16, 2026"}</span>
+         </div>
+         <h3 className="text-xl font-orbitron italic font-bold mb-2 uppercase leading-tight group-hover:text-[var(--theme-accent)] transition-colors text-black">{blog.title}</h3>
+         <p className="font-jakarta font-bold text-xs text-gray-600 line-clamp-3 mb-4">{blog.subtitle}</p>
+         
+         <div className="mt-auto pt-4 border-t-2 border-black flex items-center justify-between">
+           <span className="text-[10px] font-orbitron font-bold uppercase italic text-black">{blog.author}</span>
+           <ArrowRight size={18} className="text-black group-hover:translate-x-2 transition-transform" />
+         </div>
+       </div>
+    </div>
+  );
+}
 
-        <div className="text-center mb-8">
-          <motion.div
-            className="inline-block p-8 rounded-full mb-6"
-            style={{
-              background: "#F9F7F2",
-              boxShadow: "8px 8px 20px #E0DCD0, -8px -8px 20px #FFFFFF",
-            }}
-            animate={{
-              scale: [1, 1.05, 1],
-            }}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
-            <Crown className="w-16 h-16 text-[#E5D3B3]" />
-          </motion.div>
-          <h2 className="text-4xl font-['Bodoni_Moda'] font-bold mb-4" style={{ color: "#2D1E2F" }}>
-            Unlock Premium Power
-          </h2>
-          <p className="text-lg opacity-70" style={{ color: "#2D1E2F" }}>
-            You've used all your free credits! Upgrade to continue humanizing AI content.
-          </p>
+function BlogTab() {
+  const [selectedBlog, setSelectedBlog] = useState<any>(null);
+
+  const blogs = Array.from({ length: 12 }).map((_, i) => ({
+    title: `The Future of AI Detection ${i + 1}`,
+    category: i % 2 === 0 ? "SEO & Content" : "Technology",
+    subtitle: "Understanding how neural networks distinguish synthetic text from human writing.",
+    author: ["Jane Doe", "Alex Smith", "Sarah Connor"][i % 3],
+    date: i % 2 === 0 ? "MAY 15, 2026" : "MAY 16, 2026",
+    intro: "As generative models become more advanced, the line between human and machine-generated content continues to blur. In this article, we explore the foundations of AI detection and how neural structures successfully bypass predictive detection layers. AI writing is a powerful tool, maintaining human authenticity is critical for SEO and academic integrity.",
+    discussion: "The core discussion revolves around predictive patterns. LLMs tend to choose highly probable next words, creating a 'bland' cadence. Human writers inject burstiness and perplexity. By analyzing these traits, tools like REDAI can accurately score text. We analyze the neural structures that define human-like writing and how our protocol validates these patterns.",
+    conclusion: "In conclusion, while AI writing is a powerful tool, maintaining human authenticity is critical for SEO and academic integrity. Always verify your content with a robust detection protocol. The REDAI system remains the benchmark for neural verification in the Aeternum Protocol age.",
+    image: `https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80&auto=format&fit=crop`
+  }));
+
+  if (selectedBlog) {
+    return <BlogDetailView blog={selectedBlog} onBack={() => setSelectedBlog(null)} />;
+  }
+
+  return (
+    <TabContainer title="BLOG & SEO CONTENT" gridClass="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {blogs.map((b, i) => <BlogCard key={i} blog={b} onClick={() => setSelectedBlog(b)} />)}
+    </TabContainer>
+  );
+}
+
+function ReferralCard({ brand }: { brand: any }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(brand.link);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="brutal-container p-4 bg-white border-4 border-black flex flex-col group hover:bg-black hover:text-white transition-colors h-[380px]">
+      <div className="flex items-center gap-3 mb-3">
+        <div className="w-10 h-10 bg-white border-2 border-black overflow-hidden flex-shrink-0 flex items-center justify-center p-1">
+          <img src={brand.logo} alt={`${brand.name} logo`} className="max-w-full max-h-full object-contain" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
         </div>
+        <h3 className="text-lg font-orbitron italic font-bold uppercase truncate">{brand.name}</h3>
+      </div>
+      
+      <p className="font-jakarta text-[10px] font-bold mb-4 group-hover:text-gray-300 leading-relaxed text-black">
+        If you refer using this link <span className="text-[var(--theme-accent)] uppercase">{brand.name}</span>, you will earn 50.00 plus a bonus 100.00 to your {brand.name} account. Show and send the proof of referral, successful installation, and real {brand.name} account.
+      </p>
 
-        <div
-          className="p-8 rounded-3xl mb-8"
-          style={{
-            background: "#F9F7F2",
-            boxShadow: "inset 6px 6px 12px #E0DCD0, inset -6px -6px 12px #FFFFFF",
-          }}
-        >
-          <div className="flex items-center justify-between mb-6">
+      <div className="mt-auto space-y-3">
+         <div className="flex flex-col gap-1">
+           <span className="text-[9px] font-orbitron font-bold uppercase text-gray-500 group-hover:text-gray-400">Your Unique Link</span>
+           <div className="flex w-full border-2 border-black group-hover:border-white">
+             <input type="text" readOnly value={brand.link} className="flex-1 bg-gray-100 group-hover:bg-gray-900 text-[10px] p-2 outline-none text-black group-hover:text-white truncate" />
+             <button onClick={handleCopy} className={`px-3 font-orbitron font-bold text-[10px] uppercase transition-colors ${copied ? "bg-[var(--theme-cyan)] text-black" : "bg-[var(--theme-accent)] text-white hover:bg-white hover:text-black"}`}>
+               {copied ? "COPIED" : "COPY"}
+             </button>
+           </div>
+         </div>
+         
+         <div className="h-20 w-full border-2 border-black overflow-hidden relative group-hover:border-white">
+           <video src={brand.adUrl} autoPlay loop muted playsInline className="w-full h-full object-cover opacity-80" />
+           <span className="absolute top-0 right-0 bg-black text-white text-[8px] px-1 border-b border-l border-white">ADVERT</span>
+         </div>
+      </div>
+    </div>
+  );
+}
+
+function ReferralTab() {
+  const brandsData = [
+    { name: "Maya", domain: "maya.ph", adUrl: "https://media.w3.org/2010/05/sintel/trailer.mp4" },
+    { name: "SMDC", domain: "smdc.com", adUrl: "https://www.w3schools.com/html/mov_bbb.mp4" },
+    { name: "Polywall", domain: "polywall.net", adUrl: "https://media.w3.org/2010/05/bunny/trailer.mp4" },
+    { name: "Dev Partners", domain: "devpartners.co", adUrl: "https://media.w3.org/2010/05/video/movie_300.mp4" },
+    { name: "Outsourced PH", domain: "outsourced.ph", adUrl: "https://media.w3.org/2010/05/sintel/trailer.mp4" },
+    { name: "GCash", domain: "gcash.com", adUrl: "https://www.w3schools.com/html/mov_bbb.mp4" },
+    { name: "BPI", domain: "bpi.com.ph", adUrl: "https://media.w3.org/2010/05/bunny/trailer.mp4" },
+    { name: "UnionBank", domain: "unionbankph.com", adUrl: "https://media.w3.org/2010/05/video/movie_300.mp4" },
+    { name: "Grab", domain: "grab.com", adUrl: "https://media.w3.org/2010/05/sintel/trailer.mp4" },
+    { name: "Foodpanda", domain: "foodpanda.ph", adUrl: "https://www.w3schools.com/html/mov_bbb.mp4" },
+    { name: "Lalamove", domain: "lalamove.com", adUrl: "https://media.w3.org/2010/05/bunny/trailer.mp4" },
+    { name: "Shopee", domain: "shopee.ph", adUrl: "https://media.w3.org/2010/05/video/movie_300.mp4" },
+    { name: "Lazada", domain: "lazada.com.ph", adUrl: "https://media.w3.org/2010/05/sintel/trailer.mp4" },
+    { name: "Zalora", domain: "zalora.com.ph", adUrl: "https://www.w3schools.com/html/mov_bbb.mp4" },
+    { name: "Angkas", domain: "angkas.com", adUrl: "https://media.w3.org/2010/05/bunny/trailer.mp4" }
+  ].map(b => ({
+    ...b,
+    logo: `https://logo.clearbit.com/${b.domain}`,
+    link: `https://${b.domain}/ref/REDAI${Math.floor(Math.random() * 10000)}`
+  }));
+
+  return (
+    <div className="space-y-16 pb-20">
+      {/* How it Works Section */}
+      <section className="brutal-container bg-[var(--theme-cyan)] border-4 border-black p-8">
+        <h2 className="text-4xl font-orbitron italic font-bold uppercase mb-6 text-black border-b-4 border-black pb-4 inline-block">How The Referral Program Works</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+          <div className="bg-white border-4 border-black p-8 shadow-[12px_12px_0_#000] relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-[var(--theme-accent)] -mr-12 -mt-12 rotate-45 group-hover:scale-150 transition-transform"></div>
+            <h3 className="text-2xl font-orbitron font-bold uppercase mb-6 text-black border-b-4 border-black pb-2 flex items-center gap-3">
+              <DollarSign size={24} className="text-[var(--theme-accent)]" /> The Reward
+            </h3>
+            <p className="font-jakarta font-bold text-black leading-relaxed text-lg mb-6">
+              If you refer and the other party did install or purchase a product, you will earn a commission. 
+            </p>
+            <div className="bg-black text-[var(--theme-accent)] p-6 text-center border-2 border-black shadow-[4px_4px_0_var(--theme-accent)]">
+               <p className="font-orbitron italic font-bold text-3xl">50.00 + 100.00</p>
+               <p className="font-orbitron font-bold uppercase text-xs tracking-widest mt-1 text-white">Bonus Per Referral</p>
+            </div>
+          </div>
+          
+          <div className="bg-white border-4 border-black p-8 shadow-[12px_12px_0_black]">
+            <h3 className="text-2xl font-orbitron font-bold uppercase mb-6 text-black border-b-4 border-black pb-2 flex items-center gap-3">
+              <Zap size={24} className="text-[var(--theme-cyan)]" /> The Process
+            </h3>
+            <ol className="font-jakarta font-bold text-black space-y-4">
+              <li className="flex gap-4 items-start">
+                <span className="w-8 h-8 bg-black text-white flex items-center justify-center shrink-0 font-orbitron text-sm">01</span>
+                <span>Fill up the Referral Claim Form below.</span>
+              </li>
+              <li className="flex gap-4 items-start">
+                <span className="w-8 h-8 bg-black text-white flex items-center justify-center shrink-0 font-orbitron text-sm">02</span>
+                <span>Indicate how many referrals you have successfully made.</span>
+              </li>
+              <li className="flex gap-4 items-start">
+                <span className="w-8 h-8 bg-black text-white flex items-center justify-center shrink-0 font-orbitron text-sm">03</span>
+                <span>Provide proof of successful referral with purchase (Screenshots).</span>
+              </li>
+              <li className="flex gap-4 items-start">
+                <span className="w-8 h-8 bg-black text-white flex items-center justify-center shrink-0 font-orbitron text-sm">04</span>
+                <span>Receive your money from REDAI via your chosen brand account.</span>
+              </li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <TabContainer title="REFERRAL PARTNERS" subtitle="Use your unique link to promote these brands." gridClass="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+        {brandsData.map(brand => (
+          <ReferralCard key={brand.name} brand={brand} />
+        ))}
+      </TabContainer>
+
+      {/* Referral Claim Form */}
+      <section className="brutal-container bg-white border-4 border-black p-8 max-w-4xl mx-auto shadow-[12px_12px_0_#000]">
+        <div className="text-center mb-10">
+          <h2 className="text-4xl font-orbitron italic font-bold uppercase mb-2 text-black">Referral Claim Form</h2>
+          <p className="font-jakarta font-bold text-gray-600 uppercase text-sm">Submit your proof of successful conversion here</p>
+        </div>
+        <form className="grid grid-cols-1 md:grid-cols-2 gap-8" onSubmit={(e) => { e.preventDefault(); alert('Claim submitted! We will email you instead.'); }}>
+          <div className="space-y-6">
             <div>
-              <h3 className="text-2xl font-['Bodoni_Moda'] font-bold mb-1" style={{ color: "#2D1E2F" }}>
-                Pro Plan
-              </h3>
-              <p style={{ color: "#EC5840" }}>500 credits/month</p>
+              <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black">Full Name</label>
+              <input type="text" required placeholder="Enter your full name" className="w-full border-4 border-black p-4 font-jakarta font-bold outline-none bg-gray-50 focus:bg-white focus:ring-4 ring-[var(--theme-accent)]/20 transition-all" />
             </div>
-            <div className="text-right">
-              <div className="text-4xl font-bold" style={{ color: "#2D1E2F" }}>
-                $19
-              </div>
-              <div className="opacity-60" style={{ color: "#2D1E2F" }}>
-                /month
-              </div>
+            <div>
+              <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black">Brand Referred</label>
+              <select className="w-full border-4 border-black p-4 font-jakarta font-bold outline-none bg-gray-50 focus:bg-white appearance-none cursor-pointer">
+                {brandsData.map(b => <option key={b.name} value={b.name}>{b.name}</option>)}
+              </select>
             </div>
           </div>
-
-          <div className="space-y-3">
-            {["500 credits per month", "All 4 premium tools", "Priority support", "No watermarks", "API access"].map(
-              (feature, i) => (
-                <div key={i} className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5" style={{ color: "#EC5840" }} />
-                  <span style={{ color: "#2D1E2F" }}>{feature}</span>
-                </div>
-              )
-            )}
+          <div className="space-y-6">
+            <div>
+              <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black">How many referrals?</label>
+              <input type="number" min="1" required placeholder="Total successful conversions" className="w-full border-4 border-black p-4 font-jakarta font-bold outline-none bg-gray-50 focus:bg-white focus:ring-4 ring-[var(--theme-accent)]/20 transition-all" />
+            </div>
+            <div>
+              <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black">Proof of Purchase (Upload Screenshots)</label>
+              <input type="file" required className="w-full border-4 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 focus:bg-white file:mr-4 file:py-2 file:px-4 file:border-0 file:text-xs file:font-orbitron file:font-bold file:bg-black file:text-white hover:file:bg-[var(--theme-accent)] transition-all cursor-pointer" />
+            </div>
           </div>
-        </div>
+          <div className="md:col-span-2 pt-6">
+            <button type="submit" className="w-full bg-[var(--theme-accent)] text-white font-orbitron font-bold py-6 text-xl border-4 border-black hover:bg-black hover:border-white transition-all uppercase shadow-[8px_8px_0_#000] hover:translate-x-1 hover:translate-y-1 hover:shadow-none active:scale-95">
+              Submit Claim For Review
+            </button>
+            <div className="bg-gray-100 border-2 border-black p-4 mt-8">
+              <p className="text-center text-[10px] font-bold uppercase text-gray-700 leading-relaxed">
+                <span className="text-[var(--theme-accent)]">Notice:</span> Your information will be collected and for future reference we can reach out to you. Don't wait for the email, we will email you instead.
+              </p>
+            </div>
+          </div>
+        </form>
+      </section>
+    </div>
+  );
+}
 
-        <div className="flex gap-4">
-          <motion.button
-            className="flex-1 py-4 rounded-full font-semibold"
-            style={{
-              background: "linear-gradient(135deg, #EC5840, #D84A36)",
-              color: "#F9F7F2",
-              boxShadow: "6px 6px 16px #E0DCD0, -4px -4px 12px #FFFFFF",
-            }}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+function CareerTab() {
+  const [selectedRole, setSelectedRole] = useState<string | null>(null);
+
+  return (
+    <TabContainer title="CAREERS" subtitle="Join the REDAI Protocol team." gridClass="grid-cols-1 md:grid-cols-3 lg:grid-cols-6">
+       <BrutalCard onClick={() => setSelectedRole("Senior AI Engineer")} title="Senior AI Engineer" desc="Lead the development of AETERNUM PROTOCOL V5. Remote, competitive equity." icon={<Cpu size={28} className="text-white" />} badge="ENGINEERING" />
+       <BrutalCard onClick={() => setSelectedRole("Frontend Architect")} title="Frontend Architect" desc="Build high-density React/Tailwind interfaces. React, Framer Motion, Neumorphism." icon={<Code2 size={28} className="text-white" />} badge="DESIGN" />
+       <BrutalCard onClick={() => setSelectedRole("Growth Hacker")} title="Growth Hacker" desc="Scale our affiliate programs and manage B2B ad partnerships." icon={<TrendingUp size={28} className="text-white" />} badge="MARKETING" />
+       <BrutalCard onClick={() => setSelectedRole("Cybersecurity Analyst")} title="Cybersecurity Analyst" desc="Ensure protocol integrity and user data protection against synthetic attacks." icon={<Shield size={28} className="text-white" />} badge="SECURITY" />
+       <BrutalCard onClick={() => setSelectedRole("Community Manager")} title="Community Manager" desc="Moderate our creator networks and facilitate marketplace connections." icon={<Users size={28} className="text-white" />} badge="COMMUNITY" />
+       <BrutalCard onClick={() => setSelectedRole("Sales Director (B2B)")} title="Sales Director (B2B)" desc="Onboard enterprise clients, SEO agencies, and universities." icon={<DollarSign size={28} className="text-white" />} badge="SALES" />
+
+       <AnimatePresence>
+         {selectedRole && (
+           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+             <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }} className="brutal-container bg-white border-4 border-black p-8 max-w-md w-full relative">
+               <button onClick={() => setSelectedRole(null)} className="absolute top-4 right-4 text-black hover:text-[var(--theme-accent)] transition-colors">
+                 <X size={24} />
+               </button>
+               <h3 className="text-2xl font-orbitron italic font-bold mb-4 uppercase leading-tight text-black">Apply: {selectedRole}</h3>
+               
+               <div className="bg-black text-white p-5 mb-6 border-2 border-black shadow-[4px_4px_0_var(--theme-accent)] relative">
+                 <p className="font-jakarta text-xs font-bold leading-relaxed relative z-10 text-white">
+                   However, this career is currently vacant, but the team will let you know about the movement of REDAI. For now, your information will be collected and for future reference we can reach out to you. Don't wait for the email, we will email you instead.
+                 </p>
+               </div>
+
+               <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); setSelectedRole(null); }}>
+                 <div>
+                   <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Full Name</label>
+                   <input type="text" required placeholder="John Doe" className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-black text-white focus:border-[var(--theme-accent)]" />
+                 </div>
+                 <div>
+                   <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Email Address</label>
+                   <input type="email" required placeholder="john@example.com" className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-black text-white focus:border-[var(--theme-accent)]" />
+                 </div>
+                 <div>
+                   <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">LinkedIn / Portfolio</label>
+                   <input type="url" placeholder="https://linkedin.com/in/johndoe" className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-black text-white focus:border-[var(--theme-accent)]" />
+                 </div>
+                 <button type="submit" className="w-full bg-[var(--theme-accent)] text-white font-orbitron font-bold py-4 border-2 border-black hover:bg-black hover:border-white hover:shadow-[4px_4px_0_var(--theme-cyan)] transition-all uppercase mt-4">
+                   Submit Application
+                 </button>
+               </form>
+             </motion.div>
+           </motion.div>
+         )}
+       </AnimatePresence>
+    </TabContainer>
+  );
+}
+
+function MarketingDealsTab() {
+  const [viewMode, setViewMode] = useState<"cards" | "agreement" | "form">("cards");
+  const [selectedDeal, setSelectedDeal] = useState<string | null>(null);
+
+  const handleSelectDeal = (deal: string) => {
+    setSelectedDeal(deal);
+    setViewMode("agreement");
+  };
+
+  const handleAgree = () => {
+    setViewMode("form");
+  };
+
+  const handleBack = () => {
+    if (viewMode === "form") setViewMode("agreement");
+    else {
+      setViewMode("cards");
+      setSelectedDeal(null);
+    }
+  };
+
+  return (
+    <div className="space-y-16">
+      
+      {/* 1. CARDS VIEW */}
+      {viewMode === "cards" && (
+        <>
+          <TabContainer title="MARKETING DEALS & CONSIGMENTS" gridClass="grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+            <BrutalCard 
+              badge="PARTNERSHIP" 
+              title="BE PARTNERS WITH US" 
+              desc="We will promote your product in our blogs, carousel, and ad spaces. Dealership commission structure available." 
+              icon={<Shield size={28} className="text-white" />} 
+              onClick={() => handleSelectDeal("Partnership")}
+            />
+            <BrutalCard 
+              badge="AFFILIATE" 
+              title="BE REDAI'S AFFILIATE" 
+              desc="Market and earn consignment on every deal and product purchased. Receive 20% commission per sale." 
+              icon={<TrendingUp size={28} className="text-white" />} 
+              onClick={() => handleSelectDeal("Affiliate")}
+            />
+            <BrutalCard 
+              badge="INFLUENCER" 
+              title="SOCIAL MEDIA INFLUENCER" 
+              desc="Post TikTok or Facebook content with positive reviews to earn 100.00 per platform. Get free credits, clothing, and bags. Scripts and assets provided." 
+              icon={<Users size={28} className="text-white" />} 
+              onClick={() => handleSelectDeal("Influencer")}
+            />
+            <BrutalCard 
+              badge="CREATOR" 
+              title="SUBMIT ART & BLOGS" 
+              desc="Showcase your work (cartoons, abstract art) with our logo. Earn 5% commission on sales. We buy cartoon designs for PHP 100.00 to support local artists." 
+              icon={<PenTool size={28} className="text-white" />} 
+              onClick={() => handleSelectDeal("Creator")}
+            />
+          </TabContainer>
+
+          {/* History Table */}
+          <section className="brutal-container bg-white border-4 border-black p-8 max-w-5xl mx-auto shadow-[12px_12px_0_#000]">
+             <h3 className="text-3xl font-orbitron italic font-bold uppercase mb-6 text-black border-b-4 border-black pb-2">Affiliate Earnings History</h3>
+             <div className="overflow-x-auto">
+                <table className="w-full text-left font-jakarta text-sm font-bold text-black border-collapse">
+                   <thead>
+                      <tr className="bg-black text-white border-2 border-black">
+                         <th className="p-4 uppercase tracking-wider">Affiliate Name</th>
+                         <th className="p-4 uppercase tracking-wider">Recent Purchase</th>
+                         <th className="p-4 uppercase tracking-wider">Commission Earned</th>
+                      </tr>
+                   </thead>
+                   <tbody>
+                      <tr className="border-b-2 border-black">
+                         <td className="p-4">Alex Mercer</td>
+                         <td className="p-4">RedAI Premium API</td>
+                         <td className="p-4 text-[var(--theme-accent)]">PHP 1,250.00</td>
+                      </tr>
+                      <tr className="border-b-2 border-black bg-gray-50">
+                         <td className="p-4">Jane Doe</td>
+                         <td className="p-4">Goofy Mood Hoodie</td>
+                         <td className="p-4 text-[var(--theme-accent)]">PHP 450.00</td>
+                      </tr>
+                      <tr className="border-b-2 border-black">
+                         <td className="p-4">Local Artist Co.</td>
+                         <td className="p-4">Cartoon Design Buyout</td>
+                         <td className="p-4 text-[var(--theme-accent)]">PHP 100.00</td>
+                      </tr>
+                   </tbody>
+                </table>
+             </div>
+          </section>
+        </>
+      )}
+
+      {/* 2. AGREEMENT VIEW */}
+      {viewMode === "agreement" && (
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="brutal-container bg-white border-4 border-black p-8 md:p-16 max-w-4xl mx-auto shadow-[16px_16px_0_var(--theme-accent)]">
+           <button onClick={handleBack} className="mb-8 font-orbitron font-bold uppercase text-black hover:text-[var(--theme-accent)] transition-colors flex items-center gap-2">
+              &larr; Go Back
+           </button>
+           
+           <h2 className="text-4xl md:text-5xl font-orbitron italic font-bold uppercase text-black mb-8 border-b-8 border-black pb-4">
+              Protocol Rules & Conditions
+           </h2>
+           
+           <div className="font-jakarta text-lg text-gray-800 space-y-6 mb-12">
+              <p>Before proceeding with your application for the <strong>{selectedDeal}</strong> program, you must read and agree to the following terms and conditions enforced by the REDAI Protocol.</p>
+              
+              <ul className="list-disc pl-8 space-y-4 font-bold">
+                 <li>All submissions and applications are subject to a strict manual review process.</li>
+                 <li>Any fraudulent claims, fake traffic sources, or bot-generated followers will result in an immediate and permanent ban from the network.</li>
+                 <li>Commission payouts are processed strictly according to the schedule. No early withdrawals are permitted.</li>
+                 <li>All provided marketing materials and assets remain the intellectual property of REDAI Protocol and must not be altered without permission.</li>
+              </ul>
+              
+              <div className="bg-black text-white p-6 border-4 border-[var(--theme-accent)] mt-8">
+                 <p className="font-orbitron font-bold uppercase tracking-widest text-sm text-center">Failure to comply with these rules will result in immediate termination of the agreement.</p>
+              </div>
+           </div>
+
+           <button onClick={handleAgree} className="w-full bg-[var(--theme-accent)] text-white font-orbitron font-bold py-6 border-4 border-black hover:bg-black hover:border-white hover:shadow-[8px_8px_0_var(--theme-cyan)] transition-all uppercase text-2xl tracking-widest">
+              I Agree & Proceed
+           </button>
+        </motion.div>
+      )}
+
+      {/* 3. FORM VIEW */}
+      {viewMode === "form" && (
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="brutal-container bg-white border-4 border-black p-8 md:p-16 max-w-4xl mx-auto shadow-[16px_16px_0_#000]">
+           <button onClick={handleBack} className="mb-8 font-orbitron font-bold uppercase text-black hover:text-[var(--theme-accent)] transition-colors flex items-center gap-2">
+              &larr; Go Back
+           </button>
+
+           <h2 className="text-4xl font-orbitron italic font-bold uppercase text-black mb-2">
+              {selectedDeal} Application
+           </h2>
+           <p className="font-jakarta font-bold text-[var(--theme-accent)] text-xl mb-8 border-b-4 border-black pb-4">Please fill out all required fields.</p>
+
+           <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); alert('Application submitted successfully. We will reach out via email shortly.'); handleBack(); handleBack(); }}>
+                
+                {/* PARTNERSHIP FORM */}
+                {selectedDeal === "Partnership" && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="col-span-1 md:col-span-2">
+                      <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black tracking-widest">Brand/Company Name</label>
+                      <input type="text" required className="w-full border-4 border-black p-4 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black tracking-widest">Contact Email</label>
+                      <input type="email" required className="w-full border-4 border-black p-4 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black tracking-widest">Product Link / Website</label>
+                      <input type="url" required className="w-full border-4 border-black p-4 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                    </div>
+                    <div className="col-span-1 md:col-span-2">
+                      <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black tracking-widest">Proposed Commission Structure</label>
+                      <textarea required placeholder="Outline your dealership/commission proposal..." className="w-full border-4 border-black p-4 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)] resize-none" rows={5}></textarea>
+                    </div>
+                  </div>
+                )}
+
+                {/* AFFILIATE FORM */}
+                {selectedDeal === "Affiliate" && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="col-span-1 md:col-span-2">
+                      <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black tracking-widest">Full Name</label>
+                      <input type="text" required className="w-full border-4 border-black p-4 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black tracking-widest">Email Address</label>
+                      <input type="email" required className="w-full border-4 border-black p-4 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black tracking-widest">Primary Traffic Source</label>
+                      <input type="text" required placeholder="Website URL or Social Media Handle" className="w-full border-4 border-black p-4 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                    </div>
+                    <div className="col-span-1 md:col-span-2">
+                      <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black tracking-widest">Preferred Payout Method</label>
+                      <select required className="w-full border-4 border-black p-4 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]">
+                        <option value="">Select Method...</option>
+                        <option value="gcash">GCash</option>
+                        <option value="bank">Bank Transfer</option>
+                      </select>
+                    </div>
+                  </div>
+                )}
+
+                {/* INFLUENCER FORM */}
+                {selectedDeal === "Influencer" && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="col-span-1 md:col-span-2 bg-[var(--theme-accent)] text-white p-4 border-4 border-black">
+                      <p className="font-jakarta text-sm font-bold uppercase tracking-widest">Scripts and assets will be provided upon approval via email.</p>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black tracking-widest">Full Name</label>
+                      <input type="text" required className="w-full border-4 border-black p-4 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black tracking-widest">Email Address</label>
+                      <input type="email" required className="w-full border-4 border-black p-4 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black tracking-widest">Platform</label>
+                      <select required className="w-full border-4 border-black p-4 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]">
+                        <option value="tiktok">TikTok</option>
+                        <option value="facebook">Facebook</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black tracking-widest">Followers</label>
+                      <input type="number" required min="0" placeholder="e.g. 10000" className="w-full border-4 border-black p-4 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                    </div>
+                    <div className="col-span-1 md:col-span-2">
+                      <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black tracking-widest">Profile Link</label>
+                      <input type="url" required className="w-full border-4 border-black p-4 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                    </div>
+                  </div>
+                )}
+
+                {/* CREATOR FORM */}
+                {selectedDeal === "Creator" && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="col-span-1 md:col-span-2 bg-black text-[var(--theme-cyan)] p-4 border-4 border-black">
+                      <p className="font-jakarta text-sm font-bold uppercase tracking-widest">We buy cartoon designs for PHP 100.00. Please upload your low-res watermarked design for review.</p>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black tracking-widest">Creator Name</label>
+                      <input type="text" required className="w-full border-4 border-black p-4 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black tracking-widest">Email Address</label>
+                      <input type="email" required className="w-full border-4 border-black p-4 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                    </div>
+                    <div className="col-span-1 md:col-span-2">
+                      <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black tracking-widest">Portfolio / Social Link</label>
+                      <input type="url" className="w-full border-4 border-black p-4 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                    </div>
+                    <div className="col-span-1 md:col-span-2">
+                      <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black tracking-widest">Upload Art File (PNG/JPG)</label>
+                      <input type="file" required accept="image/png, image/jpeg" className="w-full border-4 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black text-sm file:bg-black file:text-white file:border-0 file:px-4 file:py-2 file:font-orbitron file:uppercase file:cursor-pointer hover:file:bg-[var(--theme-accent)] transition-all cursor-pointer" />
+                    </div>
+                  </div>
+                )}
+
+                <button type="submit" className="w-full bg-[var(--theme-accent)] text-white font-orbitron font-bold py-6 border-4 border-black hover:bg-black hover:border-white hover:shadow-[8px_8px_0_var(--theme-cyan)] transition-all uppercase mt-8 text-2xl tracking-widest">
+                  Submit Application
+                </button>
+
+           </form>
+        </motion.div>
+      )}
+
+    </div>
+  );
+}
+
+function MarketplaceTab() {
+  const [viewingProduct, setViewingProduct] = useState<any>(null);
+  const [cart, setCart] = useState<any[]>([]);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [checkoutItems, setCheckoutItems] = useState<any[]>([]);
+  const [activeFilter, setActiveFilter] = useState("All");
+  const [paymentMethod, setPaymentMethod] = useState("GCash");
+
+  const products = [
+    { id: 1, name: "REDAI Protocol Hoodie", category: "Cool Hoodies", price: 1500, priceStr: "PHP 1,500.00", image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&q=80", desc: "Premium heavy-weight cotton hoodie featuring the exclusive Aeternum matrix print. Perfect for late-night coding sessions." },
+    { id: 2, name: "The Goofy Mood Perfume", category: "Perfumes", price: 800, priceStr: "PHP 800.00", image: "https://images.unsplash.com/photo-1594035910387-fea47794261f?w=400&q=80", desc: "A chaotic blend of citrus and synthetic musk. Smells like success and syntax errors." },
+    { id: 3, name: "Aeternum Matrix T-Shirt", category: "T-Shirts", price: 600, priceStr: "PHP 600.00", image: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=400&q=80", desc: "Breathable, high-contrast t-shirt. The official uniform of the neural network elite." },
+    { id: 4, name: "Neural Verify Mug", category: "Mugs", price: 350, priceStr: "PHP 350.00", image: "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=400&q=80", desc: "Holds 16oz of pure caffeine. Engineered to keep your coffee hot during endless deploys." },
+    { id: 5, name: "Goofy Mood Oversized Tee", category: "T-Shirts", price: 750, priceStr: "PHP 750.00", image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&q=80", desc: "Comfortable oversized fit for ultimate relaxation. Graphic design is our passion." },
+    { id: 6, name: "Syntax Error Coffee Mug", category: "Mugs", price: 300, priceStr: "PHP 300.00", image: "https://images.unsplash.com/photo-1481833759220-4183c509b5dc?w=400&q=80", desc: "For those days when nothing compiles. A classic ceramic mug with a painful message." },
+    { id: 7, name: "Cyberpunk Zip-Up Hoodie", category: "Cool Hoodies", price: 1800, priceStr: "PHP 1,800.00", image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&q=80", desc: "High-collar zip-up with reflective accents. Stay stealthy in the neon glow." },
+    { id: 8, name: "Abstract Neural Print", category: "Art", price: 1200, priceStr: "PHP 1,200.00", image: "https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=400&q=80", desc: "High-quality poster print of an AI's dream state. Perfect for brutalist office spaces." }
+  ];
+
+  const filters = ["All", ...Array.from(new Set(products.map(p => p.category)))];
+  const filteredProducts = activeFilter === "All" ? products : products.filter(p => p.category === activeFilter);
+
+  const addToCart = (product: any) => {
+    setCart([...cart, product]);
+    setViewingProduct(null);
+  };
+
+  const buyNow = (product: any) => {
+    setCheckoutItems([product]);
+    setViewingProduct(null);
+    setIsCheckoutOpen(true);
+  };
+
+  const checkoutCart = () => {
+    setCheckoutItems(cart);
+    setIsCheckoutOpen(true);
+  };
+
+  const totalCheckoutPrice = checkoutItems.reduce((sum, item) => sum + item.price, 0);
+
+  return (
+    <div className="space-y-12 relative">
+      {/* Cart Floating Button */}
+      {cart.length > 0 && (
+        <button 
+          onClick={checkoutCart}
+          className="fixed bottom-24 right-8 z-50 bg-[var(--theme-accent)] text-white p-4 border-4 border-black shadow-[8px_8px_0_#000] hover:translate-y-1 hover:shadow-[4px_4px_0_#000] transition-all flex items-center gap-3 group"
+        >
+          <div className="bg-black text-white px-3 py-1 font-orbitron font-bold rounded-full group-hover:bg-white group-hover:text-black transition-colors">{cart.length}</div>
+          <span className="font-orbitron font-bold uppercase tracking-widest">View Cart</span>
+        </button>
+      )}
+
+      <div className="text-center mb-8">
+        <h2 className="text-5xl md:text-6xl text-black font-orbitron italic mb-4">REDAI MARKETPLACE</h2>
+        <p className="text-xl text-black font-jakarta max-w-3xl mx-auto">Premium merch, generated cartoons, and goofy mood drops.</p>
+      </div>
+
+      {/* Filter Bar */}
+      <div className="flex flex-wrap gap-4 justify-center mb-12">
+        {filters.map(f => (
+          <button 
+            key={f} 
+            onClick={() => setActiveFilter(f)}
+            className={`px-6 py-2 font-orbitron font-bold uppercase border-2 transition-all ${activeFilter === f ? 'bg-black text-white border-black shadow-[4px_4px_0_var(--theme-accent)] translate-y-[-2px]' : 'bg-white text-black border-black hover:bg-gray-100'}`}
           >
-            Upgrade to Pro
-          </motion.button>
-          <motion.button
-            onClick={onClose}
-            className="px-10 py-4 rounded-full font-semibold"
-            style={{
-              background: "#F9F7F2",
-              boxShadow: "inset 4px 4px 10px #E0DCD0, inset -4px -4px 10px #FFFFFF",
-              color: "#2D1E2F",
-            }}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            Maybe Later
-          </motion.button>
-        </div>
-      </motion.div>
+            {f}
+          </button>
+        ))}
+      </div>
+
+      {/* Product Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-12">
+        {filteredProducts.map((p, i) => (
+          <div key={i} onClick={() => setViewingProduct(p)} className="group cursor-pointer flex flex-col">
+            <div className="aspect-[4/5] bg-gray-50 mb-4 overflow-hidden relative border border-gray-200">
+               <img src={p.image} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" alt={p.name} />
+               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-500 flex items-center justify-center">
+                  <span className="opacity-0 group-hover:opacity-100 bg-white/90 backdrop-blur-sm text-black font-orbitron font-bold px-6 py-3 uppercase tracking-[0.2em] text-xs transition-opacity duration-300">Quick View</span>
+               </div>
+            </div>
+            <div className="flex justify-between items-start">
+               <div>
+                 <h3 className="text-lg font-orbitron font-bold uppercase leading-tight text-black mb-1">{p.name}</h3>
+                 <span className="text-gray-500 text-xs font-bold uppercase tracking-widest">{p.category}</span>
+               </div>
+               <p className="font-jakarta font-bold text-lg text-black">{p.priceStr}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <AnimatePresence>
+        {/* PREMIUM PRODUCT DETAIL MODAL */}
+        {viewingProduct && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center bg-white p-4 md:p-8">
+            <motion.div initial={{ scale: 0.98, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.98, opacity: 0 }} transition={{ duration: 0.4, ease: "easeOut" }} className="w-full h-full max-w-[1400px] flex flex-col md:flex-row relative">
+              
+              {/* Close Button */}
+              <button onClick={() => setViewingProduct(null)} className="absolute top-0 right-0 z-50 p-4 text-black hover:text-[var(--theme-accent)] transition-colors">
+                <X size={32} strokeWidth={1} />
+              </button>
+              
+              {/* Large Image Side */}
+              <div className="w-full md:w-1/2 h-1/2 md:h-full bg-gray-50 flex items-center justify-center relative">
+                 <img src={viewingProduct.image} className="w-full h-full object-cover" alt={viewingProduct.name} />
+              </div>
+
+              {/* Details Side */}
+              <div className="w-full md:w-1/2 h-1/2 md:h-full bg-white p-8 md:p-16 lg:p-24 overflow-y-auto flex flex-col justify-center">
+                 <div className="max-w-xl mx-auto w-full">
+                    <span className="text-gray-400 font-orbitron font-bold uppercase tracking-[0.3em] text-xs mb-4 block">{viewingProduct.category}</span>
+                    <h2 className="text-5xl lg:text-6xl font-orbitron font-bold uppercase leading-tight text-black mb-6">{viewingProduct.name}</h2>
+                    <p className="font-jakarta text-2xl text-black mb-12">{viewingProduct.priceStr}</p>
+                    
+                    <div className="mb-12">
+                       <p className="font-jakarta text-lg text-gray-600 leading-relaxed font-light">{viewingProduct.desc}</p>
+                    </div>
+
+                    <ul className="space-y-4 mb-16 font-jakarta text-sm text-gray-500 uppercase tracking-widest border-t border-gray-200 pt-8">
+                       <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 bg-black rounded-full"></span> Premium Quality Materials</li>
+                       <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 bg-black rounded-full"></span> Exclusive Protocol Branding</li>
+                       <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 bg-black rounded-full"></span> Limited Batch Release</li>
+                    </ul>
+
+                    <div className="flex flex-col gap-4">
+                       <button onClick={() => addToCart(viewingProduct)} className="w-full bg-white text-black font-orbitron font-bold py-5 border border-black hover:bg-gray-50 transition-colors uppercase text-sm tracking-[0.2em]">
+                         Add to Bag
+                       </button>
+                       <button onClick={() => buyNow(viewingProduct)} className="w-full bg-black text-white font-orbitron font-bold py-5 border border-black hover:bg-gray-900 transition-colors uppercase text-sm tracking-[0.2em]">
+                         Purchase Now
+                       </button>
+                    </div>
+                 </div>
+              </div>
+
+            </motion.div>
+          </motion.div>
+        )}
+
+        {/* BATCH CHECKOUT MODAL */}
+        {isCheckoutOpen && checkoutItems.length > 0 && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center bg-white p-4 md:p-8">
+            <motion.div initial={{ scale: 0.98, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.98, opacity: 0 }} transition={{ duration: 0.4, ease: "easeOut" }} className="w-full h-full max-w-[1400px] flex flex-col md:flex-row relative bg-white border border-gray-200">
+              
+              <button onClick={() => setIsCheckoutOpen(false)} className="absolute top-4 right-4 z-50 p-4 text-black hover:text-gray-500 transition-colors">
+                <X size={32} strokeWidth={1} />
+              </button>
+              
+              {/* Order Summary Side */}
+              <div className="w-full md:w-5/12 bg-gray-50 p-8 md:p-16 overflow-y-auto border-r border-gray-200">
+                 <h3 className="text-2xl font-orbitron font-bold mb-12 uppercase tracking-[0.2em] text-black">Order Summary</h3>
+                 
+                 <div className="space-y-6 mb-12">
+                    {checkoutItems.map((item, idx) => (
+                       <div key={idx} className="flex items-center gap-6">
+                          <img src={item.image} className="w-24 h-32 object-cover bg-gray-200" alt={item.name} />
+                          <div>
+                             <p className="font-orbitron font-bold text-sm uppercase mb-2">{item.name}</p>
+                             <p className="font-jakarta text-gray-600">{item.priceStr}</p>
+                          </div>
+                       </div>
+                    ))}
+                 </div>
+
+                 <div className="border-t border-gray-200 pt-8 space-y-4">
+                    <div className="flex justify-between items-center text-sm font-jakarta text-gray-600 uppercase tracking-widest">
+                       <span>Subtotal</span>
+                       <span>PHP {totalCheckoutPrice.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm font-jakarta text-gray-600 uppercase tracking-widest">
+                       <span>Shipping</span>
+                       <span>Calculated via Email</span>
+                    </div>
+                    <div className="flex justify-between items-center pt-4 text-xl font-orbitron font-bold uppercase tracking-widest text-black">
+                       <span>Total</span>
+                       <span>PHP {totalCheckoutPrice.toLocaleString()}</span>
+                    </div>
+                 </div>
+              </div>
+
+              {/* Checkout Form Side */}
+              <div className="w-full md:w-7/12 p-8 md:p-16 lg:p-24 overflow-y-auto">
+                 <div className="max-w-xl mx-auto">
+                   <h3 className="text-2xl font-orbitron font-bold mb-12 uppercase tracking-[0.2em] text-black">Secure Checkout</h3>
+
+                   <div className="bg-gray-50 text-black p-6 mb-10 border border-gray-200">
+                     <p className="font-orbitron text-xs font-bold uppercase tracking-[0.2em] mb-2">
+                       <AlertTriangle size={14} className="inline mr-2 -mt-1" /> Philippines Only
+                     </p>
+                     <p className="font-jakarta text-sm text-gray-600 leading-relaxed font-light">
+                       Orders are manually verified. Confirmation and shipping details will be emailed after payment proof is received.
+                     </p>
+                   </div>
+
+                   <form className="space-y-8" onSubmit={(e) => { 
+                     e.preventDefault(); 
+                     alert('Purchase submitted! Confirmation details will be emailed to you.'); 
+                     setIsCheckoutOpen(false); 
+                     setCart([]); 
+                   }}>
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                       <div>
+                         <label className="block text-xs font-orbitron font-bold uppercase mb-3 text-gray-500 tracking-[0.2em]">Full Name</label>
+                         <input type="text" required className="w-full border-b border-gray-300 p-2 font-jakarta bg-transparent text-black focus:border-black outline-none transition-colors" />
+                       </div>
+                       <div>
+                         <label className="block text-xs font-orbitron font-bold uppercase mb-3 text-gray-500 tracking-[0.2em]">Email Address</label>
+                         <input type="email" required className="w-full border-b border-gray-300 p-2 font-jakarta bg-transparent text-black focus:border-black outline-none transition-colors" />
+                       </div>
+                     </div>
+                     
+                     <div>
+                       <label className="block text-xs font-orbitron font-bold uppercase mb-3 text-gray-500 tracking-[0.2em]">Shipping Address</label>
+                       <input type="text" required placeholder="Street, City, Province, Zip" className="w-full border-b border-gray-300 p-2 font-jakarta bg-transparent text-black focus:border-black outline-none transition-colors" />
+                     </div>
+
+                     {/* Payment Toggle */}
+                     <div>
+                        <label className="block text-xs font-orbitron font-bold uppercase mb-4 text-gray-500 tracking-[0.2em]">Payment Method</label>
+                        <div className="flex gap-4">
+                           <button type="button" onClick={() => setPaymentMethod("GCash")} className={`flex-1 py-4 border font-orbitron font-bold text-xs uppercase tracking-[0.2em] transition-all ${paymentMethod === "GCash" ? "bg-black text-white border-black" : "bg-transparent text-black border-gray-300 hover:border-black"}`}>GCash</button>
+                           <button type="button" onClick={() => setPaymentMethod("Bank")} className={`flex-1 py-4 border font-orbitron font-bold text-xs uppercase tracking-[0.2em] transition-all ${paymentMethod === "Bank" ? "bg-black text-white border-black" : "bg-transparent text-black border-gray-300 hover:border-black"}`}>Bank Transfer</button>
+                        </div>
+                     </div>
+
+                     <div className="bg-gray-50 p-8 border border-gray-200">
+                       <p className="text-xs font-orbitron font-bold uppercase text-gray-500 mb-4 tracking-[0.2em]">Transfer Details</p>
+                       {paymentMethod === "GCash" ? (
+                          <div className="font-jakarta text-sm text-gray-800 space-y-2">
+                             <p>Account Number: <span className="font-bold text-black tracking-widest ml-2">0917-123-4567</span></p>
+                             <p>Account Name: <span className="font-bold text-black ml-2">REDAI Protocol</span></p>
+                          </div>
+                       ) : (
+                          <div className="font-jakarta text-sm text-gray-800 space-y-2">
+                             <p>Bank: <span className="font-bold text-black ml-2">REDAI GLOBAL BANK</span></p>
+                             <p>Account Name: <span className="font-bold text-black ml-2">REDAI Protocol</span></p>
+                             <p>Account Number: <span className="font-bold text-black tracking-widest ml-2">1234-5678-9012</span></p>
+                          </div>
+                       )}
+                     </div>
+
+                     <div>
+                       <label className="block text-xs font-orbitron font-bold uppercase mb-4 text-gray-500 tracking-[0.2em]">Upload Receipt</label>
+                       <input type="file" required className="w-full border border-gray-200 p-4 font-jakarta text-sm bg-gray-50 text-black file:bg-black file:text-white file:border-0 file:px-6 file:py-2 file:font-orbitron file:uppercase file:text-xs file:tracking-[0.2em] file:cursor-pointer hover:file:bg-gray-800 transition-all cursor-pointer" />
+                     </div>
+                     
+                     <button type="submit" className="w-full bg-black text-white font-orbitron font-bold py-6 border border-black hover:bg-white hover:text-black transition-colors uppercase mt-12 text-sm tracking-[0.3em]">
+                       Complete Order
+                     </button>
+                   </form>
+                 </div>
+              </div>
+
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+// --- SHARED COMPONENTS ---
+
+function TabContainer({ title, subtitle, children, gridClass = "grid-cols-1 md:grid-cols-2 lg:grid-cols-3" }: { title: string, subtitle?: string, children: React.ReactNode, gridClass?: string }) {
+  return (
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }} className="space-y-12">
+      <div className="text-center mb-16">
+        <h2 className="text-5xl md:text-6xl text-black font-orbitron italic mb-4">{title}</h2>
+        {subtitle && <p className="text-xl text-black font-jakarta max-w-3xl mx-auto">{subtitle}</p>}
+      </div>
+      <div className={`grid gap-8 ${gridClass}`}>
+        {children}
+      </div>
     </motion.div>
+  );
+}
+
+function BrutalCard({ title, desc, icon, badge, descClass, onClick }: { title: string, desc: string, icon: React.ReactNode, badge?: string, descClass?: string, onClick?: () => void }) {
+  return (
+    <div onClick={onClick} className="brutal-container p-8 bg-white flex flex-col justify-between group cursor-pointer hover:bg-black hover:text-white transition-colors min-h-[300px]">
+      <div>
+        <div className="flex justify-between items-start mb-6">
+           <div className="w-14 h-14 bg-black border-2 border-black flex items-center justify-center shadow-[2px_2px_0_#000] group-hover:bg-[var(--theme-accent)] group-hover:border-white transition-colors">
+             {icon}
+           </div>
+           {badge && <span className="brutal-badge group-hover:border-white group-hover:text-black">{badge}</span>}
+        </div>
+        <h3 className="text-2xl font-orbitron italic font-bold mb-4 leading-tight uppercase group-hover:text-white">{title}</h3>
+        <p className={`font-jakarta group-hover:text-white/80 ${descClass ? descClass : 'text-gray-700'}`}>{desc}</p>
+      </div>
+      <div className="mt-8 pt-4 border-t-2 border-black group-hover:border-white flex justify-end">
+        <ArrowRight size={24} className="text-black group-hover:text-[var(--theme-accent)]" />
+      </div>
+    </div>
   );
 }
 
 function Footer() {
   return (
-    <footer className="py-16 px-6 relative z-10">
-      <div className="h-[1px] max-w-6xl mx-auto mb-12" style={{ background: "rgba(45, 30, 47, 0.1)" }} />
-      <div className="max-w-6xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <Sparkles className="w-6 h-6" style={{ color: "#EC5840" }} />
-              <span className="text-xl font-['Bodoni_Moda'] font-bold" style={{ color: "#2D1E2F" }}>
-                Red's AI Humanizer
+    <footer className="border-t-8 border-black bg-white py-20 text-black px-6 mt-20">
+      <div className="max-w-[1600px] mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+          <div className="col-span-1 md:col-span-1">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 flex items-center justify-center bg-black border-2 border-black">
+                <Cpu size={24} className="text-white" />
+              </div>
+              <span className="text-3xl font-orbitron italic font-bold tracking-tighter text-black uppercase">
+                RED<span className="text-[var(--theme-accent)]">AI</span>
               </span>
             </div>
-            <p className="opacity-60 leading-relaxed" style={{ color: "#2D1E2F" }}>
-              Transform AI content into authentic human writing
+            <p className="font-jakarta text-black text-sm font-bold leading-relaxed">
+              The world's most advanced AI detection and humanization protocol. Engineered for the Aeternum age. High-performance neural verification for creators and developers.
             </p>
           </div>
+          
           <div>
-            <h4 className="font-['Bodoni_Moda'] font-semibold mb-4" style={{ color: "#2D1E2F" }}>
-              Product
-            </h4>
-            <ul className="space-y-2 opacity-60" style={{ color: "#2D1E2F" }}>
-              <li>
-                <a href="#" className="hover:opacity-100 transition-opacity">
-                  Tools
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:opacity-100 transition-opacity">
-                  Pricing
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:opacity-100 transition-opacity">
-                  API
-                </a>
-              </li>
+            <h4 className="font-orbitron font-bold uppercase text-[var(--theme-accent)] mb-6 text-sm tracking-widest border-b-2 border-black pb-2 inline-block">Protocols</h4>
+            <ul className="space-y-3 font-jakarta text-sm font-bold uppercase text-black">
+              <li className="hover:text-[var(--theme-accent)] cursor-pointer transition-colors">Text Humanizer</li>
+              <li className="hover:text-[var(--theme-accent)] cursor-pointer transition-colors">AI Detector</li>
+              <li className="hover:text-[var(--theme-accent)] cursor-pointer transition-colors">Plagiarism Matrix</li>
+              <li className="hover:text-[var(--theme-accent)] cursor-pointer transition-colors">Neural Rewriter</li>
+              <li className="hover:text-[var(--theme-accent)] cursor-pointer transition-colors">API Access</li>
             </ul>
           </div>
+
           <div>
-            <h4 className="font-['Bodoni_Moda'] font-semibold mb-4" style={{ color: "#2D1E2F" }}>
-              Resources
-            </h4>
-            <ul className="space-y-2 opacity-60" style={{ color: "#2D1E2F" }}>
-              <li>
-                <a href="#" className="hover:opacity-100 transition-opacity">
-                  Documentation
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:opacity-100 transition-opacity">
-                  Support
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:opacity-100 transition-opacity">
-                  Blog
-                </a>
-              </li>
+            <h4 className="font-orbitron font-bold uppercase text-[var(--theme-cyan)] mb-6 text-sm tracking-widest border-b-2 border-black pb-2 inline-block">Network</h4>
+            <ul className="space-y-3 font-jakarta text-sm font-bold uppercase text-black">
+              <li className="hover:text-[var(--theme-cyan)] cursor-pointer transition-colors">Marketplace</li>
+              <li className="hover:text-[var(--theme-cyan)] cursor-pointer transition-colors">Affiliate Hub</li>
+              <li className="hover:text-[var(--theme-cyan)] cursor-pointer transition-colors">Referral Link</li>
+              <li className="hover:text-[var(--theme-cyan)] cursor-pointer transition-colors">Career Portal</li>
+              <li className="hover:text-[var(--theme-cyan)] cursor-pointer transition-colors">Ad Partners</li>
             </ul>
           </div>
+
           <div>
-            <h4 className="font-['Bodoni_Moda'] font-semibold mb-4" style={{ color: "#2D1E2F" }}>
-              Company
-            </h4>
-            <ul className="space-y-2 opacity-60" style={{ color: "#2D1E2F" }}>
-              <li>
-                <a href="#" className="hover:opacity-100 transition-opacity">
-                  About
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:opacity-100 transition-opacity">
-                  Privacy
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:opacity-100 transition-opacity">
-                  Terms
-                </a>
-              </li>
-            </ul>
+            <h4 className="font-orbitron font-bold uppercase text-black mb-6 text-sm tracking-widest border-b-2 border-black pb-2 inline-block">Connect</h4>
+            <div className="flex gap-4">
+               <div className="w-12 h-12 bg-black border-4 border-black flex items-center justify-center group cursor-pointer hover:bg-[var(--theme-accent)] transition-colors shadow-[4px_4px_0_#000]">
+                  <Terminal size={24} className="text-white group-hover:text-black" />
+               </div>
+               <div className="w-12 h-12 bg-black border-4 border-black flex items-center justify-center group cursor-pointer hover:bg-[var(--theme-cyan)] transition-colors shadow-[4px_4px_0_#000]">
+                  <MessageSquare size={24} className="text-white group-hover:text-black" />
+               </div>
+               <div className="w-12 h-12 bg-black border-4 border-black flex items-center justify-center group cursor-pointer hover:bg-[var(--theme-accent)] transition-colors shadow-[4px_4px_0_#000]">
+                  <Layers size={24} className="text-white group-hover:text-black" />
+               </div>
+            </div>
+            <p className="mt-8 text-[11px] font-orbitron text-black uppercase font-bold italic">© 2026 REDAI PROTOCOL. ALL RIGHTS RESERVED.</p>
           </div>
         </div>
-        <div className="text-center opacity-60" style={{ color: "#2D1E2F" }}>
-          <p>© 2026 Red's AI Humanizer. All rights reserved.</p>
+
+        <div className="pt-12 border-t-4 border-black flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex gap-8 text-[11px] font-orbitron uppercase tracking-widest italic text-black font-bold">
+            <span className="hover:text-[var(--theme-accent)] cursor-pointer transition-colors">Protocol Rules</span>
+            <span className="hover:text-[var(--theme-cyan)] cursor-pointer transition-colors">Privacy Matrix</span>
+            <span className="hover:text-gray-400 cursor-pointer transition-colors">Security Audit</span>
+          </div>
+          <div className="text-[11px] font-orbitron text-black uppercase font-bold italic px-4 py-1 border-2 border-black bg-gray-100">
+             V4.2.0-STABLE // BUILD 05162026
+          </div>
         </div>
       </div>
     </footer>
