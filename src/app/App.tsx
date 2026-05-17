@@ -147,27 +147,27 @@ export default function App() {
               </div>
 
               {/* How it Works / Proof (Updated Text & Darker Font) */}
-              <section className="bg-[var(--theme-accent)] border-b-4 border-black py-24 px-6">
-                <div className="max-w-[1400px] mx-auto">
-                   <div className="text-center mb-20">
-                      <h2 className="text-5xl md:text-6xl text-black font-orbitron italic font-bold uppercase tracking-tighter mb-4 shadow-none">How to Detect AI With RED<span className="text-[var(--theme-cyan)]">AI</span></h2>
-                      <p className="text-2xl text-black font-jakarta font-bold">Check any text for AI-generated content in three simple steps</p>
+              <section className="bg-[var(--theme-accent)] border-b-4 border-black py-12 px-6">
+                <div className="max-w-[1200px] mx-auto">
+                   <div className="text-center mb-12">
+                      <h2 className="text-3xl md:text-4xl text-black font-orbitron italic font-bold uppercase tracking-tighter mb-2 shadow-none">How to Detect AI With RED<span className="text-[var(--theme-cyan)]">AI</span></h2>
+                      <p className="text-sm md:text-base text-black font-jakarta font-bold">Check any text for AI-generated content in three simple steps</p>
                    </div>
-                   <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-                      <div className="brutal-container bg-white border-4 border-black p-8 relative group">
-                         <div className="absolute -top-6 -left-6 w-12 h-12 bg-[var(--theme-cyan)] border-4 border-black flex items-center justify-center font-orbitron font-bold text-xl">1</div>
-                         <h3 className="text-2xl font-orbitron italic font-bold uppercase mb-4 mt-2">Paste or upload your text</h3>
-                         <p className="font-jakarta font-bold text-black">Paste your text directly or upload a PDF, Word, or TXT file. Check up to 15,000 words in one scan.</p>
+                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div className="brutal-container bg-white border-2 border-black p-5 relative group">
+                         <div className="absolute -top-4 -left-4 w-8 h-8 bg-[var(--theme-cyan)] border-2 border-black flex items-center justify-center font-orbitron font-bold text-sm">1</div>
+                         <h3 className="text-lg font-orbitron italic font-bold uppercase mb-2 mt-1">Paste or upload your text</h3>
+                         <p className="font-jakarta font-bold text-black text-xs leading-relaxed">Paste your text directly or upload a PDF, Word, or TXT file. Check up to 15,000 words in one scan.</p>
                       </div>
-                      <div className="brutal-container bg-black text-white border-4 border-white p-8 relative group">
-                         <div className="absolute -top-6 -left-6 w-12 h-12 bg-[var(--theme-accent)] border-4 border-white flex items-center justify-center font-orbitron font-bold text-xl">2</div>
-                         <h3 className="text-2xl font-orbitron italic font-bold uppercase mb-4 mt-2 text-[var(--theme-cyan)]">Run the scan</h3>
-                         <p className="font-jakarta font-bold text-gray-300">Click Detect AI and get your results in seconds. REDAI checks your text against output patterns from ChatGPT, GPT-5, Claude, Gemini, DeepSeek, and more.</p>
+                      <div className="brutal-container bg-black text-white border-2 border-white p-5 relative group">
+                         <div className="absolute -top-4 -left-4 w-8 h-8 bg-[var(--theme-accent)] border-2 border-white flex items-center justify-center font-orbitron font-bold text-sm">2</div>
+                         <h3 className="text-lg font-orbitron italic font-bold uppercase mb-2 mt-1 text-[var(--theme-cyan)]">Run the scan</h3>
+                         <p className="font-jakarta font-bold text-gray-300 text-xs leading-relaxed">Click Detect AI and get your results in seconds. REDAI checks your text against output patterns from ChatGPT, GPT-5, Claude, Gemini, DeepSeek, and more.</p>
                       </div>
-                      <div className="brutal-container bg-white border-4 border-black p-8 relative group">
-                         <div className="absolute -top-6 -left-6 w-12 h-12 bg-[var(--theme-cyan)] border-4 border-black flex items-center justify-center font-orbitron font-bold text-xl">3</div>
-                         <h3 className="text-2xl font-orbitron italic font-bold uppercase mb-4 mt-2">See the report and fix what was flagged</h3>
-                         <p className="font-jakarta font-bold text-black">Review sentence-level results to see what triggered detection. Rewrite flagged parts with the AI Humanizer, then rescan to confirm everything looks right.</p>
+                      <div className="brutal-container bg-white border-2 border-black p-5 relative group">
+                         <div className="absolute -top-4 -left-4 w-8 h-8 bg-[var(--theme-cyan)] border-2 border-black flex items-center justify-center font-orbitron font-bold text-sm">3</div>
+                         <h3 className="text-lg font-orbitron italic font-bold uppercase mb-2 mt-1">See the report and fix what was flagged</h3>
+                         <p className="font-jakarta font-bold text-black text-xs leading-relaxed">Review sentence-level results to see what triggered detection. Rewrite flagged parts with the AI Humanizer, then rescan to confirm everything looks right.</p>
                       </div>
                    </div>
                 </div>
