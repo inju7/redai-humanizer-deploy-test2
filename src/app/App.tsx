@@ -131,15 +131,7 @@ export default function App() {
             />
           )}
 
-          {/* Floating Menu Toggle Trigger (Mobile/Tablet Only) - Highly Premium, styled with Neobrutalist thick borders */}
-          <button 
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="fixed left-0 top-[40%] z-40 lg:hidden bg-[var(--theme-accent)] text-white border-[3px] border-l-0 border-black px-3 py-2.5 shadow-[3px_3px_0_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none hover:bg-black hover:text-[var(--theme-cyan)] transition-all flex items-center gap-2 rounded-r-md font-orbitron font-black uppercase text-[9px] tracking-widest leading-none select-none group"
-            title="AI Protocols Menu"
-          >
-            <Sliders size={12} className="text-white group-hover:rotate-90 transition-transform" />
-            <span>Protocols</span>
-          </button>
+
 
           <aside className={`fixed top-16 lg:top-20 left-0 bottom-32 w-[240px] bg-white border-r-4 border-black z-40 flex flex-col shadow-[4px_0_0_#000] transition-transform duration-300 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
             <div className="bg-black text-white p-3 border-b-4 border-black text-center flex items-center justify-between">
