@@ -34,6 +34,8 @@ export default function App() {
   const [credits] = useState(5);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [conscienceCleansed, setConscienceCleansed] = useState(false);
+  const [copiedShare, setCopiedShare] = useState(false);
 
   return (
     <div className="relative min-h-screen pb-32 bg-[var(--theme-bg)] selection:bg-[var(--theme-accent)] selection:text-white">
@@ -129,7 +131,15 @@ export default function App() {
             />
           )}
 
-          {/* Floating Menu Toggle Trigger (Mobile/Tablet Only) - Handled premium-style inline inside the workspace flow */}
+          {/* Floating Menu Toggle Trigger (Mobile/Tablet Only) - Highly Premium, styled with Neobrutalist thick borders */}
+          <button 
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className="fixed left-0 top-[40%] z-40 lg:hidden bg-[var(--theme-accent)] text-white border-[3px] border-l-0 border-black px-3 py-2.5 shadow-[3px_3px_0_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none hover:bg-black hover:text-[var(--theme-cyan)] transition-all flex items-center gap-2 rounded-r-md font-orbitron font-black uppercase text-[9px] tracking-widest leading-none select-none group"
+            title="AI Protocols Menu"
+          >
+            <Sliders size={12} className="text-white group-hover:rotate-90 transition-transform" />
+            <span>Protocols</span>
+          </button>
 
           <aside className={`fixed top-16 lg:top-20 left-0 bottom-32 w-[240px] bg-white border-r-4 border-black z-40 flex flex-col shadow-[4px_0_0_#000] transition-transform duration-300 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
             <div className="bg-black text-white p-3 border-b-4 border-black text-center flex items-center justify-between">
@@ -197,8 +207,73 @@ export default function App() {
                    </div>
                 </div>
 
-                {/* Two-Pane Workspace */}
-                <WorkspaceProcessor activeTool={activeTool} />
+                 {/* Two-Pane Workspace */}
+                 <WorkspaceProcessor activeTool={activeTool} />
+
+                 {/* THE FREE RIDER'S ABSOLUTION PROTOCOL (Moral Conscience Arbitrage) */}
+                 <div className="mt-8 brutal-container bg-white border-4 border-black p-5 sm:p-8 relative overflow-hidden group shadow-[6px_6px_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[8px_8px_0_var(--theme-accent)] transition-all">
+                    <div className="absolute top-0 right-0 bg-black text-white border-b-2 border-l-2 border-black font-orbitron font-extrabold text-[7px] sm:text-[9px] px-3 py-1 uppercase tracking-widest z-10 animate-pulse">
+                       STATUS: ACTIVE ARBITRAGE
+                    </div>
+
+                    <div className="relative z-10 max-w-4xl">
+                       <div className="flex items-center gap-2 mb-3">
+                          <div className="w-6 h-6 bg-black text-[var(--theme-cyan)] flex items-center justify-center border border-black shadow-[1px_1px_0_var(--theme-accent)]">
+                             <Activity size={12} className="animate-spin" />
+                          </div>
+                          <h3 className="text-sm sm:text-base font-orbitron italic font-extrabold uppercase text-black tracking-tight leading-none mt-0.5">
+                             Proprietary Moral Tax Protocol V1.2
+                          </h3>
+                       </div>
+
+                       <p className="font-jakarta text-[11px] sm:text-xs font-bold text-black leading-relaxed mb-6">
+                          We noticed you are bypassing enterprise-grade AI detectors for the low, low price of <span className="text-[var(--theme-accent)] font-extrabold">absolutely free</span>. Since server power isn't fueled by sheer good vibes alone, we present to you the <span className="underline decoration-[var(--theme-accent)] decoration-2">Free Rider's Absolution</span>. It costs exactly zero pesos, clears your conscience of riding our GPU clusters for free, and guarantees our developers get to eat lunch today.
+                          <br />
+                          <span className="italic text-gray-500 mt-2 block">Think of it as a mutual non-aggression pact: we give you 100% human-grade bypass scores, you make us famous with your friends. Deal?</span>
+                       </p>
+
+                       {/* Conscience Tracker / Progress Bar */}
+                       <div className="bg-gray-100 border-2 border-black p-3.5 mb-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+                          <div className="flex-1">
+                             <div className="flex justify-between items-center mb-1 text-[8px] sm:text-[9px] font-orbitron font-black uppercase">
+                                <span className="text-black">Your Conscience Balance:</span>
+                                <span className={conscienceCleansed ? "text-green-600 animate-bounce font-black" : "text-red-500 font-black animate-pulse"}>
+                                   {conscienceCleansed ? "100% CLEANSED" : "0% (GUILTY RIDER)"}
+                                </span>
+                             </div>
+                             <div className="w-full h-4 bg-white border border-black p-0.5 relative overflow-hidden">
+                                <div 
+                                   className={`h-full border-r border-black transition-all duration-1000 ${conscienceCleansed ? 'w-full bg-green-500' : 'w-[10%] bg-red-500 animate-pulse'}`}
+                                ></div>
+                             </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-2">
+                             <button 
+                                onClick={() => {
+                                   navigator.clipboard.writeText("https://redaihumanizer.com");
+                                   setCopiedShare(true);
+                                   setConscienceCleansed(true);
+                                   setTimeout(() => setCopiedShare(false), 3000);
+                                }}
+                                className={`px-4 py-2 font-orbitron font-black text-[9px] uppercase tracking-wider border-2 transition-all shadow-[2px_2px_0_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none ${conscienceCleansed ? 'bg-green-500 text-white border-black' : 'bg-black text-white border-black hover:bg-[var(--theme-accent)]'}`}
+                             >
+                                {copiedShare ? "Link Copied! Conscience +100" : "Copy Share Link"}
+                             </button>
+
+                             <a 
+                                href="https://twitter.com/intent/tweet?text=Bypassing%20AI%20detection%20instantly%20with%20REDAI%20Humanizer!%20Check%20it%20out:%20https://redaihumanizer.com"
+                                target="_blank"
+                                rel="noreferrer"
+                                onClick={() => setConscienceCleansed(true)}
+                                className="px-3.5 py-2 bg-[var(--theme-cyan)] text-black border-2 border-black font-orbitron font-black text-[9px] uppercase tracking-wider hover:bg-black hover:text-white transition-colors active:translate-y-0.5 shadow-[2px_2px_0_#000] active:shadow-none"
+                             >
+                                Tweet It
+                             </a>
+                          </div>
+                       </div>
+                    </div>
+                 </div>
 
               </section>
 
