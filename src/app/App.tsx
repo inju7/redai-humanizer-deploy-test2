@@ -418,32 +418,43 @@ export default function App() {
                       </div>
                    </div>
 
-                   {/* Mobile Viewport: Premium Swipe Deck Cards */}
-                   <div className="md:hidden flex overflow-x-auto gap-4 pb-6 snap-x snap-mandatory scrollbar-none px-1">
-                      {[
-                        { name: "Sarah J.", role: "College Student", text: "Bypassed Turnitin instantly. Saved my academic career. 10/10 protocol." },
-                        { name: "Mark T.", role: "SEO Agency", text: "We use the API to mass-humanize our programmatic SEO blogs. AdSense approved." },
-                        { name: "Elena R.", role: "Freelance Writer", text: "Clients think I spend hours writing these articles. Matches my voice perfectly." },
-                        { name: "David C.", role: "Content Manager", text: "Tested 5 different tools. REDAI is the only one that passes Originality 3.0." },
-                        { name: "Priya M.", role: "Professor", text: "The detection is incredibly accurate. I use it to filter out low-effort submissions." },
-                        { name: "James L.", role: "Affiliate Marketer", text: "My product review sites are flourishing. The rewording tool handles bulk jobs." },
-                        { name: "Chris W.", role: "Editor", text: "Uncanny cadence matching. The grammar check alone saves my team hours." },
-                        { name: "Anna B.", role: "Student", text: "The essay writer provides an amazing starting point without raising any AI flags." },
-                        { name: "Luke D.", role: "Content Director", text: "Streamlined our publishing workflow. AI detection score is now consistently 0%." },
-                        { name: "Sophia V.", role: "PhD Candidate", text: "Flawless academic phrasing. Preserves my original arguments perfectly." },
-                        { name: "Marcus K.", role: "SEO Specialist", text: "Completely revolutionized our local search campaigns. Zero drops in traffic." },
-                        { name: "Chloe P.", role: "Copywriter", text: "The humanizer adds the perfect natural cadence. Feels like a top-tier copywriter." },
-                        { name: "Nate B.", role: "Digital Agency", text: "Passes Copyleaks and GPTZero with ease. Absolutely robust security protocol." },
-                        { name: "Zoe T.", role: "Blog Owner", text: "My readers love the new tone. Natural, engaging, and highly informative." },
-                        { name: "Ethan F.", role: "Tech Journalist", text: "The best paraphraser in the market. Retains context perfectly." }
-                      ].map((item, idx) => (
-                         <div key={idx} className="w-[82vw] flex-shrink-0 snap-center">
-                            <TestimonialCard name={item.name} role={item.role} text={item.text} />
-                         </div>
-                      ))}
-                   </div>
-
-                   {/* Desktop Viewport: 5-Column High Density Grid */}
+                   {/* Mobile Viewport: Premium Swipe Deck Cards - 3 horizontal rectangular strips per slide */}
+                    <div className="md:hidden flex overflow-x-auto gap-4 pb-6 snap-x snap-mandatory scrollbar-none px-1">
+                       {[
+                         [
+                           { name: "Sarah J.", role: "College Student", text: "Bypassed Turnitin instantly. Saved my academic career. 10/10 protocol." },
+                           { name: "Mark T.", role: "SEO Agency", text: "We use the API to mass-humanize our programmatic SEO blogs. AdSense approved." },
+                           { name: "Elena R.", role: "Freelance Writer", text: "Clients think I spend hours writing these articles. Matches my voice perfectly." }
+                         ],
+                         [
+                           { name: "David C.", role: "Content Manager", text: "Tested 5 different tools. REDAI is the only one that passes Originality 3.0." },
+                           { name: "Priya M.", role: "Professor", text: "The detection is incredibly accurate. I use it to filter out low-effort submissions." },
+                           { name: "James L.", role: "Affiliate Marketer", text: "My product review sites are flourishing. The rewording tool handles bulk jobs." }
+                         ],
+                         [
+                           { name: "Chris W.", role: "Editor", text: "Uncanny cadence matching. The grammar check alone saves my team hours." },
+                           { name: "Anna B.", role: "Student", text: "The essay writer provides an amazing starting point without raising any AI flags." },
+                           { name: "Luke D.", role: "Content Director", text: "Streamlined our publishing workflow. AI detection score is now consistently 0%." }
+                         ],
+                         [
+                           { name: "Sophia V.", role: "PhD Candidate", text: "Flawless academic phrasing. Preserves my original arguments perfectly." },
+                           { name: "Marcus K.", role: "SEO Specialist", text: "Completely revolutionized our local search campaigns. Zero drops in traffic." },
+                           { name: "Chloe P.", role: "Copywriter", text: "The humanizer adds the perfect natural cadence. Feels like a top-tier copywriter." }
+                         ],
+                         [
+                           { name: "Nate B.", role: "Digital Agency", text: "Passes Copyleaks and GPTZero with ease. Absolutely robust security protocol." },
+                           { name: "Zoe T.", role: "Blog Owner", text: "My readers love the new tone. Natural, engaging, and highly informative." },
+                           { name: "Ethan F.", role: "Tech Journalist", text: "The best paraphraser in the market. Retains context perfectly." }
+                         ]
+                       ].map((chunk, chunkIdx) => (
+                          <div key={chunkIdx} className="w-[88vw] flex-shrink-0 snap-center space-y-2">
+                             {chunk.map((item, idx) => (
+                                <TestimonialCard key={idx} name={item.name} role={item.role} text={item.text} isCompact={true} />
+                             ))}
+                          </div>
+                       ))}
+                    </div>
+                    {/* Desktop Viewport: 5-Column High Density Grid */}
                    <div className="hidden md:grid grid-cols-3 lg:grid-cols-5 gap-3">
                       <TestimonialCard name="Sarah J." role="College Student" text="Bypassed Turnitin instantly. Saved my academic career. 10/10 protocol." />
                       <TestimonialCard name="Mark T." role="SEO Agency" text="We use the API to mass-humanize our programmatic SEO blogs. AdSense approved." />
@@ -593,7 +604,28 @@ function WorkspaceProcessor({ activeTool }: { activeTool: string }) {
 
 // --- LANDING PAGE COMPONENTS ---
 
-function TestimonialCard({ name, role, text }: { name: string, role: string, text: string }) {
+function TestimonialCard({ name, role, text, isCompact = false }: { name: string, role: string, text: string, isCompact?: boolean }) {
+  if (isCompact) {
+    return (
+      <div className="brutal-container bg-white border-2 border-black p-2.5 flex items-center justify-between gap-3 hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[3px_3px_0_#000] transition-all cursor-pointer rounded-none w-full">
+         <div className="flex-1 min-w-0">
+            <p className="font-jakarta text-[9px] font-bold leading-snug text-black line-clamp-2">"{text}"</p>
+            <div className="flex items-center gap-1.5 mt-1">
+               <span className="font-orbitron font-extrabold italic uppercase text-[8px] text-black leading-none">{name}</span>
+               <span className="text-[6px] text-gray-500 font-bold uppercase leading-none border-l border-black pl-1.5">{role}</span>
+            </div>
+         </div>
+         <div className="flex text-[var(--theme-accent)] flex-shrink-0 gap-0.5">
+            <Star size={7} fill="currentColor" />
+            <Star size={7} fill="currentColor" />
+            <Star size={7} fill="currentColor" />
+            <Star size={7} fill="currentColor" />
+            <Star size={7} fill="currentColor" />
+         </div>
+      </div>
+    );
+  }
+
   return (
     <div className="brutal-container bg-white border-2 border-black p-2 relative flex flex-col justify-between hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[3px_3px_0_#000] transition-all cursor-pointer">
        <div>
