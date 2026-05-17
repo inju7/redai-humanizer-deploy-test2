@@ -154,6 +154,7 @@ export default function App() {
                    key={tool}
                    onClick={() => {
                      setActiveTool(tool);
+                      setActiveTab("home");
                      setIsSidebarOpen(false);
                    }}
                    className={`w-full text-left px-3 py-2 font-jakarta text-[13px] font-bold uppercase transition-all border-2 ${
@@ -623,14 +624,14 @@ function TestimonialCard({ name, role, text }: { name: string, role: string, tex
 
 function BottomAdBar() {
   return (
-    <div className="fixed bottom-0 left-0 right-0 h-32 bg-black border-t-4 border-white z-50 flex items-center overflow-hidden">
-      <div className="w-12 h-full bg-[var(--theme-accent)] border-r-4 border-white flex flex-col items-center justify-center flex-shrink-0">
-         <span className="text-white font-orbitron italic font-bold tracking-widest text-[10px] uppercase rotate-[-90deg] whitespace-nowrap">SPONSORED</span>
+    <div className="fixed bottom-0 left-0 right-0 h-16 sm:h-32 bg-black border-t-[3px] sm:border-t-4 border-white z-50 flex items-center overflow-hidden">
+      <div className="w-8 sm:w-12 h-full bg-[var(--theme-accent)] border-r-2 sm:border-r-4 border-white flex flex-col items-center justify-center flex-shrink-0">
+         <span className="text-white font-orbitron italic font-bold tracking-widest text-[6px] sm:text-[10px] uppercase rotate-[-90deg] whitespace-nowrap">SPONSORED</span>
       </div>
-      <div className="flex-1 h-full grid grid-cols-4 divide-x-4 divide-white">
+      <div className="flex-1 h-full grid grid-cols-2 sm:grid-cols-4 divide-x-2 sm:divide-x-4 divide-white">
          {[1, 2, 3, 4].map((slot) => (
-            <div key={slot} className="relative h-full bg-gray-900 group">
-               <div className="absolute inset-0 flex items-center justify-center opacity-50 font-orbitron font-bold text-white text-xs z-0 uppercase tracking-widest">
+            <div key={slot} className={`relative h-full bg-gray-900 group ${slot > 2 ? 'hidden sm:block' : ''}`}>
+               <div className="absolute inset-0 flex items-center justify-center opacity-40 font-orbitron font-bold text-white text-[8px] sm:text-xs z-0 uppercase tracking-widest">
                  Ad Slot {slot}
                </div>
                {/* Autoplaying, muted, looping ad placeholder video */}
@@ -643,7 +644,7 @@ function BottomAdBar() {
                  className="w-full h-full object-cover opacity-80 mix-blend-luminosity group-hover:mix-blend-normal group-hover:opacity-100 transition-all z-10 relative pointer-events-none"
                />
                <div className="absolute bottom-1 right-2 z-20">
-                 <span className="bg-black text-white text-[9px] font-bold px-1 uppercase border border-white">AD</span>
+                 <span className="bg-black text-white text-[6px] sm:text-[9px] font-bold px-1 uppercase border border-white leading-none">AD</span>
                </div>
             </div>
          ))}
@@ -747,26 +748,26 @@ function BlogDetailView({ blog, onBack }: { blog: any, onBack: () => void }) {
           ))}
         </div>
 
-        {/* Aesthetic Ad Container */}
-        <div className="mt-24 pt-12 border-t-4 border-black">
-           <div className="brutal-container bg-black text-white p-12 relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--theme-accent)] opacity-20 blur-[100px] -mr-32 -mt-32 transition-all group-hover:opacity-40 group-hover:scale-150"></div>
-              <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-                 <div>
-                    <span className="inline-block px-3 py-1 bg-[var(--theme-accent)] text-white text-[10px] font-bold uppercase tracking-widest mb-4">SPONSORED PROTOCOL</span>
-                    <h3 className="text-4xl font-orbitron italic font-bold uppercase mb-6 leading-none">Upgrade Your Neural Network</h3>
-                    <p className="font-jakarta text-gray-400 mb-8 font-bold">Secure the most advanced AI humanization layers today. REDAI Premium is now available with 50% discount for early adopters.</p>
-                    <button className="brutal-button bg-white text-black border-white hover:bg-[var(--theme-cyan)] hover:text-white px-8 py-4 text-xl">
-                       ENROLL NOW
-                    </button>
-                 </div>
-                 <div className="aspect-square border-4 border-white overflow-hidden relative">
-                    <video src="https://www.w3schools.com/html/mov_bbb.mp4" autoPlay loop muted playsInline className="w-full h-full object-cover opacity-80 mix-blend-screen" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
-                 </div>
-              </div>
-           </div>
-        </div>
+         {/* Aesthetic Ad Container */}
+         <div className="mt-16 sm:mt-24 pt-8 sm:pt-12 border-t-4 border-black">
+            <div className="brutal-container bg-black text-white p-4 sm:p-12 relative overflow-hidden group border-4 border-black">
+               <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--theme-accent)] opacity-20 blur-[100px] -mr-32 -mt-32 transition-all group-hover:opacity-40 group-hover:scale-150"></div>
+               <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-12 items-center">
+                  <div>
+                     <span className="inline-block px-3 py-1 bg-[var(--theme-accent)] text-white text-[9px] sm:text-[10px] font-bold uppercase tracking-widest mb-3 sm:mb-4">SPONSORED PROTOCOL</span>
+                     <h3 className="text-2xl sm:text-4xl font-orbitron italic font-bold uppercase mb-4 sm:mb-6 leading-tight break-words">Upgrade Your Neural Network</h3>
+                     <p className="font-jakarta text-gray-400 mb-6 sm:mb-8 font-bold text-xs sm:text-base leading-relaxed">Secure the most advanced AI humanization layers today. REDAI Premium is now available with 50% discount for early adopters.</p>
+                     <button className="px-5 py-2.5 bg-white text-black font-orbitron font-bold border-2 border-white hover:bg-[var(--theme-cyan)] hover:text-white active:translate-y-0.5 transition-all uppercase text-xs sm:text-sm tracking-wider">
+                        ENROLL NOW
+                     </button>
+                  </div>
+                  <div className="aspect-square border-4 border-white overflow-hidden relative hidden md:block">
+                     <video src="https://www.w3schools.com/html/mov_bbb.mp4" autoPlay loop muted playsInline className="w-full h-full object-cover opacity-80 mix-blend-screen" />
+                     <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+                  </div>
+               </div>
+            </div>
+         </div>
       </div>
     </div>
   );
@@ -1146,14 +1147,14 @@ function CareerTab() {
        <AnimatePresence>
          {selectedRole && (
            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-             <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }} className="brutal-container bg-white border-4 border-black p-8 max-w-md w-full relative">
+             <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }} className="brutal-container bg-white border-4 border-black p-5 sm:p-8 max-w-md w-full relative max-h-[90vh] overflow-y-auto brutal-scrollbar">
                <button onClick={() => setSelectedRole(null)} className="absolute top-4 right-4 text-black hover:text-[var(--theme-accent)] transition-colors">
-                 <X size={24} />
+                 <X size={20} />
                </button>
-               <h3 className="text-2xl font-orbitron italic font-bold mb-4 uppercase leading-tight text-black">Apply: {selectedRole}</h3>
+               <h3 className="text-xl sm:text-2xl font-orbitron italic font-bold mb-3 sm:mb-4 uppercase leading-tight text-black break-words pr-6">Apply: {selectedRole}</h3>
                
-               <div className="bg-black text-white p-5 mb-6 border-2 border-black shadow-[4px_4px_0_var(--theme-accent)] relative">
-                 <p className="font-jakarta text-xs font-bold leading-relaxed relative z-10 text-white">
+               <div className="bg-black text-white p-4 mb-4 border-2 border-black shadow-[3px_3px_0_var(--theme-accent)] relative">
+                 <p className="font-jakarta text-[11px] sm:text-xs font-bold leading-relaxed relative z-10 text-white">
                    However, this career is currently vacant, but the team will let you know about the movement of REDAI. For now, your information will be collected and for future reference we can reach out to you. Don't wait for the email, we will email you instead.
                  </p>
                </div>
@@ -1580,7 +1581,7 @@ function MarketplaceTab() {
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [checkoutItems, setCheckoutItems] = useState<any[]>([]);
   const [activeFilter, setActiveFilter] = useState("All");
-  const [paymentMethod, setPaymentMethod] = useState("GCash");
+  const [paymentMethod, setPaymentMethod] = useState("");
 
   const products = [
     { 
@@ -1857,22 +1858,22 @@ function MarketplaceTab() {
         {/* BATCH CHECKOUT MODAL */}
         {isCheckoutOpen && checkoutItems.length > 0 && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-md p-4">
-            <motion.div initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }} transition={{ duration: 0.3, ease: "easeOut" }} className="w-full h-auto md:h-[350px] max-w-4xl flex flex-col relative bg-white shadow-[4px_4px_0_rgba(0,0,0,1)] border-2 border-black overflow-hidden">
+            <motion.div initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }} transition={{ duration: 0.3, ease: "easeOut" }} className="w-full h-auto max-h-[90vh] max-w-4xl flex flex-col relative bg-white shadow-[4px_4px_0_rgba(0,0,0,1)] border-2 border-black overflow-y-auto brutal-scrollbar">
               
               <button onClick={() => setIsCheckoutOpen(false)} className="absolute top-2 right-2 z-50 p-1 bg-black text-white hover:bg-[var(--theme-accent)] transition-colors border border-black">
                 <X size={16} strokeWidth={2} />
               </button>
               
               {/* Order Summary Horizontal Strip */}
-              <div className="w-full bg-gray-50 p-3 border-b-2 border-black flex flex-col md:flex-row md:items-center justify-between gap-4">
-                 <div className="flex items-center gap-3">
-                    <h3 className="text-[10px] font-orbitron font-bold uppercase tracking-widest text-black border-r-2 border-black pr-3 flex-shrink-0">Order Summary</h3>
-                    <div className="flex items-center gap-2 overflow-x-auto brutal-scrollbar max-w-[450px] py-1">
+              <div className="w-full bg-gray-50 p-3 border-b-2 border-black flex flex-col md:flex-row md:items-center justify-between gap-4 flex-shrink-0">
+                 <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 w-full md:w-auto">
+                    <h3 className="text-[9px] sm:text-[10px] font-orbitron font-bold uppercase tracking-widest text-black border-b border-black sm:border-b-0 sm:border-r-2 border-black pb-1 sm:pb-0 pr-0 sm:pr-3 flex-shrink-0">Order Summary</h3>
+                    <div className="flex items-center gap-2 overflow-x-auto brutal-scrollbar max-w-full md:max-w-[400px] py-1">
                        {checkoutItems.map((item, idx) => (
                           <div key={idx} className="flex items-center gap-1.5 flex-shrink-0 bg-white border border-black p-1">
                              <img src={item.image} className="w-6 h-8 object-cover bg-gray-200" alt={item.name} />
                              <div className="leading-tight">
-                                <p className="font-orbitron font-bold text-[8px] uppercase tracking-wide truncate max-w-[100px]">{item.name}</p>
+                                <p className="font-orbitron font-bold text-[8px] uppercase tracking-wide truncate max-w-[80px] sm:max-w-[100px]">{item.name}</p>
                                 <p className="font-jakarta text-[9px] text-[var(--theme-accent)] font-bold">{item.priceStr}</p>
                              </div>
                           </div>
@@ -1880,16 +1881,16 @@ function MarketplaceTab() {
                     </div>
                  </div>
                  
-                 <div className="flex items-center gap-4 text-right font-orbitron font-bold uppercase tracking-widest text-[8px] text-gray-600 flex-shrink-0">
+                 <div className="flex flex-wrap items-center justify-between sm:justify-end gap-3 font-orbitron font-bold uppercase tracking-widest text-[8px] text-gray-600 w-full md:w-auto flex-shrink-0">
                     <div>
                        <span>Subtotal: </span>
-                       <span className="text-black ml-1">PHP {totalCheckoutPrice.toLocaleString()}</span>
+                       <span className="text-black ml-1 font-black">PHP {totalCheckoutPrice.toLocaleString()}</span>
                     </div>
                     <div>
                        <span>Shipping: </span>
-                       <span className="text-black ml-1">Via Email</span>
+                       <span className="text-black ml-1 font-black">Via Email</span>
                     </div>
-                    <div className="text-[10px] text-black border-l-2 border-black pl-3 flex items-center gap-1">
+                    <div className="text-[10px] text-black border-l border-black pl-3 flex items-center gap-1">
                        <span>Total:</span>
                        <span className="text-[var(--theme-accent)] font-black text-[11px]">PHP {totalCheckoutPrice.toLocaleString()}</span>
                     </div>
@@ -1897,67 +1898,69 @@ function MarketplaceTab() {
               </div>
  
               {/* Checkout Form Side */}
-              <div className="w-full flex-1 p-4 overflow-y-auto brutal-scrollbar flex flex-col justify-center">
+              <div className="w-full flex-grow p-4 md:p-5 overflow-y-auto brutal-scrollbar flex flex-col justify-center bg-white">
                  <div className="w-full">
-                    <div className="flex items-center justify-between border-b-2 border-black pb-1 mb-2">
-                       <h3 className="text-[10px] font-orbitron font-bold uppercase tracking-widest text-black">Secure Checkout</h3>
-                       <div className="bg-black text-[var(--theme-cyan)] px-2 py-0.5 border border-black flex items-center gap-1.5">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b-2 border-black pb-1.5 mb-3 gap-2">
+                       <h3 className="text-[10px] sm:text-xs font-orbitron font-black uppercase tracking-widest text-black">Secure Checkout</h3>
+                       <div className="bg-black text-[var(--theme-cyan)] px-2 py-0.5 border border-black flex items-center gap-1.5 self-start">
                          <span className="font-orbitron text-[8px] font-bold uppercase tracking-widest"><AlertTriangle size={8} className="inline" /> PH Only</span>
                          <span className="font-jakarta text-[8px] text-gray-300">Manual verification via email</span>
                        </div>
                     </div>
  
-                    <form className="space-y-2.5" onSubmit={(e) => { 
+                    <form className="space-y-3" onSubmit={(e) => { 
                       e.preventDefault(); 
                       alert('Purchase submitted! Confirmation details will be emailed to you.'); 
                       setIsCheckoutOpen(false); 
                       setCart([]); 
                     }}>
                       {/* Row 1: Full Name, Email, Shipping Address (3 Columns!) */}
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <div>
                           <label className="block text-[8px] font-orbitron font-bold uppercase mb-0.5 text-black tracking-widest">Full Name</label>
-                          <input type="text" required className="w-full border-2 border-black p-1 font-jakarta bg-gray-50 text-black focus:border-[var(--theme-accent)] outline-none transition-colors text-[9px]" />
+                          <input type="text" required className="w-full border-2 border-black p-2 font-jakarta bg-white text-black rounded-none focus:border-[var(--theme-accent)] outline-none transition-colors text-[9px] font-bold" />
                         </div>
                         <div>
                           <label className="block text-[8px] font-orbitron font-bold uppercase mb-0.5 text-black tracking-widest">Email</label>
-                          <input type="email" required className="w-full border-2 border-black p-1 font-jakarta bg-gray-50 text-black focus:border-[var(--theme-accent)] outline-none transition-colors text-[9px]" />
+                          <input type="email" required className="w-full border-2 border-black p-2 font-jakarta bg-white text-black rounded-none focus:border-[var(--theme-accent)] outline-none transition-colors text-[9px] font-bold" />
                         </div>
                         <div>
                           <label className="block text-[8px] font-orbitron font-bold uppercase mb-0.5 text-black tracking-widest">Shipping Address</label>
-                          <input type="text" required placeholder="Street, City, Province, Zip" className="w-full border-2 border-black p-1 font-jakarta bg-gray-50 text-black focus:border-[var(--theme-accent)] outline-none transition-colors text-[9px]" />
+                          <input type="text" required placeholder="Street, City, Province, Zip" className="w-full border-2 border-black p-2 font-jakarta bg-white text-black rounded-none focus:border-[var(--theme-accent)] outline-none transition-colors text-[9px] font-bold placeholder-gray-400" />
                         </div>
                       </div>
                       
                       {/* Row 2: Payment Method, Transfer Details, Upload Receipt (3 Columns!) */}
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 items-end">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
                          <div>
-                            <label className="block text-[8px] font-orbitron font-bold uppercase mb-0.5 text-black tracking-widest">Payment Method</label>
-                            <div className="flex gap-1">
-                               <button type="button" onClick={() => setPaymentMethod("GCash")} className={`flex-1 py-1 border-2 font-orbitron font-bold text-[8px] uppercase tracking-widest transition-all ${paymentMethod === "GCash" ? "bg-black text-[var(--theme-cyan)] border-black shadow-[1px_1px_0_var(--theme-accent)]" : "bg-white text-black border-black hover:bg-gray-100"}`}>GCash</button>
-                               <button type="button" onClick={() => setPaymentMethod("Bank")} className={`flex-1 py-1 border-2 font-orbitron font-bold text-[8px] uppercase tracking-widest transition-all ${paymentMethod === "Bank" ? "bg-black text-[var(--theme-cyan)] border-black shadow-[1px_1px_0_var(--theme-accent)]" : "bg-white text-black border-black hover:bg-gray-100"}`}>Bank</button>
+                            <label className="block text-[8px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Payment Method</label>
+                            <div className="flex gap-1.5">
+                               <button type="button" onClick={() => setPaymentMethod("GCash")} className={`flex-grow py-2 border-2 font-orbitron font-black text-[8px] uppercase tracking-widest transition-all rounded-none ${paymentMethod === "GCash" ? "bg-black text-[var(--theme-cyan)] border-black shadow-[1.5px_1.5px_0_var(--theme-accent)]" : "bg-white text-black border-black hover:bg-gray-100"}`}>GCash</button>
+                               <button type="button" onClick={() => setPaymentMethod("Bank")} className={`flex-grow py-2 border-2 font-orbitron font-black text-[8px] uppercase tracking-widest transition-all rounded-none ${paymentMethod === "Bank" ? "bg-black text-[var(--theme-cyan)] border-black shadow-[1.5px_1.5px_0_var(--theme-accent)]" : "bg-white text-black border-black hover:bg-gray-100"}`}>Bank</button>
                             </div>
                          </div>
-                         <div className="bg-gray-100 p-1 border border-dashed border-black h-[28px] flex flex-col justify-center">
-                            {paymentMethod === "GCash" ? (
+                         <div className="bg-gray-50 p-2 border-2 border-dashed border-black min-h-[38px] flex flex-col justify-center rounded-none">
+                            {!paymentMethod ? (
+                               <span className="font-jakarta text-[8px] text-gray-500 font-bold uppercase tracking-wider text-center select-none block">Pick method first</span>
+                            ) : paymentMethod === "GCash" ? (
                                <div className="font-jakarta text-[8px] text-gray-800 leading-none">
-                                  <p>Num: <span className="font-bold text-black tracking-widest">0917-123-4567</span></p>
-                                  <p className="mt-0.5">Name: <span className="font-bold text-black">REDAI Protocol</span></p>
+                                  <p className="mb-0.5">Num: <span className="font-bold text-black tracking-wider">0917-123-4567</span></p>
+                                  <p className="mt-1">Name: <span className="font-bold text-black">REDAI Protocol</span></p>
                                </div>
                             ) : (
                                <div className="font-jakarta text-[7px] text-gray-800 leading-tight">
                                   <p className="font-bold text-black leading-none">REDAI GLOBAL BANK</p>
-                                  <p className="mt-0.5">Acct: <span className="font-bold text-black tracking-widest">1234-5678-9012</span></p>
+                                  <p className="mt-1">Acct: <span className="font-bold text-black tracking-wider">1234-5678-9012</span></p>
                                 </div>
                             )}
                          </div>
                          <div>
                             <label className="block text-[8px] font-orbitron font-bold uppercase mb-0.5 text-black tracking-widest">Upload Receipt</label>
-                            <input type="file" required className="w-full border-2 border-black p-0.5 font-jakarta text-[8px] bg-gray-50 text-black file:bg-black file:text-white file:border-0 file:px-2 file:py-0.5 file:font-orbitron file:uppercase file:text-[8px] file:tracking-widest file:cursor-pointer hover:file:bg-[var(--theme-accent)] transition-all cursor-pointer" />
+                            <input type="file" required className="w-full border-2 border-black p-1 font-jakarta text-[8px] bg-white text-black rounded-none file:bg-black file:text-white file:border-0 file:px-2.5 file:py-1 file:font-orbitron file:uppercase file:text-[8px] file:tracking-widest file:cursor-pointer hover:file:bg-[var(--theme-accent)] file:rounded-none transition-all cursor-pointer" />
                          </div>
                       </div>
                       
-                      <button type="submit" className="w-full bg-[var(--theme-accent)] text-white font-orbitron font-bold py-1.5 border-2 border-black hover:bg-black hover:text-white transition-colors uppercase mt-1 text-[9px] tracking-widest shadow-[2px_2px_0_var(--theme-cyan)]">
+                      <button type="submit" className="w-full bg-[var(--theme-accent)] text-white font-orbitron font-black py-2.5 border-2 border-black hover:bg-black hover:text-white transition-colors uppercase mt-2 text-[9px] tracking-widest shadow-[2px_2px_0_var(--theme-cyan)] rounded-none">
                         Complete Order
                       </button>
                     </form>
