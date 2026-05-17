@@ -847,37 +847,37 @@ function MarketingDealsTab() {
 
       {/* 2. AGREEMENT VIEW */}
       {viewMode === "agreement" && (
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="brutal-container bg-white border-4 border-black p-6 md:p-8 w-full max-w-6xl mx-auto shadow-[12px_12px_0_var(--theme-accent)]">
-           <button onClick={handleBack} className="mb-4 font-orbitron font-bold uppercase text-black hover:text-[var(--theme-accent)] transition-colors flex items-center gap-2 text-sm">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="brutal-container bg-white border-4 border-black p-4 md:p-6 w-full max-w-3xl mx-auto shadow-[8px_8px_0_var(--theme-accent)]">
+           <button onClick={handleBack} className="mb-3 font-orbitron font-bold uppercase text-black hover:text-[var(--theme-accent)] transition-colors flex items-center gap-1.5 text-xs">
               &larr; Go Back
            </button>
            
-           <h2 className="text-3xl md:text-4xl font-orbitron italic font-bold uppercase text-black mb-4 border-b-4 border-black pb-2">
+           <h2 className="text-2xl md:text-3xl font-orbitron italic font-bold uppercase text-black mb-3 border-b-2 border-black pb-1.5">
               Protocol Rules & Conditions
            </h2>
            
-           <div className="font-jakarta text-base text-gray-800 space-y-4 mb-6">
+           <div className="font-jakarta text-xs text-gray-800 space-y-3 mb-4">
               <p>Before proceeding with your application for the <strong>{selectedDeal}</strong> program, you must read and agree to the following terms and conditions enforced by the REDAI Protocol.</p>
               
-              <ul className="list-disc pl-8 space-y-2 font-bold">
+              <ul className="list-disc pl-6 space-y-1 font-bold">
                  <li>All submissions and applications are subject to a strict manual review process.</li>
                  <li>Any fraudulent claims, fake traffic sources, or bot-generated followers will result in an immediate and permanent ban from the network.</li>
                  <li>Commission payouts are processed strictly according to the schedule. No early withdrawals are permitted.</li>
                  <li>All provided marketing materials and assets remain the intellectual property of REDAI Protocol and must not be altered without permission.</li>
               </ul>
               
-              <div className="bg-black text-white p-4 border-2 border-[var(--theme-accent)] mt-4">
-                 <p className="font-orbitron font-bold uppercase tracking-widest text-xs text-center">Failure to comply with these rules will result in immediate termination of the agreement.</p>
+              <div className="bg-black text-white p-3 border border-[var(--theme-accent)] mt-3">
+                 <p className="font-orbitron font-bold uppercase tracking-widest text-[10px] text-center">Failure to comply with these rules will result in immediate termination of the agreement.</p>
               </div>
            </div>
 
            <form onSubmit={(e) => { e.preventDefault(); handleAgree(); }}>
-               <div className="mb-6 flex flex-col md:flex-row gap-4 items-end">
+               <div className="mb-4 flex flex-col md:flex-row gap-3 items-end">
                    <div className="flex-1 w-full">
-                       <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black tracking-widest">Signatory Name (I agree to these terms)</label>
-                       <input type="text" required placeholder="Type your full name..." className="w-full border-4 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                       <label className="block text-[10px] font-orbitron font-bold uppercase mb-1.5 text-black tracking-widest">Signatory Name (I agree to these terms)</label>
+                       <input type="text" required placeholder="Type your full name..." className="w-full border-2 border-black p-2 font-jakarta font-bold outline-none bg-gray-50 text-black text-xs focus:border-[var(--theme-accent)]" />
                    </div>
-                   <button type="submit" className="w-full md:w-auto px-12 bg-[var(--theme-accent)] text-white font-orbitron font-bold py-3 border-4 border-black hover:bg-black hover:border-white transition-all uppercase text-lg tracking-widest whitespace-nowrap shadow-[4px_4px_0_var(--theme-cyan)]">
+                   <button type="submit" className="w-full md:w-auto px-8 bg-[var(--theme-accent)] text-white font-orbitron font-bold py-2 border-2 border-black hover:bg-black hover:border-white transition-all uppercase text-sm tracking-widest whitespace-nowrap shadow-[3px_3px_0_var(--theme-cyan)]">
                       I Agree & Proceed
                    </button>
                </div>
@@ -887,15 +887,15 @@ function MarketingDealsTab() {
 
       {/* 3. FORM VIEW */}
       {viewMode === "form" && (
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="brutal-container bg-white border-4 border-black p-6 md:p-8 w-full max-w-6xl mx-auto shadow-[12px_12px_0_#000]">
-           <button onClick={handleBack} className="mb-4 font-orbitron font-bold uppercase text-black hover:text-[var(--theme-accent)] transition-colors flex items-center gap-2 text-sm">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="brutal-container bg-white border-4 border-black p-4 md:p-6 w-full max-w-3xl mx-auto shadow-[8px_8px_0_#000]">
+           <button onClick={handleBack} className="mb-3 font-orbitron font-bold uppercase text-black hover:text-[var(--theme-accent)] transition-colors flex items-center gap-1.5 text-xs">
               &larr; Go Back
            </button>
 
-           <h2 className="text-3xl font-orbitron italic font-bold uppercase text-black mb-2">
+           <h2 className="text-2xl font-orbitron italic font-bold uppercase text-black mb-1">
               {selectedDeal} Application
            </h2>
-           <p className="font-jakarta font-bold text-[var(--theme-accent)] text-lg mb-6 border-b-4 border-black pb-2">Please fill out all required fields.</p>
+           <p className="font-jakarta font-bold text-[var(--theme-accent)] text-base mb-4 border-b-2 border-black pb-1.5">Please fill out all required fields.</p>
 
            <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); alert('Application submitted successfully. We will reach out via email shortly.'); handleBack(); handleBack(); }}>
                 
@@ -1111,40 +1111,40 @@ function MarketplaceTab() {
         {/* PREMIUM PRODUCT DETAIL MODAL */}
         {viewingProduct && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-md p-2">
-            <motion.div initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }} transition={{ duration: 0.3, ease: "easeOut" }} className="w-full max-h-[85vh] max-w-4xl flex flex-col md:flex-row relative bg-white shadow-[6px_6px_0_rgba(0,0,0,1)] border-4 border-black overflow-hidden">
+            <motion.div initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }} transition={{ duration: 0.3, ease: "easeOut" }} className="w-full max-h-[68vh] max-w-2xl flex flex-col md:flex-row relative bg-white shadow-[4px_4px_0_rgba(0,0,0,1)] border-2 border-black overflow-hidden">
               
               {/* Close Button */}
-              <button onClick={() => setViewingProduct(null)} className="absolute top-0 right-0 z-50 p-4 text-black hover:text-[var(--theme-accent)] transition-colors">
-                <X size={32} strokeWidth={1} />
+              <button onClick={() => setViewingProduct(null)} className="absolute top-0 right-0 z-50 p-2 text-black hover:text-[var(--theme-accent)] transition-colors">
+                <X size={20} strokeWidth={2} />
               </button>
               
               {/* Large Image Side */}
-              <div className="w-full md:w-1/2 bg-gray-50 flex items-center justify-center relative border-b-4 md:border-b-0 md:border-r-4 border-black min-h-[250px]">
-                 <img src={viewingProduct.image} className="w-full h-full object-contain p-4" alt={viewingProduct.name} />
+              <div className="w-full md:w-1/2 bg-gray-50 flex items-center justify-center relative border-b-2 md:border-b-0 md:border-r-2 border-black min-h-[200px]">
+                 <img src={viewingProduct.image} className="w-full h-full object-contain p-2" alt={viewingProduct.name} />
               </div>
 
               {/* Details Side */}
-              <div className="w-full md:w-1/2 bg-white p-6 overflow-y-auto flex flex-col justify-center brutal-scrollbar">
+              <div className="w-full md:w-1/2 bg-white p-4 overflow-y-auto flex flex-col justify-center brutal-scrollbar">
                  <div className="w-full">
-                    <span className="text-gray-400 font-orbitron font-bold uppercase tracking-[0.2em] text-[10px] mb-2 block">{viewingProduct.category}</span>
-                    <h2 className="text-2xl lg:text-3xl font-orbitron font-bold uppercase leading-tight text-black mb-2">{viewingProduct.name}</h2>
-                    <p className="font-jakarta font-bold text-xl text-[var(--theme-accent)] mb-4">{viewingProduct.priceStr}</p>
+                    <span className="text-gray-400 font-orbitron font-bold uppercase tracking-[0.2em] text-[8px] mb-1 block">{viewingProduct.category}</span>
+                    <h2 className="text-lg lg:text-xl font-orbitron font-bold uppercase leading-tight text-black mb-1">{viewingProduct.name}</h2>
+                    <p className="font-jakarta font-bold text-base text-[var(--theme-accent)] mb-2">{viewingProduct.priceStr}</p>
                     
-                    <div className="mb-4">
-                       <p className="font-jakarta text-sm text-gray-600 leading-relaxed font-light">{viewingProduct.desc}</p>
+                    <div className="mb-2">
+                       <p className="font-jakarta text-xs text-gray-600 leading-relaxed font-light">{viewingProduct.desc}</p>
                     </div>
 
-                    <ul className="space-y-2 mb-6 font-jakarta text-xs text-gray-500 uppercase tracking-widest border-t border-gray-200 pt-4">
-                       <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 bg-black rounded-full"></span> Premium Quality Materials</li>
-                       <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 bg-black rounded-full"></span> Exclusive Protocol Branding</li>
-                       <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 bg-black rounded-full"></span> Limited Batch Release</li>
+                    <ul className="space-y-1 mb-4 font-jakarta text-[10px] text-gray-500 uppercase tracking-widest border-t border-gray-200 pt-2">
+                       <li className="flex items-center gap-2"><span className="w-1 h-1 bg-black rounded-full"></span> Premium Quality</li>
+                       <li className="flex items-center gap-2"><span className="w-1 h-1 bg-black rounded-full"></span> Protocol Branding</li>
+                       <li className="flex items-center gap-2"><span className="w-1 h-1 bg-black rounded-full"></span> Limited Batch</li>
                     </ul>
 
-                    <div className="flex flex-row gap-3">
-                       <button onClick={() => addToCart(viewingProduct)} className="flex-1 bg-white text-black font-orbitron font-bold py-3 border-2 border-black hover:bg-gray-50 transition-colors uppercase text-xs tracking-[0.1em] shadow-[3px_3px_0_#000]">
+                    <div className="flex flex-row gap-2">
+                       <button onClick={() => addToCart(viewingProduct)} className="flex-1 bg-white text-black font-orbitron font-bold py-2 border border-black hover:bg-gray-50 transition-colors uppercase text-[10px] tracking-[0.05em] shadow-[2px_2px_0_#000]">
                          Add to Bag
                        </button>
-                       <button onClick={() => buyNow(viewingProduct)} className="flex-1 bg-black text-white font-orbitron font-bold py-3 border-2 border-black hover:bg-gray-900 transition-colors uppercase text-xs tracking-[0.1em] shadow-[3px_3px_0_var(--theme-cyan)]">
+                       <button onClick={() => buyNow(viewingProduct)} className="flex-1 bg-black text-white font-orbitron font-bold py-2 border border-black hover:bg-gray-900 transition-colors uppercase text-[10px] tracking-[0.05em] shadow-[2px_2px_0_var(--theme-cyan)]">
                          Purchase Now
                        </button>
                     </div>
@@ -1158,7 +1158,7 @@ function MarketplaceTab() {
         {/* BATCH CHECKOUT MODAL */}
         {isCheckoutOpen && checkoutItems.length > 0 && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-md p-2">
-            <motion.div initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }} transition={{ duration: 0.3, ease: "easeOut" }} className="w-full max-h-[85vh] max-w-4xl flex flex-col md:flex-row relative bg-white shadow-[6px_6px_0_rgba(0,0,0,1)] border-4 border-black overflow-hidden">
+            <motion.div initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }} transition={{ duration: 0.3, ease: "easeOut" }} className="w-full max-h-[68vh] max-w-2xl flex flex-col md:flex-row relative bg-white shadow-[4px_4px_0_rgba(0,0,0,1)] border-2 border-black overflow-hidden">
               
               <button onClick={() => setIsCheckoutOpen(false)} className="absolute top-2 right-2 z-50 p-2 text-black hover:text-gray-500 transition-colors">
                 <X size={24} strokeWidth={2} />
