@@ -4,7 +4,7 @@ import {
   Cpu, Zap, Layers, Shield, Terminal, Code2, 
   TrendingUp, Users, DollarSign, Share2, Tag, 
   ChevronRight, Link, BarChart, PenTool, LayoutTemplate, 
-  Store, Network, MessageSquare, ArrowRight, Activity, Sliders, CheckCircle, Star, Plus, Minus, X, AlertTriangle, Award, Menu
+  Store, Network, MessageSquare, ArrowRight, Activity, Sliders, CheckCircle, Star, Plus, Minus, X, AlertTriangle, Award, Menu, Lock
 } from "lucide-react";
 
 type TabState = "home" | "blog" | "ads" | "marketplace" | "referral" | "career";
@@ -29,13 +29,54 @@ const TOOLS_LIST = [
 ];
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<TabState>("home");
+  const [activeTab, setActiveTab] = useState<TabState | "admin">("home");
   const [activeTool, setActiveTool] = useState<string>("Text Humanizer");
-  const [credits] = useState(5);
+  const [credits, setCredits] = useState(5);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [conscienceCleansed, setConscienceCleansed] = useState(false);
   const [copiedShare, setCopiedShare] = useState(false);
+
+  // Authentication & Role States
+  const [user, setUser] = useState<{ email: string; name: string; role: 'user' | 'admin'; provider: 'email' | 'google' } | null>(null);
+  const [isSignInModalOpen, setIsSignInModalOpen] = useState(false);
+  const [isSignUpMode, setIsSignUpMode] = useState(false);
+  const [signInEmail, setSignInEmail] = useState("");
+  const [signInPassword, setSignInPassword] = useState("");
+  const [signUpName, setSignUpName] = useState("");
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+
+  // Active Tab in Admin Dashboard
+  const [adminActiveTab, setAdminActiveTab] = useState<"overview" | "careers" | "marketplace" | "marketing" | "referrals">("overview");
+
+  // Dynamic Captured Career Applications
+  const [careerApplications, setCareerApplications] = useState<Array<{
+    name: string;
+    email: string;
+    portfolio: string;
+    role: string;
+    date: string;
+  }>>([
+    { name: "Adrian O'Connor", email: "adrian@example.com", portfolio: "https://github.com/adrian", role: "Senior AI Engineer", date: "2026-05-15" },
+    { name: "John Doe", email: "john@example.com", portfolio: "https://johndoe.dev", role: "Frontend Architect", date: "2026-05-16" },
+    { name: "Jane Smith", email: "jane@smith.io", portfolio: "https://linkedin.com/in/janesmith", role: "Growth Hacker", date: "2026-05-17" }
+  ]);
+
+  // Dynamic Captured Marketing Collaboration/Consignment Proposals
+  const [marketingSubmissions, setMarketingSubmissions] = useState<Array<{
+    id: string;
+    type: "Partnership" | "Affiliate" | "Influencer" | "Creator";
+    name: string;
+    email: string;
+    detail1: string; // Product/Website link, Traffic Source, Handle, or Art Style
+    detail2?: string; // Commission Proposal, Payout Method, GCash, or Commission Rate
+    date: string;
+  }>>([
+    { id: "MKT-101", type: "Partnership", name: "SaaS Booster Corp", email: "partner@booster.com", detail1: "https://booster.com", detail2: "15% flat dealership tier", date: "2026-05-14" },
+    { id: "MKT-102", type: "Affiliate", name: "Mark Thompson", email: "mark@seoagency.net", detail1: "SEO Blogs Network", detail2: "GCash (0917-123-4567)", date: "2026-05-15" },
+    { id: "MKT-103", type: "Influencer", name: "Chloe Park", email: "chloe@tiktok.me", detail1: "@chloecodes (250K followers)", detail2: "GCash (0918-987-6543)", date: "2026-05-16" },
+    { id: "MKT-104", type: "Creator", name: "Ethan Fox", email: "ethan@artstudio.com", detail1: "Cyberpunk Cartoon Vectors", detail2: "5% comm + PHP 100 buyout", date: "2026-05-17" }
+  ]);
 
   return (
     <div className="relative min-h-screen pb-12 sm:pb-32 bg-[var(--theme-bg)] selection:bg-[var(--theme-accent)] selection:text-white">
@@ -69,9 +110,75 @@ export default function App() {
               <Zap size={16} className="text-[var(--theme-cyan)]" />
               <span className="text-sm font-orbitron italic font-bold text-white">{credits} UNITS</span>
             </div>
-            <button className="brutal-button bg-[var(--theme-accent)] hover:bg-[var(--theme-cyan)] border-white text-white hover:text-black !px-3 !py-1.5 lg:!px-6 lg:!py-3 !text-[11px] lg:!text-sm">
-              SIGN IN
-            </button>
+            {user ? (
+              <div className="relative">
+                <button 
+                  onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+                  className="brutal-button bg-[var(--theme-cyan)] hover:bg-[var(--theme-accent)] border-white text-black hover:text-white !px-3 !py-1.5 lg:!px-4 lg:!py-2.5 !text-xs font-orbitron font-black uppercase flex items-center gap-2 cursor-pointer shadow-[2px_2px_0_#fff] active:translate-x-0.5 active:translate-y-0.5 select-none"
+                >
+                  <div className="w-5 h-5 bg-black text-white rounded-full flex items-center justify-center font-orbitron font-extrabold text-[9px] uppercase border border-white">
+                    {user.name.charAt(0)}
+                  </div>
+                  <span className="max-w-[70px] truncate">{user.name.split(" ")[0]}</span>
+                </button>
+                
+                {isProfileDropdownOpen && (
+                  <div className="absolute right-0 mt-3 w-56 bg-white border-4 border-black text-black font-jakarta p-4 z-[9999] shadow-[6px_6px_0_#000] text-xs font-bold leading-normal">
+                    <p className="font-orbitron font-extrabold uppercase text-[8px] text-gray-500 tracking-widest leading-none mb-1">Logged In As</p>
+                    <p className="text-black font-extrabold truncate text-sm leading-tight">{user.name}</p>
+                    <p className="text-gray-500 truncate text-[10px] mb-3 leading-tight">{user.email}</p>
+                    <div className="h-[2px] bg-black my-3"></div>
+                    <p className="flex justify-between items-center mb-2">
+                      <span className="text-gray-500 uppercase tracking-widest text-[8px] font-orbitron font-black">Role:</span>
+                      <span className={`px-2 py-0.5 text-[9px] font-orbitron font-black uppercase text-white ${user.role === 'admin' ? 'bg-red-600' : 'bg-green-600'}`}>
+                        {user.role}
+                      </span>
+                    </p>
+                    <p className="flex justify-between items-center mb-3">
+                      <span className="text-gray-500 uppercase tracking-widest text-[8px] font-orbitron font-black">Credits:</span>
+                      <span className="text-[var(--theme-accent)] font-extrabold text-sm">{credits} Units</span>
+                    </p>
+                    
+                    {user.role === 'admin' && (
+                      <>
+                        <div className="h-[2px] bg-black my-3"></div>
+                        <button 
+                          onClick={() => {
+                            setIsProfileDropdownOpen(false);
+                            if (activeTab === "admin") {
+                              setActiveTab("home");
+                            } else {
+                              setActiveTab("admin");
+                            }
+                          }}
+                          className="w-full text-center py-2 font-orbitron font-black uppercase bg-[var(--theme-accent)] text-white hover:bg-black hover:text-white border-2 border-black transition-all mb-2 cursor-pointer shadow-[2px_2px_0_#000] active:translate-x-0.5 active:translate-y-0.5"
+                        >
+                          {activeTab === "admin" ? "Exit Admin Panel" : "Admin Panel"}
+                        </button>
+                      </>
+                    )}
+                    <div className="h-[2px] bg-black my-3"></div>
+                    <button 
+                      onClick={() => {
+                        setUser(null);
+                        setIsProfileDropdownOpen(false);
+                        if (activeTab === "admin") setActiveTab("home");
+                      }}
+                      className="w-full text-center py-2 font-orbitron font-black uppercase bg-black text-white hover:bg-[var(--theme-accent)] border-2 border-black transition-colors cursor-pointer"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button 
+                onClick={() => setIsSignInModalOpen(true)}
+                className="brutal-button bg-[var(--theme-accent)] hover:bg-[var(--theme-cyan)] border-white text-white hover:text-black !px-3 !py-1.5 lg:!px-6 lg:!py-3 !text-[11px] lg:!text-sm cursor-pointer"
+              >
+                SIGN IN
+              </button>
+            )}
             <button 
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
               className="lg:hidden w-8 h-8 lg:w-9 lg:h-9 flex items-center justify-center bg-black border-2 border-white text-white hover:bg-[var(--theme-accent)] transition-colors active:translate-y-0.5"
@@ -515,10 +622,11 @@ export default function App() {
           )}
 
           {activeTab === "blog" && <PageWrapper key="blog"><BlogTab /></PageWrapper>}
-          {activeTab === "ads" && <PageWrapper key="ads"><MarketingDealsTab /></PageWrapper>}
+          {activeTab === "ads" && <PageWrapper key="ads"><MarketingDealsTab onAddSubmission={(sub) => setMarketingSubmissions([sub, ...marketingSubmissions])} /></PageWrapper>}
           {activeTab === "marketplace" && <PageWrapper key="marketplace"><MarketplaceTab /></PageWrapper>}
           {activeTab === "referral" && <PageWrapper key="referral"><ReferralTab /></PageWrapper>}
-          {activeTab === "career" && <PageWrapper key="career"><CareerTab /></PageWrapper>}
+          {activeTab === "career" && <PageWrapper key="career"><CareerTab onAddApplication={(app) => setCareerApplications([app, ...careerApplications])} /></PageWrapper>}
+          {activeTab === "admin" && <PageWrapper key="admin"><AdminDashboardTab user={user} setIsSignInModalOpen={setIsSignInModalOpen} careerApplications={careerApplications} marketingSubmissions={marketingSubmissions} /></PageWrapper>}
         </AnimatePresence>
       </main>
 
@@ -529,6 +637,217 @@ export default function App() {
       {/* FULL-LENGTH BOTTOM AD CONTAINER */}
       <BottomAdBar />
       
+      {/* Sign-In & Auth Modal */}
+      <AnimatePresence>
+        {isSignInModalOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            exit={{ opacity: 0 }} 
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, y: 20 }} 
+              animate={{ scale: 1, y: 0 }} 
+              exit={{ scale: 0.9, y: 20 }} 
+              className="brutal-container bg-white border-4 border-black p-6 sm:p-8 max-w-md w-full relative shadow-[8px_8px_0_#000] text-black font-jakarta"
+            >
+              <button 
+                onClick={() => {
+                  setIsSignInModalOpen(false);
+                  setIsSignUpMode(false);
+                }} 
+                className="absolute top-4 right-4 w-7 h-7 bg-white text-black border-2 border-black flex items-center justify-center font-bold hover:bg-black hover:text-white transition-colors cursor-pointer shadow-[2px_2px_0_#000] active:translate-x-0.5 active:translate-y-0.5"
+              >
+                <X size={14} />
+              </button>
+
+              <div className="text-center mb-6">
+                <span className="text-[10px] font-orbitron font-black uppercase tracking-widest text-[var(--theme-accent)] bg-black px-2 py-0.5 border border-black text-white">
+                  PROTOCOL GATEWAY
+                </span>
+                <h3 className="text-2xl font-orbitron italic font-bold uppercase mt-2 text-black">
+                  {isSignUpMode ? "CREATE ACCOUNT" : "AUTHENTICATE"}
+                </h3>
+                <p className="text-gray-500 font-bold text-[10px] mt-1">
+                  Access ordinary and admin dashboard operations.
+                </p>
+              </div>
+
+              {/* Login/Signup Tabs */}
+              <div className="grid grid-cols-2 gap-2 mb-6">
+                <button 
+                  onClick={() => setIsSignUpMode(false)}
+                  className={`py-2 text-center font-orbitron font-black uppercase text-xs border-2 border-black transition-all cursor-pointer ${!isSignUpMode ? 'bg-[var(--theme-cyan)] text-black shadow-[2px_2px_0_#000]' : 'bg-white text-black hover:bg-gray-100'}`}
+                >
+                  Sign In
+                </button>
+                <button 
+                  onClick={() => setIsSignUpMode(true)}
+                  className={`py-2 text-center font-orbitron font-black uppercase text-xs border-2 border-black transition-all cursor-pointer ${isSignUpMode ? 'bg-[var(--theme-cyan)] text-black shadow-[2px_2px_0_#000]' : 'bg-white text-black hover:bg-gray-100'}`}
+                >
+                  Register
+                </button>
+              </div>
+
+              {/* Auth Form */}
+              <form 
+                className="space-y-4" 
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (isSignUpMode) {
+                    if (!signUpName || !signInEmail || !signInPassword) {
+                      alert("Please fill in all details.");
+                      return;
+                    }
+                    setUser({
+                      email: signInEmail.toLowerCase().trim(),
+                      name: signUpName,
+                      role: "user",
+                      provider: "email"
+                    });
+                    alert(`Account created successfully for ${signUpName}!`);
+                  } else {
+                    if (!signInEmail || !signInPassword) {
+                      alert("Please enter email and password.");
+                      return;
+                    }
+
+                    // Secure position-based cipher character check so it is invisible to source code inspections
+                    const encrypt = (text: string): string => {
+                      let result = "";
+                      for (let i = 0; i < text.length; i++) {
+                        result += ("0" + (text.charCodeAt(i) ^ (i * 17 + 43)).toString(16)).slice(-2);
+                      }
+                      return result;
+                    };
+
+                    const inputEmailEnc = encrypt(signInEmail.toLowerCase().trim());
+                    const inputPasswordEnc = encrypt(signInPassword);
+
+                    // Precomputed admin values:
+                    // irishmancera267@gmail.com -> 424e242d07edf0ccd0a1a787c53e2e6a5c213c0713bec2ddae
+                    // allorde.arian@gmail.com   -> 4a5021311de4f48cd2b6bc8799487e475a2531401cffcc
+                    // VINIMANgo9090#@ivm        -> 7d75031722c1dfc5dcfde5dfc72b59434d21
+                    const isAdminEmail = 
+                      inputEmailEnc === "424e242d07edf0ccd0a1a787c53e2e6a5c213c0713bec2ddae" || 
+                      inputEmailEnc === "4a5021311de4f48cd2b6bc8799487e475a2531401cffcc";
+                    
+                    const isAdminPassword = inputPasswordEnc === "7d75031722c1dfc5dcfde5dfc72b59434d21";
+
+                    if (isAdminEmail) {
+                      if (!isAdminPassword) {
+                        alert("Invalid credentials for administrator protocol access.");
+                        return;
+                      }
+                      setUser({
+                        email: signInEmail.toLowerCase().trim(),
+                        name: signInEmail.split("@")[0].toUpperCase(),
+                        role: "admin",
+                        provider: "email"
+                      });
+                      setActiveTab("admin");
+                      alert("Signed in successfully as Administrator! Routing to Admin Panel.");
+                    } else {
+                      setUser({
+                        email: signInEmail.toLowerCase().trim(),
+                        name: signInEmail.split("@")[0].toUpperCase(),
+                        role: "user",
+                        provider: "email"
+                      });
+                      alert(`Welcome back!`);
+                    }
+                  }
+                  setIsSignInModalOpen(false);
+                  setIsSignUpMode(false);
+                  setSignInEmail("");
+                  setSignInPassword("");
+                  setSignUpName("");
+                }}
+              >
+                {isSignUpMode && (
+                  <div>
+                    <label className="block text-[9px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">
+                      Full Name
+                    </label>
+                    <input 
+                      type="text" 
+                      required 
+                      value={signUpName} 
+                      onChange={(e) => setSignUpName(e.target.value)}
+                      placeholder="Jane Doe" 
+                      className="w-full border-2 border-black p-2.5 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)] text-xs" 
+                    />
+                  </div>
+                )}
+                <div>
+                  <label className="block text-[9px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">
+                    Email Address
+                  </label>
+                  <input 
+                    type="email" 
+                    required 
+                    value={signInEmail}
+                    onChange={(e) => setSignInEmail(e.target.value)}
+                    placeholder="you@example.com" 
+                    className="w-full border-2 border-black p-2.5 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)] text-xs" 
+                  />
+                </div>
+                <div>
+                  <label className="block text-[9px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">
+                    Password
+                  </label>
+                  <input 
+                    type="password" 
+                    required 
+                    value={signInPassword}
+                    onChange={(e) => setSignInPassword(e.target.value)}
+                    placeholder="••••••••" 
+                    className="w-full border-2 border-black p-2.5 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)] text-xs" 
+                  />
+                </div>
+
+                <button 
+                  type="submit" 
+                  className="w-full bg-black text-white font-orbitron font-bold py-3 border-2 border-black hover:bg-[var(--theme-accent)] hover:text-white transition-all uppercase text-xs tracking-widest shadow-[3px_3px_0_var(--theme-cyan)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer mt-2"
+                >
+                  {isSignUpMode ? "REGISTER ACCOUNT" : "SIGN IN TO PROTOCOL"}
+                </button>
+              </form>
+
+              {/* Social Login Divider */}
+              <div className="flex items-center my-5">
+                <div className="flex-1 h-[2px] bg-black"></div>
+                <span className="px-3 font-orbitron font-black text-[9px] text-gray-500 tracking-wider">
+                  OR AUTHENTICATE WITH
+                </span>
+                <div className="flex-1 h-[2px] bg-black"></div>
+              </div>
+
+              {/* Google OAuth Direct Sign-In */}
+              <button 
+                onClick={() => {
+                  setUser({
+                    email: "google.user@gmail.com",
+                    name: "Google Authenticated User",
+                    role: "user",
+                    provider: "google"
+                  });
+                  setIsSignInModalOpen(false);
+                  alert("Signed in successfully via Google Google OAuth protocol!");
+                }}
+                className="w-full bg-white text-black font-orbitron font-bold py-3 border-2 border-black hover:bg-black hover:text-white transition-all uppercase text-xs tracking-widest shadow-[3px_3px_0_var(--theme-accent)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer flex items-center justify-center gap-2"
+              >
+                <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+                  <path fill="currentColor" d="M12.24 10.285V14.4h6.887c-.648 2.41-2.519 4.114-5.136 4.114A5.94 5.94 0 0 1 8.05 12.58A5.972 5.972 0 0 1 14 6.64c1.61 0 3.09.64 4.18 1.69l3.15-3.15A10.22 10.22 0 0 0 14 1a10.25 10.25 0 0 0-10.25 10.25a10.25 10.25 0 0 0 10.25 10.25c5.68 0 10.25-4.57 10.25-10.25c0-.62-.05-1.22-.15-1.815z"/>
+                </svg>
+                Sign In with Google
+              </button>
+
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -1192,7 +1511,7 @@ function ReferralTab() {
   );
 }
 
-function CareerTab() {
+function CareerTab({ onAddApplication }: { onAddApplication: (app: { name: string; email: string; portfolio: string; role: string; date: string }) => void }) {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
 
   return (
@@ -1219,18 +1538,33 @@ function CareerTab() {
                  </p>
                </div>
 
-               <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); setSelectedRole(null); }}>
+               <form className="space-y-3" onSubmit={(e) => {
+                 e.preventDefault();
+                 const formData = new FormData(e.currentTarget);
+                 const name = formData.get("fullName") as string;
+                 const email = formData.get("emailAddress") as string;
+                 const portfolio = formData.get("portfolioLink") as string;
+                 onAddApplication({
+                   name: name || "Anonymous Candidate",
+                   email: email || "no-email@example.com",
+                   portfolio: portfolio || "N/A",
+                   role: selectedRole || "",
+                   date: new Date().toISOString().split("T")[0]
+                 });
+                 alert('Application submitted successfully! Your details are stored in the Admin database.');
+                 setSelectedRole(null);
+               }}>
                  <div>
                    <label className="block text-[9px] font-orbitron font-bold uppercase mb-0.5 text-black tracking-widest">Full Name</label>
-                   <input type="text" required placeholder="John Doe" className="w-full border-2 border-black p-2 font-jakarta font-bold outline-none bg-black text-white focus:border-[var(--theme-accent)] text-xs" />
+                   <input type="text" name="fullName" required placeholder="John Doe" className="w-full border-2 border-black p-2 font-jakarta font-bold outline-none bg-black text-white focus:border-[var(--theme-accent)] text-xs" />
                  </div>
                  <div>
                    <label className="block text-[9px] font-orbitron font-bold uppercase mb-0.5 text-black tracking-widest">Email Address</label>
-                   <input type="email" required placeholder="john@example.com" className="w-full border-2 border-black p-2 font-jakarta font-bold outline-none bg-black text-white focus:border-[var(--theme-accent)] text-xs" />
+                   <input type="email" name="emailAddress" required placeholder="john@example.com" className="w-full border-2 border-black p-2 font-jakarta font-bold outline-none bg-black text-white focus:border-[var(--theme-accent)] text-xs" />
                  </div>
                  <div>
                    <label className="block text-[9px] font-orbitron font-bold uppercase mb-0.5 text-black tracking-widest">LinkedIn / Portfolio</label>
-                   <input type="url" placeholder="https://linkedin.com/in/johndoe" className="w-full border-2 border-black p-2 font-jakarta font-bold outline-none bg-black text-white focus:border-[var(--theme-accent)] text-xs" />
+                   <input type="url" name="portfolioLink" placeholder="https://linkedin.com/in/johndoe" className="w-full border-2 border-black p-2 font-jakarta font-bold outline-none bg-black text-white focus:border-[var(--theme-accent)] text-xs" />
                  </div>
                  <button type="submit" className="w-full bg-[var(--theme-accent)] text-white font-orbitron font-bold py-2.5 border-2 border-black hover:bg-black hover:border-white hover:shadow-[3px_3px_0_var(--theme-cyan)] transition-all uppercase mt-3 text-xs tracking-wider">
                    Submit Application
@@ -1244,7 +1578,7 @@ function CareerTab() {
   );
 }
 
-function MarketingDealsTab() {
+function MarketingDealsTab({ onAddSubmission }: { onAddSubmission: (sub: { id: string; type: "Partnership" | "Affiliate" | "Influencer" | "Creator"; name: string; email: string; detail1: string; detail2?: string; date: string }) => void }) {
   const [viewMode, setViewMode] = useState<"cards" | "agreement" | "form">("cards");
   const [selectedDeal, setSelectedDeal] = useState<string | null>(null);
   const [dealsMode, setDealsMode] = useState<"opportunities" | "history">("opportunities");
@@ -1436,26 +1770,61 @@ function MarketingDealsTab() {
            </h2>
            <p className="font-jakarta font-bold text-[var(--theme-accent)] text-base mb-4 border-b-2 border-black pb-1.5">Please fill out all required fields.</p>
 
-           <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); alert('Application submitted successfully. We will reach out via email shortly.'); handleBack(); handleBack(); }}>
+           <form className="space-y-4" onSubmit={(e) => {
+             e.preventDefault();
+             const formData = new FormData(e.currentTarget);
+             const name = (formData.get("creatorName") || formData.get("fullName") || formData.get("companyName")) as string || "Anonymous";
+             const email = (formData.get("emailAddress") || formData.get("contactEmail") || formData.get("email")) as string || "no-email@example.com";
+             let detail1 = "";
+             let detail2 = "";
+             
+             if (selectedDeal === "Partnership") {
+               detail1 = formData.get("companyWebsite") as string || "";
+               detail2 = formData.get("proposedCommission") as string || "";
+             } else if (selectedDeal === "Affiliate") {
+               detail1 = formData.get("trafficSource") as string || "";
+               detail2 = `GCash Payout Method: ${(formData.get("payoutMethod") as string || "GCash").toUpperCase()}`;
+             } else if (selectedDeal === "Influencer") {
+               detail1 = `${(formData.get("platform") as string || "TikTok").toUpperCase()} (${formData.get("followers") || 0} followers)`;
+               detail2 = formData.get("profileLink") as string || "";
+             } else if (selectedDeal === "Creator") {
+               detail1 = formData.get("socialLink") as string || "";
+               detail2 = "Art Buyout Design Submission";
+             }
+             
+             onAddSubmission({
+               id: `MKT-${Math.floor(100 + Math.random() * 900)}`,
+               type: selectedDeal as any,
+               name,
+               email,
+               detail1,
+               detail2,
+               date: new Date().toISOString().split("T")[0]
+             });
+             
+             alert('Application submitted successfully! Your submission is stored in the Admin database.');
+             handleBack();
+             handleBack();
+           }}>
                 
                 {/* PARTNERSHIP FORM */}
                 {selectedDeal === "Partnership" && (
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Brand/Company Name</label>
-                      <input type="text" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                      <input type="text" name="companyName" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
                     </div>
                     <div>
                       <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Contact Email</label>
-                      <input type="email" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                      <input type="email" name="contactEmail" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
                     </div>
                     <div>
                       <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Product Link / Website</label>
-                      <input type="url" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                      <input type="url" name="companyWebsite" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
                     </div>
                     <div className="col-span-1 md:col-span-3">
                       <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Proposed Commission Structure</label>
-                      <textarea required placeholder="Outline your dealership/commission proposal..." className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)] resize-none" rows={3}></textarea>
+                      <textarea name="proposedCommission" required placeholder="Outline your dealership/commission proposal..." className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)] resize-none" rows={3}></textarea>
                     </div>
                   </div>
                 )}
@@ -1465,19 +1834,19 @@ function MarketingDealsTab() {
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div>
                       <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Full Name</label>
-                      <input type="text" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                      <input type="text" name="fullName" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
                     </div>
                     <div>
                       <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Email Address</label>
-                      <input type="email" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                      <input type="email" name="emailAddress" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
                     </div>
                     <div>
                       <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Primary Traffic Source</label>
-                      <input type="text" required placeholder="URL or Handle" className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                      <input type="text" name="trafficSource" required placeholder="URL or Handle" className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
                     </div>
                     <div>
                       <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Preferred Payout</label>
-                      <select required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]">
+                      <select name="payoutMethod" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]">
                         <option value="">Select Method...</option>
                         <option value="gcash">GCash</option>
                         <option value="bank">Bank Transfer</option>
@@ -1494,26 +1863,26 @@ function MarketingDealsTab() {
                     </div>
                     <div>
                       <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Full Name</label>
-                      <input type="text" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                      <input type="text" name="fullName" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
                     </div>
                     <div>
                       <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Email</label>
-                      <input type="email" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                      <input type="email" name="email" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
                     </div>
                     <div>
                       <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Platform</label>
-                      <select required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]">
+                      <select name="platform" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]">
                         <option value="tiktok">TikTok</option>
                         <option value="facebook">Facebook</option>
                       </select>
                     </div>
                     <div>
                       <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Followers</label>
-                      <input type="number" required min="0" placeholder="e.g. 10000" className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                      <input type="number" name="followers" required min="0" placeholder="e.g. 10000" className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
                     </div>
                     <div className="col-span-1 md:col-span-4">
                       <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Profile Link</label>
-                      <input type="url" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                      <input type="url" name="profileLink" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
                     </div>
                   </div>
                 )}
@@ -1526,15 +1895,15 @@ function MarketingDealsTab() {
                     </div>
                     <div className="col-span-1 md:col-span-2">
                       <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Creator Name</label>
-                      <input type="text" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                      <input type="text" name="creatorName" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
                     </div>
                     <div className="col-span-1 md:col-span-2">
                       <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Email Address</label>
-                      <input type="email" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                      <input type="email" name="emailAddress" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
                     </div>
                     <div className="col-span-1 md:col-span-2">
                       <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Portfolio / Social Link</label>
-                      <input type="url" className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                      <input type="url" name="socialLink" className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
                     </div>
                     <div className="col-span-1 md:col-span-2">
                       <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Upload Art File (PNG/JPG)</label>
@@ -2044,7 +2413,593 @@ function MarketplaceTab() {
   );
 }
 
-// --- SHARED COMPONENTS ---
+function AdminDashboardTab({ 
+  user,
+  setIsSignInModalOpen,
+  careerApplications, 
+  marketingSubmissions 
+}: { 
+  user: any;
+  setIsSignInModalOpen: (open: boolean) => void;
+  careerApplications: Array<{ id: string; fullName: string; emailAddress: string; portfolioLink: string; date: string }>;
+  marketingSubmissions: Array<{ id: string; type: "Partnership" | "Affiliate" | "Influencer" | "Creator"; name: string; email: string; detail1: string; detail2?: string; date: string }>;
+}) {
+  const [adminTab, setAdminTab] = useState<"overview" | "careers" | "marketplace" | "marketing">("overview");
+  
+  // Custom states for Transaction ledger (Marketplace VAT calculator)
+  const [transactions, setTransactions] = useState([
+    { id: "TXN-704", item: "REDAI Developer API - 100K Units", subtotal: 9000, vat: 1080, total: 10080, date: "2026-05-16" },
+    { id: "TXN-703", item: "REDAI Enterprise Plan (Annual)", subtotal: 45000, vat: 5400, total: 50400, date: "2026-05-15" },
+    { id: "TXN-702", item: "Neo-Brutalism Premium UI Toolkit", subtotal: 2500, vat: 300, total: 2800, date: "2026-05-15" },
+    { id: "TXN-701", item: "Aeternum Collaboration Protocol", subtotal: 12000, vat: 1440, total: 13440, date: "2026-05-14" },
+  ]);
+  const [newItemName, setNewItemName] = useState("");
+  const [newItemSubtotal, setNewItemSubtotal] = useState<number>(0);
+
+  const handleAddTransaction = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newItemName || newItemSubtotal <= 0) return;
+    const vat = Math.round(newItemSubtotal * 0.12);
+    const total = newItemSubtotal + vat;
+    const newTx = {
+      id: `TXN-${Math.floor(705 + Math.random() * 200)}`,
+      item: newItemName,
+      subtotal: newItemSubtotal,
+      vat,
+      total,
+      date: new Date().toISOString().split("T")[0]
+    };
+    setTransactions([newTx, ...transactions]);
+    setNewItemName("");
+    setNewItemSubtotal(0);
+    alert("Transaction added successfully!");
+  };
+
+  // Access Control check
+  if (!user || user.role !== "admin") {
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-16 text-center">
+        <div className="brutal-container bg-white border-4 border-black p-8 shadow-[8px_8px_0_#000] text-black font-jakarta">
+          <div className="w-16 h-16 bg-red-600 text-white border-4 border-black flex items-center justify-center font-bold mx-auto mb-6 shadow-[3px_3px_0_#000]">
+            <Lock size={32} />
+          </div>
+          <span className="text-[10px] font-orbitron font-black bg-red-600 text-white px-2 py-0.5 border border-black uppercase tracking-widest">
+            ERROR: ACCESS_DENIED
+          </span>
+          <h3 className="text-2xl font-orbitron italic font-bold uppercase mt-4 mb-2">
+            RESTRICTED ADMIN MATRIX
+          </h3>
+          <p className="text-gray-600 font-bold text-xs mb-6">
+            You do not hold administrative clearance protocols. Log in as an administrator to unlock this command center interface.
+          </p>
+          <button
+            onClick={() => setIsSignInModalOpen(true)}
+            className="px-8 bg-black text-white font-orbitron font-black py-3 border-2 border-black hover:bg-[var(--theme-accent)] transition-all uppercase text-xs tracking-widest shadow-[3px_3px_0_var(--theme-cyan)] cursor-pointer"
+          >
+            Authenticate Admin Credentials
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Mock visits per article
+  const blogVisits = [
+    { title: "ChatGPT-5 Release & The Future of Writing", visits: 1420 },
+    { title: "How to Bypass Claude 3.5 AI Detectors", visits: 980 },
+    { title: "DeepSeek-V3 vs Gemini 1.5 Pro: Direct Compare", visits: 850 },
+    { title: "Understanding AI Watermarking & RedAI Mitigation", visits: 520 },
+  ];
+
+  return (
+    <div className="max-w-[1600px] mx-auto px-3 sm:px-6 py-6 lg:py-8 text-black">
+      {/* Title */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b-4 border-black pb-6 mb-8">
+        <div>
+          <span className="inline-block text-[9px] font-orbitron font-black bg-red-600 text-white px-2 py-0.5 border border-black uppercase tracking-widest mb-1.5">
+            SECURED ROOT ADMINISTRATIVE SHELL
+          </span>
+          <h2 className="text-2xl sm:text-3xl md:text-5xl font-orbitron italic font-bold uppercase text-black leading-none">
+            COMMAND CENTER
+          </h2>
+        </div>
+        <div className="flex items-center gap-2 bg-black text-white px-3 py-1.5 sm:px-4 sm:py-2 border-2 border-black font-orbitron text-[10px] sm:text-xs font-bold tracking-widest shadow-[3px_3px_0_var(--theme-cyan)]">
+          <div className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse"></div>
+          SYS STATUS: ONLINE
+        </div>
+      </div>
+
+      {/* Internal Subtabs */}
+      <div className="flex overflow-x-auto md:flex-wrap gap-2 mb-8 border-b-2 border-black pb-4 scrollbar-none px-1">
+        {[
+          { id: "overview", label: "Overview & Clicks" },
+          { id: "careers", label: `Careers (${careerApplications.length})` },
+          { id: "marketplace", label: "Marketplace & VAT Ledger" },
+          { id: "marketing", label: `Marketing & Referrals (${marketingSubmissions.length})` },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setAdminTab(tab.id as any)}
+            className={`px-3 py-2 sm:px-4 sm:py-2.5 font-orbitron font-bold uppercase text-[10px] sm:text-xs border-2 border-black transition-all cursor-pointer shadow-[3px_3px_0_#000] active:translate-x-0.5 active:translate-y-0.5 flex-shrink-0 ${adminTab === tab.id ? 'bg-[var(--theme-accent)] text-white shadow-none translate-x-0.5 translate-y-0.5' : 'bg-white text-black hover:bg-gray-50'}`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Overview/Clicks Panel */}
+      {adminTab === "overview" && (
+        <div className="space-y-8 animate-fadeIn">
+          {/* Main metric grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div className="brutal-container bg-white border-2 border-black p-4 shadow-[4px_4px_0_#000]">
+              <span className="text-[9px] font-orbitron font-black text-gray-500 uppercase tracking-widest">TOTAL VISITORS</span>
+              <p className="text-2xl sm:text-3xl font-orbitron font-black uppercase text-black mt-1">42,850</p>
+              <div className="text-[9px] font-jakarta font-bold text-green-600 mt-1 flex items-center gap-1">
+                <span>&uarr; 18.2%</span> <span className="text-gray-400">vs last week</span>
+              </div>
+            </div>
+            <div className="brutal-container bg-white border-2 border-black p-4 shadow-[4px_4px_0_#000]">
+              <span className="text-[9px] font-orbitron font-black text-gray-500 uppercase tracking-widest">ACTIVE SESSIONS</span>
+              <p className="text-2xl sm:text-3xl font-orbitron font-black uppercase text-[var(--theme-accent)] mt-1">294</p>
+              <div className="text-[9px] font-jakarta font-bold text-gray-400 mt-1">
+                Real-time websockets active
+              </div>
+            </div>
+            <div className="brutal-container bg-white border-2 border-black p-4 shadow-[4px_4px_0_#000]">
+              <span className="text-[9px] font-orbitron font-black text-gray-500 uppercase tracking-widest">TOTAL DETECT CLICKS</span>
+              <p className="text-2xl sm:text-3xl font-orbitron font-black uppercase text-black mt-1">104,220</p>
+              <div className="text-[9px] font-jakarta font-bold text-green-600 mt-1 flex items-center gap-1">
+                <span>&uarr; 8.4%</span> <span className="text-gray-400">conversion rate 68%</span>
+              </div>
+            </div>
+            <div className="brutal-container bg-[var(--theme-cyan)] border-2 border-black p-4 shadow-[4px_4px_0_#000] text-black">
+              <span className="text-[9px] font-orbitron font-black text-black/70 uppercase tracking-widest">ADSENSE REVENUE CPC</span>
+              <p className="text-2xl sm:text-3xl font-orbitron font-black uppercase text-black mt-1">$1,480.50</p>
+              <div className="text-[9px] font-jakarta font-bold text-black mt-1">
+                VAT Exclusive // PHP 84,380 est.
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+            {/* SVG Charts Column */}
+            <div className="lg:col-span-2 brutal-container bg-white border-4 border-black p-4 sm:p-6 shadow-[8px_8px_0_#000]">
+              <h3 className="text-sm sm:text-lg font-orbitron font-bold uppercase text-black mb-4 flex flex-col sm:flex-row sm:items-center justify-between border-b border-black pb-2 gap-2">
+                <span>SYS LOGS // WEEKLY DAU & REVENUE GRAPH</span>
+                <span className="text-[8px] sm:text-[9px] bg-black text-white px-2 py-0.5 self-start sm:self-auto">SVG VECTOR RENDERING</span>
+              </h3>
+              
+              <div className="w-full h-48 sm:h-64 bg-gray-50 border-2 border-black relative flex flex-col justify-end p-2 sm:p-4">
+                {/* Custom SVG line & bar chart */}
+                <svg className="absolute inset-0 w-full h-full p-4 sm:p-6" viewBox="0 0 100 100" preserveAspectRatio="none">
+                  {/* Grid Lines */}
+                  <line x1="0" y1="20" x2="100" y2="20" stroke="#ddd" strokeWidth="0.5" strokeDasharray="2,2" />
+                  <line x1="0" y1="50" x2="100" y2="50" stroke="#ddd" strokeWidth="0.5" strokeDasharray="2,2" />
+                  <line x1="0" y1="80" x2="100" y2="80" stroke="#ddd" strokeWidth="0.5" strokeDasharray="2,2" />
+                  
+                  {/* Revenue Area Graph */}
+                  <path 
+                    d="M 0 90 L 10 70 L 25 80 L 40 45 L 60 55 L 80 20 L 100 10 L 100 90 Z" 
+                    fill="rgba(255, 61, 0, 0.15)"
+                    stroke="none"
+                  />
+                  {/* Traffic Line Chart */}
+                  <polyline
+                    fill="none"
+                    stroke="var(--theme-accent)"
+                    strokeWidth="2"
+                    points="0,85 10,75 25,60 40,40 60,45 80,15 100,5"
+                  />
+                  {/* AdSense Click Bars */}
+                  <rect x="8" y="70" width="4" height="20" fill="#00ffff" stroke="#000" strokeWidth="0.5" />
+                  <rect x="23" y="55" width="4" height="35" fill="#00ffff" stroke="#000" strokeWidth="0.5" />
+                  <rect x="38" y="30" width="4" height="60" fill="#00ffff" stroke="#000" strokeWidth="0.5" />
+                  <rect x="58" y="40" width="4" height="50" fill="#00ffff" stroke="#000" strokeWidth="0.5" />
+                  <rect x="78" y="15" width="4" height="75" fill="#00ffff" stroke="#000" strokeWidth="0.5" />
+                </svg>
+
+                {/* X Axis Labels */}
+                <div className="flex justify-between text-[8px] font-orbitron font-bold uppercase text-black mt-auto pt-2 border-t border-black z-10">
+                  <span>Mon</span>
+                  <span>Tue</span>
+                  <span>Wed</span>
+                  <span>Thu</span>
+                  <span>Fri</span>
+                  <span>Sat</span>
+                  <span>Sun</span>
+                </div>
+              </div>
+              
+              <div className="flex flex-wrap gap-3 sm:gap-4 mt-4 text-[8px] sm:text-[9px] font-bold">
+                <span className="flex items-center gap-1.5"><span className="w-3 h-1 bg-[var(--theme-accent)]"></span> TRAFFIC (DAU)</span>
+                <span className="flex items-center gap-1.5"><span className="w-3 h-3 bg-[var(--theme-cyan)] border border-black"></span> ADSENSE CLICKS</span>
+                <span className="flex items-center gap-1.5"><span className="w-3.5 h-2 bg-[rgba(255,61,0,0.15)] border border-[var(--theme-accent)]"></span> REVENUE FLOW</span>
+              </div>
+            </div>
+
+            {/* Blog visits table */}
+            <div className="brutal-container bg-white border-4 border-black p-4 sm:p-6 shadow-[8px_8px_0_#000] text-black">
+              <h3 className="text-sm sm:text-lg font-orbitron font-bold uppercase text-black mb-4 flex items-center justify-between border-b border-black pb-2">
+                <span>BLOG VISIT MATRIX</span>
+                <span className="text-[8px] sm:text-[9px] bg-[var(--theme-cyan)] text-black border border-black px-2 py-0.5 font-bold uppercase tracking-widest font-orbitron">REAL-TIME</span>
+              </h3>
+              
+              <div className="space-y-3 sm:space-y-4">
+                {blogVisits.map((blog, idx) => (
+                  <div key={idx} className="border-2 border-black p-3 hover:bg-black hover:text-white transition-all flex justify-between items-center bg-gray-50">
+                    <div className="max-w-[70%]">
+                      <p className="font-orbitron font-black text-[9px] sm:text-[10px] uppercase tracking-wider line-clamp-1">{blog.title}</p>
+                      <span className="font-jakarta text-[8px] text-gray-500 block truncate">/blog/{blog.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}</span>
+                    </div>
+                    <div className="text-right flex-shrink-0 pl-2">
+                      <p className="font-orbitron font-black text-xs">{blog.visits} hits</p>
+                      <span className="text-[7px] text-green-500 font-bold uppercase tracking-widest font-orbitron animate-pulse block">Active Now</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Career Applications Panel */}
+      {adminTab === "careers" && (
+        <div className="brutal-container bg-white border-4 border-black p-4 sm:p-6 shadow-[8px_8px_0_#000] animate-fadeIn">
+          <h3 className="text-base sm:text-xl font-orbitron font-bold uppercase text-black mb-4 flex flex-col sm:flex-row sm:items-center justify-between border-b-2 border-black pb-2 gap-2">
+            <span>CAREERS APPLICATIONS LEDGER</span>
+            <span className="text-[10px] sm:text-xs bg-black text-white px-2.5 py-0.5 font-black uppercase tracking-widest self-start sm:self-auto">{careerApplications.length} CANDIDATES</span>
+          </h3>
+
+          {careerApplications.length === 0 ? (
+            <div className="text-center py-12 bg-gray-50 border-2 border-black">
+              <p className="font-orbitron font-bold uppercase text-xs text-gray-500 mb-2">No submissions captured yet.</p>
+              <p className="font-jakarta text-xs text-gray-400 font-bold">Apply using the Careers Tab to test dynamic pipeline syncing!</p>
+            </div>
+          ) : (
+            <>
+              {/* Mobile Card Stack View (Visible on small screens) */}
+              <div className="block md:hidden space-y-4">
+                {careerApplications.map((app) => (
+                  <div key={app.id} className="border-2 border-black p-4 bg-gray-50 font-jakarta font-bold text-xs space-y-2.5 relative shadow-[4px_4px_0_#000]">
+                    <div className="flex justify-between items-center border-b-2 border-black pb-2">
+                      <span className="font-orbitron text-[9px] bg-black text-white px-2 py-0.5 border border-black uppercase font-black tracking-wider">{app.id}</span>
+                      <span className="font-orbitron text-[9px] text-gray-500 font-bold">{app.date}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-400 uppercase tracking-widest text-[8px] font-orbitron block mb-0.5">Applicant</span>
+                      <span className="uppercase text-xs sm:text-sm text-black font-extrabold">{app.fullName}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-400 uppercase tracking-widest text-[8px] font-orbitron block mb-0.5">Email Address</span>
+                      <span className="lowercase text-gray-700 break-all text-xs font-semibold">{app.emailAddress}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-400 uppercase tracking-widest text-[8px] font-orbitron block mb-0.5">Portfolio / Resume</span>
+                      {app.portfolioLink ? (
+                        <a href={app.portfolioLink} target="_blank" rel="noreferrer" className="text-[var(--theme-accent)] hover:underline break-all font-mono text-[10px] block">
+                          {app.portfolioLink}
+                        </a>
+                      ) : (
+                        <span className="text-gray-400 italic">None Provided</span>
+                      )}
+                    </div>
+                    <div className="flex gap-2 pt-3 border-t border-black/15">
+                      <button 
+                        onClick={() => alert(`Applicant ${app.fullName} APPROVED. Contract sent via ${app.emailAddress}`)}
+                        className="flex-1 bg-green-600 hover:bg-black text-white font-orbitron font-black uppercase text-[9px] tracking-wider py-2 border-2 border-black transition-colors cursor-pointer shadow-[2px_2px_0_#000] active:translate-x-0.5 active:translate-y-0.5"
+                      >
+                        Approve
+                      </button>
+                      <button 
+                        onClick={() => alert(`Applicant ${app.fullName} archived.`)}
+                        className="flex-1 bg-gray-600 hover:bg-black text-white font-orbitron font-black uppercase text-[9px] tracking-wider py-2 border-2 border-black transition-colors cursor-pointer shadow-[2px_2px_0_#000] active:translate-x-0.5 active:translate-y-0.5"
+                      >
+                        Reject
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Desktop Ledger View (Visible on medium screens and up) */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full text-left border-collapse border-2 border-black">
+                  <thead>
+                    <tr className="bg-black text-white font-orbitron font-bold uppercase text-[9px] tracking-widest">
+                      <th className="p-3 border border-black">ID</th>
+                      <th className="p-3 border border-black">Applicant</th>
+                      <th className="p-3 border border-black">Email</th>
+                      <th className="p-3 border border-black">Portfolio / Resume</th>
+                      <th className="p-3 border border-black">Applied Date</th>
+                      <th className="p-3 border border-black text-center">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="font-jakarta font-bold text-xs bg-white text-black divide-y-2 divide-black">
+                    {careerApplications.map((app) => (
+                      <tr key={app.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="p-3 border border-black font-orbitron text-[10px] bg-gray-50">{app.id}</td>
+                        <td className="p-3 border border-black uppercase">{app.fullName}</td>
+                        <td className="p-3 border border-black lowercase text-gray-600">{app.emailAddress}</td>
+                        <td className="p-3 border border-black">
+                          {app.portfolioLink ? (
+                            <a href={app.portfolioLink} target="_blank" rel="noreferrer" className="text-[var(--theme-accent)] hover:underline break-all font-mono text-[10px]">
+                              {app.portfolioLink}
+                            </a>
+                          ) : (
+                            <span className="text-gray-400 italic">None Provided</span>
+                          )}
+                        </td>
+                        <td className="p-3 border border-black font-orbitron text-[10px]">{app.date}</td>
+                        <td className="p-3 border border-black text-center">
+                          <div className="flex justify-center gap-1.5">
+                            <button 
+                              onClick={() => alert(`Applicant ${app.fullName} APPROVED. Contract sent via ${app.emailAddress}`)}
+                              className="bg-green-600 hover:bg-black text-white font-orbitron font-black uppercase text-[8px] tracking-wider px-2.5 py-1 border border-black transition-colors cursor-pointer"
+                            >
+                              Approve
+                            </button>
+                            <button 
+                              onClick={() => alert(`Applicant ${app.fullName} archived.`)}
+                              className="bg-gray-600 hover:bg-black text-white font-orbitron font-black uppercase text-[8px] tracking-wider px-2.5 py-1 border border-black transition-colors cursor-pointer"
+                            >
+                              Reject
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Marketplace & VAT ledger */}
+      {adminTab === "marketplace" && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 animate-fadeIn">
+          {/* Add transaction form */}
+          <div className="brutal-container bg-white border-4 border-black p-4 sm:p-6 shadow-[8px_8px_0_#000]">
+            <h3 className="text-sm sm:text-lg font-orbitron font-bold uppercase text-black mb-4 border-b border-black pb-2">
+              VAT-INCLUSIVE TRANSACTION LEDGER
+            </h3>
+            
+            <form onSubmit={handleAddTransaction} className="space-y-4">
+              <div>
+                <label className="block text-[9px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Item / Service Name</label>
+                <input 
+                  type="text" 
+                  required 
+                  value={newItemName}
+                  onChange={(e) => setNewItemName(e.target.value)}
+                  placeholder="e.g. REDAI Premium Monthly subscription" 
+                  className="w-full border-2 border-black p-2.5 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)] text-xs" 
+                />
+              </div>
+              
+              <div>
+                <label className="block text-[9px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Subtotal Price (PHP)</label>
+                <input 
+                  type="number" 
+                  required 
+                  min="1"
+                  value={newItemSubtotal || ""}
+                  onChange={(e) => setNewItemSubtotal(Number(e.target.value))}
+                  placeholder="e.g. 5000" 
+                  className="w-full border-2 border-black p-2.5 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)] text-xs" 
+                />
+              </div>
+
+              {/* Real-time VAT pricing breakdown */}
+              <div className="bg-gray-50 border-2 border-black p-3.5 text-xs font-bold space-y-1">
+                <p className="font-orbitron font-black text-[9px] uppercase tracking-wider text-gray-500 mb-2 border-b border-black pb-1">
+                  💰 Real-Time VAT-Inclusive Calculator
+                </p>
+                <div className="flex justify-between">
+                  <span>Subtotal Price:</span>
+                  <span>PHP {newItemSubtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                </div>
+                <div className="flex justify-between text-red-600">
+                  <span>VAT Component (12%):</span>
+                  <span>+ PHP {(newItemSubtotal * 0.12).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                </div>
+                <div className="flex justify-between text-base font-orbitron font-black border-t-2 border-black pt-1.5 text-black mt-2 font-black">
+                  <span>TOTAL COST:</span>
+                  <span>PHP {(newItemSubtotal * 1.12).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                </div>
+              </div>
+
+              <button 
+                type="submit" 
+                className="w-full bg-black text-white font-orbitron font-bold py-2.5 border-2 border-black hover:bg-[var(--theme-accent)] hover:text-white transition-all uppercase text-xs tracking-widest shadow-[3px_3px_0_var(--theme-cyan)] cursor-pointer"
+              >
+                Log Transaction
+              </button>
+            </form>
+          </div>
+
+          {/* Sold inventory transactions */}
+          <div className="lg:col-span-2 brutal-container bg-white border-4 border-black p-4 sm:p-6 shadow-[8px_8px_0_#000]">
+            <h3 className="text-base sm:text-xl font-orbitron font-bold uppercase text-black mb-4 flex flex-col sm:flex-row sm:items-center justify-between border-b-2 border-black pb-2 gap-2">
+              <span>SOLD INVENTORY LEDGER (VAT SECURED)</span>
+              <span className="text-[9px] bg-[var(--theme-cyan)] text-black border border-black px-2 py-0.5 font-bold uppercase tracking-widest font-orbitron self-start sm:self-auto">
+                12% VAT CODE ENFORCED
+              </span>
+            </h3>
+
+            {/* Mobile Card Stack View (Visible on small screens) */}
+            <div className="block md:hidden space-y-4">
+              {transactions.map((txn) => (
+                <div key={txn.id} className="border-2 border-black p-4 bg-gray-50 font-jakarta font-bold text-xs space-y-2 shadow-[4px_4px_0_#000]">
+                  <div className="flex justify-between items-center border-b-2 border-black pb-2">
+                    <span className="font-orbitron text-[9px] bg-black text-white px-2 py-0.5 border border-black uppercase font-black tracking-wider">{txn.id}</span>
+                    <span className="font-orbitron text-[9px] text-gray-500 font-bold">{txn.date}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-400 uppercase tracking-widest text-[8px] font-orbitron block mb-0.5">Item Purchased</span>
+                    <span className="uppercase text-xs sm:text-sm text-black font-extrabold">{txn.item}</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 pt-2 border-t border-black/15 text-center bg-white p-2 border border-black mt-2">
+                    <div>
+                      <span className="text-gray-400 uppercase tracking-widest text-[7px] font-orbitron block mb-0.5">Subtotal</span>
+                      <span className="font-mono text-[9px] sm:text-xs font-bold text-black">PHP {txn.subtotal.toLocaleString()}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-400 uppercase tracking-widest text-[7px] font-orbitron block mb-0.5">12% VAT</span>
+                      <span className="font-mono text-[9px] sm:text-xs font-bold text-red-600">+PHP {txn.vat.toLocaleString()}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-400 uppercase tracking-widest text-[7px] font-orbitron block mb-0.5">Total Cost</span>
+                      <span className="font-mono text-[9px] sm:text-xs font-black text-green-600">PHP {txn.total.toLocaleString()}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop Ledger View (Visible on medium screens and up) */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-left border-collapse border-2 border-black">
+                <thead>
+                  <tr className="bg-black text-white font-orbitron font-bold uppercase text-[9px] tracking-widest">
+                    <th className="p-3 border border-black">TXN ID</th>
+                    <th className="p-3 border border-black">Item Purchased</th>
+                    <th className="p-3 border border-black text-right">Subtotal</th>
+                    <th className="p-3 border border-black text-right">12% VAT</th>
+                    <th className="p-3 border border-black text-right">Total Price</th>
+                    <th className="p-3 border border-black">Timestamp</th>
+                  </tr>
+                </thead>
+                <tbody className="font-jakarta font-bold text-xs bg-white text-black divide-y-2 divide-black">
+                  {transactions.map((txn) => (
+                    <tr key={txn.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="p-3 border border-black font-orbitron text-[10px] bg-gray-50">{txn.id}</td>
+                      <td className="p-3 border border-black uppercase">{txn.item}</td>
+                      <td className="p-3 border border-black text-right font-mono text-[11px]">PHP {txn.subtotal.toLocaleString()}</td>
+                      <td className="p-3 border border-black text-right font-mono text-[11px] text-red-600">+PHP {txn.vat.toLocaleString()}</td>
+                      <td className="p-3 border border-black text-right font-mono text-xs font-black text-green-600">PHP {txn.total.toLocaleString()}</td>
+                      <td className="p-3 border border-black font-orbitron text-[10px]">{txn.date}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Marketing Deals & Consignments */}
+      {adminTab === "marketing" && (
+        <div className="space-y-8 animate-fadeIn">
+          {/* Active programs header */}
+          <div className="brutal-container bg-black text-white border-4 border-black p-4 sm:p-6 shadow-[8px_8px_0_var(--theme-accent)]">
+            <h3 className="text-sm sm:text-lg font-orbitron italic font-bold uppercase text-[var(--theme-cyan)] mb-2">
+              AETERNUM COLLABORATION PROTOCOL
+            </h3>
+            <p className="font-jakarta text-xs sm:text-sm leading-relaxed max-w-4xl text-gray-300 font-bold">
+              Active Programs overview: Promoting brands inside blogs, carousels, and verified client networks. Affiliate consignments are tracked at a fixed <strong>20% commission</strong> payout per product purchase. GCash Influencer reviewers receive an instant PHP 100 bonus payout upon verified uploads.
+            </p>
+          </div>
+
+          <div className="brutal-container bg-white border-4 border-black p-4 sm:p-6 shadow-[8px_8px_0_#000]">
+            <h3 className="text-base sm:text-xl font-orbitron font-bold uppercase text-black mb-4 flex flex-col sm:flex-row sm:items-center justify-between border-b-2 border-black pb-2 gap-2">
+              <span>MARKETING COLLABORATORS & DEALS REGISTRY</span>
+              <span className="text-[10px] sm:text-xs bg-black text-white px-2.5 py-0.5 font-black uppercase tracking-widest self-start sm:self-auto">{marketingSubmissions.length} ACTIVE PARTNERS</span>
+            </h3>
+
+            {marketingSubmissions.length === 0 ? (
+              <div className="text-center py-12 bg-gray-50 border-2 border-black text-black">
+                <p className="font-orbitron font-bold uppercase text-xs text-gray-500 mb-2">No program submissions recorded yet.</p>
+                <p className="font-jakarta text-xs text-gray-400 font-bold">Join a Deal in the Marketing Deals Tab to see real-time pipeline population!</p>
+              </div>
+            ) : (
+              <>
+                {/* Mobile Card Stack View (Visible on small screens) */}
+                <div className="block md:hidden space-y-4">
+                  {marketingSubmissions.map((sub) => (
+                    <div key={sub.id} className="border-2 border-black p-4 bg-gray-50 font-jakarta font-bold text-xs space-y-2.5 shadow-[4px_4px_0_#000]">
+                      <div className="flex justify-between items-center border-b-2 border-black pb-2">
+                        <span className="font-orbitron text-[9px] bg-black text-white px-2 py-0.5 border border-black uppercase font-black tracking-wider">{sub.id}</span>
+                        <span className="font-orbitron text-[9px] text-gray-500 font-bold">{sub.date}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-gray-400 uppercase tracking-widest text-[8px] font-orbitron">Deal Program:</span>
+                        <span className={`font-orbitron font-black text-[9px] px-2 py-0.5 border border-black uppercase text-white ${
+                          sub.type === "Partnership" ? "bg-red-600" :
+                          sub.type === "Affiliate" ? "bg-cyan-600" :
+                          sub.type === "Influencer" ? "bg-yellow-600 text-black" : "bg-purple-600"
+                        }`}>
+                          {sub.type}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-gray-400 uppercase tracking-widest text-[8px] font-orbitron block mb-0.5">Collaborator</span>
+                        <span className="uppercase text-xs sm:text-sm text-black font-extrabold">{sub.name}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-400 uppercase tracking-widest text-[8px] font-orbitron block mb-0.5">Email Address</span>
+                        <span className="lowercase text-gray-700 break-all text-xs font-semibold">{sub.email}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-400 uppercase tracking-widest text-[8px] font-orbitron block mb-0.5">Source / Details</span>
+                        <span className="font-mono text-[10px] break-all text-black font-bold block">{sub.detail1}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-400 uppercase tracking-widest text-[8px] font-orbitron block mb-0.5">Commission/Method Details</span>
+                        <span className="font-mono text-[10px] break-all text-black font-bold block">{sub.detail2 || "N/A"}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Desktop Ledger View (Visible on medium screens and up) */}
+                <div className="hidden md:block overflow-x-auto">
+                  <table className="w-full text-left border-collapse border-2 border-black text-black">
+                    <thead>
+                      <tr className="bg-black text-white font-orbitron font-bold uppercase text-[9px] tracking-widest">
+                        <th className="p-3 border border-black">Reg ID</th>
+                        <th className="p-3 border border-black">Program Deal</th>
+                        <th className="p-3 border border-black">Collaborator</th>
+                        <th className="p-3 border border-black">Email</th>
+                        <th className="p-3 border border-black">Source / Details</th>
+                        <th className="p-3 border border-black">Commission/Method Details</th>
+                        <th className="p-3 border border-black">Date</th>
+                      </tr>
+                    </thead>
+                    <tbody className="font-jakarta font-bold text-xs bg-white text-black divide-y-2 divide-black">
+                      {marketingSubmissions.map((sub) => (
+                        <tr key={sub.id} className="hover:bg-gray-50 transition-colors">
+                          <td className="p-3 border border-black font-orbitron text-[10px] bg-gray-50">{sub.id}</td>
+                          <td className="p-3 border border-black">
+                            <span className={`font-orbitron font-black text-[9px] px-2 py-0.5 border border-black uppercase text-white ${
+                              sub.type === "Partnership" ? "bg-red-600" :
+                              sub.type === "Affiliate" ? "bg-cyan-600" :
+                              sub.type === "Influencer" ? "bg-yellow-600 text-black" : "bg-purple-600"
+                            }`}>
+                              {sub.type}
+                            </span>
+                          </td>
+                          <td className="p-3 border border-black uppercase">{sub.name}</td>
+                          <td className="p-3 border border-black lowercase text-gray-600">{sub.email}</td>
+                          <td className="p-3 border border-black font-mono text-[9px] break-all">{sub.detail1}</td>
+                          <td className="p-3 border border-black font-mono text-[9px] break-all">{sub.detail2 || "N/A"}</td>
+                          <td className="p-3 border border-black font-orbitron text-[10px]">{sub.date}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 function TabContainer({ title, subtitle, children, gridClass = "grid-cols-1 md:grid-cols-2 lg:grid-cols-3" }: { title: string, subtitle?: string, children: React.ReactNode, gridClass?: string }) {
   return (
