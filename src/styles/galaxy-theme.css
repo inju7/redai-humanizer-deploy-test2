@@ -262,7 +262,7 @@ nav a:hover, .nav-link:hover {
    CONTENT GRID / PRODUCTS
    ============================================ */
 
-.grid, [class*="grid"], .product-grid {
+.product-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 2rem;
@@ -601,7 +601,7 @@ hr, .divider {
     font-size: 2rem;
   }
 
-  .grid, [class*="grid"], .product-grid {
+  .product-grid {
     grid-template-columns: 1fr;
     gap: 1.5rem;
     padding: 1rem;

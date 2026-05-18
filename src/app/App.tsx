@@ -38,7 +38,7 @@ export default function App() {
   const [copiedShare, setCopiedShare] = useState(false);
 
   return (
-    <div className="relative min-h-screen pb-32 bg-[var(--theme-bg)] selection:bg-[var(--theme-accent)] selection:text-white">
+    <div className="relative min-h-screen pb-12 sm:pb-32 bg-[var(--theme-bg)] selection:bg-[var(--theme-accent)] selection:text-white">
       
       {/* High-Contrast Navbar */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-black border-b-[4px] border-black text-white h-16 lg:h-20">
@@ -133,7 +133,7 @@ export default function App() {
 
 
 
-          <aside className={`fixed top-16 lg:top-20 left-0 bottom-32 w-[240px] bg-white border-r-4 border-black z-40 flex flex-col shadow-[4px_0_0_#000] transition-transform duration-300 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
+          <aside className={`fixed top-16 lg:top-20 left-0 bottom-0 sm:bottom-32 w-[240px] bg-white border-r-4 border-black z-40 flex flex-col shadow-[4px_0_0_#000] transition-transform duration-300 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
             <div className="bg-black text-white p-3 border-b-4 border-black text-center flex items-center justify-between">
                <h3 className="font-orbitron font-bold italic text-sm tracking-wider mx-auto">AI PROTOCOLS</h3>
                <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden text-white hover:text-[var(--theme-accent)] transition-colors pr-1">
@@ -366,27 +366,43 @@ export default function App() {
               </section>
 
               {/* How it Works / Proof (Updated Text & Darker Font) */}
+              {/* Why REDAI Benefits You: Website About & Features */}
               <section className="bg-[var(--theme-accent)] border-b-4 border-black py-12 px-6">
                 <div className="max-w-[1200px] mx-auto">
                    <div className="text-center mb-12">
-                      <h2 className="text-3xl md:text-4xl text-black font-orbitron italic font-bold uppercase tracking-tighter mb-2 shadow-none">How to Detect AI With RED<span className="text-[var(--theme-cyan)]">AI</span></h2>
-                      <p className="text-sm md:text-base text-black font-jakarta font-bold">Check any text for AI-generated content in three simple steps</p>
+                      <span className="text-black font-orbitron font-extrabold uppercase tracking-[0.2em] text-[9px] bg-white border border-black px-2 py-0.5 mb-2 inline-block">OUR MISSION PROTOCOL</span>
+                      <h2 className="text-3xl md:text-4xl text-black font-orbitron italic font-bold uppercase tracking-tighter mb-2 shadow-none">Why RED<span className="text-[var(--theme-cyan)]">AI</span> Humanizer Benefits You</h2>
+                      <p className="text-xs md:text-sm text-black font-jakarta font-bold max-w-2xl mx-auto">
+                         REDAI is a state-of-the-art neural bypass workspace built to bridge the gap between AI generation and natural human flow. We empower students, marketers, and creators to bypass restrictive detectors completely.
+                      </p>
                    </div>
+                   
                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                      <div className="brutal-container bg-white border-2 border-black p-5 relative group">
-                         <div className="absolute -top-4 -left-4 w-8 h-8 bg-[var(--theme-cyan)] border-2 border-black flex items-center justify-center font-orbitron font-bold text-sm">1</div>
-                         <h3 className="text-lg font-orbitron italic font-bold uppercase mb-2 mt-1">Paste or upload your text</h3>
-                         <p className="font-jakarta font-bold text-black text-xs leading-relaxed">Paste your text directly or upload a PDF, Word, or TXT file. Check up to 15,000 words in one scan.</p>
+                      {/* Benefit 1 */}
+                      <div className="brutal-container bg-white border-2 border-black p-5 relative group shadow-[4px_4px_0_#000] hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[6px_6px_0_#000] transition-all">
+                         <div className="absolute -top-4 -left-4 w-8 h-8 bg-[var(--theme-cyan)] border-2 border-black flex items-center justify-center font-orbitron font-bold text-sm">01</div>
+                         <h3 className="text-base font-orbitron italic font-bold uppercase mb-2 mt-1 text-black">100% Undetectable AI Bypass</h3>
+                         <p className="font-jakarta font-bold text-black text-xs leading-relaxed">
+                            Bypass Turnitin, Originality.ai, GPTZero, and Copyleaks seamlessly. Our Aeternum engines re-engineer sentence signatures to achieve perfect organic marks every time.
+                         </p>
                       </div>
-                      <div className="brutal-container bg-black text-white border-2 border-white p-5 relative group">
-                         <div className="absolute -top-4 -left-4 w-8 h-8 bg-[var(--theme-accent)] border-2 border-white flex items-center justify-center font-orbitron font-bold text-sm">2</div>
-                         <h3 className="text-lg font-orbitron italic font-bold uppercase mb-2 mt-1 text-[var(--theme-cyan)]">Run the scan</h3>
-                         <p className="font-jakarta font-bold text-gray-300 text-xs leading-relaxed">Click Detect AI and get your results in seconds. REDAI checks your text against output patterns from ChatGPT, GPT-5, Claude, Gemini, DeepSeek, and more.</p>
+                      
+                      {/* Benefit 2 */}
+                      <div className="brutal-container bg-white border-2 border-black p-5 relative group shadow-[4px_4px_0_#000] hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[6px_6px_0_#000] transition-all text-black">
+                         <div className="absolute -top-4 -left-4 w-8 h-8 bg-[var(--theme-accent)] border-2 border-black flex items-center justify-center font-orbitron font-bold text-sm text-white">02</div>
+                         <h3 className="text-base font-orbitron italic font-bold uppercase mb-2 mt-1 text-black">Context-Aware Re-writing</h3>
+                         <p className="font-jakarta font-bold text-black text-xs leading-relaxed">
+                            No broken grammar or clumsy synonyms. REDAI dynamically restructures phrases, shuffles syntactic patterns, and injects authentic cadence while leaving your original facts and arguments completely untouched.
+                         </p>
                       </div>
-                      <div className="brutal-container bg-white border-2 border-black p-5 relative group">
-                         <div className="absolute -top-4 -left-4 w-8 h-8 bg-[var(--theme-cyan)] border-2 border-black flex items-center justify-center font-orbitron font-bold text-sm">3</div>
-                         <h3 className="text-lg font-orbitron italic font-bold uppercase mb-2 mt-1">See the report and fix what was flagged</h3>
-                         <p className="font-jakarta font-bold text-black text-xs leading-relaxed">Review sentence-level results to see what triggered detection. Rewrite flagged parts with the AI Humanizer, then rescan to confirm everything looks right.</p>
+                      
+                      {/* Benefit 3 */}
+                      <div className="brutal-container bg-white border-2 border-black p-5 relative group shadow-[4px_4px_0_#000] hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[6px_6px_0_#000] transition-all">
+                         <div className="absolute -top-4 -left-4 w-8 h-8 bg-[var(--theme-cyan)] border-2 border-black flex items-center justify-center font-orbitron font-bold text-sm">03</div>
+                         <h3 className="text-base font-orbitron italic font-bold uppercase mb-2 mt-1 text-black">16+ Specialized Tools</h3>
+                         <p className="font-jakarta font-bold text-black text-xs leading-relaxed">
+                            Switch instantly between dedicated modules: Plagiarism checkers, Grammar correctors, Article/Sentence rewriters, Essay builders, and citation engines inside one central dashboard.
+                         </p>
                       </div>
                    </div>
                 </div>
@@ -418,60 +434,80 @@ export default function App() {
                       </div>
                    </div>
 
-                   {/* Mobile Viewport: Premium Swipe Deck Cards - 3 horizontal rectangular strips per slide */}
-                    <div className="md:hidden flex overflow-x-auto gap-4 pb-6 snap-x snap-mandatory scrollbar-none px-1">
-                       {[
-                         [
-                           { name: "Sarah J.", role: "College Student", text: "Bypassed Turnitin instantly. Saved my academic career. 10/10 protocol." },
-                           { name: "Mark T.", role: "SEO Agency", text: "We use the API to mass-humanize our programmatic SEO blogs. AdSense approved." },
-                           { name: "Elena R.", role: "Freelance Writer", text: "Clients think I spend hours writing these articles. Matches my voice perfectly." }
-                         ],
-                         [
-                           { name: "David C.", role: "Content Manager", text: "Tested 5 different tools. REDAI is the only one that passes Originality 3.0." },
-                           { name: "Priya M.", role: "Professor", text: "The detection is incredibly accurate. I use it to filter out low-effort submissions." },
-                           { name: "James L.", role: "Affiliate Marketer", text: "My product review sites are flourishing. The rewording tool handles bulk jobs." }
-                         ],
-                         [
-                           { name: "Chris W.", role: "Editor", text: "Uncanny cadence matching. The grammar check alone saves my team hours." },
-                           { name: "Anna B.", role: "Student", text: "The essay writer provides an amazing starting point without raising any AI flags." },
-                           { name: "Luke D.", role: "Content Director", text: "Streamlined our publishing workflow. AI detection score is now consistently 0%." }
-                         ],
-                         [
-                           { name: "Sophia V.", role: "PhD Candidate", text: "Flawless academic phrasing. Preserves my original arguments perfectly." },
-                           { name: "Marcus K.", role: "SEO Specialist", text: "Completely revolutionized our local search campaigns. Zero drops in traffic." },
-                           { name: "Chloe P.", role: "Copywriter", text: "The humanizer adds the perfect natural cadence. Feels like a top-tier copywriter." }
-                         ],
-                         [
-                           { name: "Nate B.", role: "Digital Agency", text: "Passes Copyleaks and GPTZero with ease. Absolutely robust security protocol." },
-                           { name: "Zoe T.", role: "Blog Owner", text: "My readers love the new tone. Natural, engaging, and highly informative." },
-                           { name: "Ethan F.", role: "Tech Journalist", text: "The best paraphraser in the market. Retains context perfectly." }
-                         ]
-                       ].map((chunk, chunkIdx) => (
-                          <div key={chunkIdx} className="w-[88vw] flex-shrink-0 snap-center space-y-2">
-                             {chunk.map((item, idx) => (
-                                <TestimonialCard key={idx} name={item.name} role={item.role} text={item.text} isCompact={true} />
+                    {/* Automatic Carousel: Infinite Auto-scrolling Verified Operations/Customers Feedback */}
+                    <div className="space-y-4 overflow-hidden py-4 select-none relative w-full">
+                       {/* Soft fade gradients on the sides of the carousel for desktop */}
+                       <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-white via-white/80 to-transparent z-10 pointer-events-none hidden md:block" />
+                       <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-white via-white/80 to-transparent z-10 pointer-events-none hidden md:block" />
+
+                       {/* Row 1: Ticker moving left */}
+                       <div className="flex overflow-hidden w-full">
+                          <div className="animate-infinite-scroll flex gap-4 items-center px-4" style={{ animationDuration: '30s' }}>
+                             {[
+                                { name: "Sarah J.", role: "College Student", text: "Bypassed Turnitin instantly. Saved my academic career. 10/10 protocol." },
+                                { name: "Mark T.", role: "SEO Agency", text: "We use the API to mass-humanize our programmatic SEO blogs. AdSense approved." },
+                                { name: "Elena R.", role: "Freelance Writer", text: "Clients think I spend hours writing these articles. Matches my voice perfectly." },
+                                { name: "David C.", role: "Content Manager", text: "Tested 5 different tools. REDAI is the only one that passes Originality 3.0." },
+                                { name: "Priya M.", role: "Professor", text: "The detection is incredibly accurate. I use it to filter out low-effort submissions." },
+                                { name: "James L.", role: "Affiliate Marketer", text: "My product review sites are flourishing. The rewording tool handles bulk jobs." },
+                                { name: "Chris W.", role: "Editor", text: "Uncanny cadence matching. The grammar check alone saves my team hours." },
+                                { name: "Anna B.", role: "Student", text: "The essay writer provides an amazing starting point without raising any AI flags." }
+                             ].map((item, idx) => (
+                                <div key={idx} className="w-[280px] sm:w-[320px] flex-shrink-0">
+                                   <TestimonialCard name={item.name} role={item.role} text={item.text} isCompact={false} />
+                                </div>
+                             ))}
+                             {/* Duplicate Row 1 for continuous infinite looping */}
+                             {[
+                                { name: "Sarah J.", role: "College Student", text: "Bypassed Turnitin instantly. Saved my academic career. 10/10 protocol." },
+                                { name: "Mark T.", role: "SEO Agency", text: "We use the API to mass-humanize our programmatic SEO blogs. AdSense approved." },
+                                { name: "Elena R.", role: "Freelance Writer", text: "Clients think I spend hours writing these articles. Matches my voice perfectly." },
+                                { name: "David C.", role: "Content Manager", text: "Tested 5 different tools. REDAI is the only one that passes Originality 3.0." },
+                                { name: "Priya M.", role: "Professor", text: "The detection is incredibly accurate. I use it to filter out low-effort submissions." },
+                                { name: "James L.", role: "Affiliate Marketer", text: "My product review sites are flourishing. The rewording tool handles bulk jobs." },
+                                { name: "Chris W.", role: "Editor", text: "Uncanny cadence matching. The grammar check alone saves my team hours." },
+                                { name: "Anna B.", role: "Student", text: "The essay writer provides an amazing starting point without raising any AI flags." }
+                             ].map((item, idx) => (
+                                <div key={`dup-${idx}`} className="w-[280px] sm:w-[320px] flex-shrink-0">
+                                   <TestimonialCard name={item.name} role={item.role} text={item.text} isCompact={false} />
+                                </div>
                              ))}
                           </div>
-                       ))}
+                       </div>
+
+                       {/* Row 2: Ticker moving left with different items and speed */}
+                       <div className="flex overflow-hidden w-full">
+                          <div className="animate-infinite-scroll flex gap-4 items-center px-4" style={{ animationDuration: '36s' }}>
+                             {[
+                                { name: "Luke D.", role: "Content Director", text: "Streamlined our publishing workflow. AI detection score is now consistently 0%." },
+                                { name: "Sophia V.", role: "PhD Candidate", text: "Flawless academic phrasing. Preserves my original arguments perfectly." },
+                                { name: "Marcus K.", role: "SEO Specialist", text: "Completely revolutionized our local search campaigns. Zero drops in traffic." },
+                                { name: "Chloe P.", role: "Copywriter", text: "The humanizer adds the perfect natural cadence. Feels like a top-tier copywriter." },
+                                { name: "Nate B.", role: "Digital Agency", text: "Passes Copyleaks and GPTZero with ease. Absolutely robust security protocol." },
+                                { name: "Zoe T.", role: "Blog Owner", text: "My readers love the new tone. Natural, engaging, and highly informative." },
+                                { name: "Ethan F.", role: "Tech Journalist", text: "The best paraphraser in the market. Retains context perfectly." }
+                             ].map((item, idx) => (
+                                <div key={idx} className="w-[280px] sm:w-[320px] flex-shrink-0">
+                                   <TestimonialCard name={item.name} role={item.role} text={item.text} isCompact={false} />
+                                </div>
+                             ))}
+                             {/* Duplicate Row 2 for continuous infinite looping */}
+                             {[
+                                { name: "Luke D.", role: "Content Director", text: "Streamlined our publishing workflow. AI detection score is now consistently 0%." },
+                                { name: "Sophia V.", role: "PhD Candidate", text: "Flawless academic phrasing. Preserves my original arguments perfectly." },
+                                { name: "Marcus K.", role: "SEO Specialist", text: "Completely revolutionized our local search campaigns. Zero drops in traffic." },
+                                { name: "Chloe P.", role: "Copywriter", text: "The humanizer adds the perfect natural cadence. Feels like a top-tier copywriter." },
+                                { name: "Nate B.", role: "Digital Agency", text: "Passes Copyleaks and GPTZero with ease. Absolutely robust security protocol." },
+                                { name: "Zoe T.", role: "Blog Owner", text: "My readers love the new tone. Natural, engaging, and highly informative." },
+                                { name: "Ethan F.", role: "Tech Journalist", text: "The best paraphraser in the market. Retains context perfectly." }
+                             ].map((item, idx) => (
+                                <div key={`dup-${idx}`} className="w-[280px] sm:w-[320px] flex-shrink-0">
+                                   <TestimonialCard name={item.name} role={item.role} text={item.text} isCompact={false} />
+                                </div>
+                             ))}
+                          </div>
+                       </div>
                     </div>
-                    {/* Desktop Viewport: 5-Column High Density Grid */}
-                   <div className="hidden md:grid grid-cols-3 lg:grid-cols-5 gap-3">
-                      <TestimonialCard name="Sarah J." role="College Student" text="Bypassed Turnitin instantly. Saved my academic career. 10/10 protocol." />
-                      <TestimonialCard name="Mark T." role="SEO Agency" text="We use the API to mass-humanize our programmatic SEO blogs. AdSense approved." />
-                      <TestimonialCard name="Elena R." role="Freelance Writer" text="Clients think I spend hours writing these articles. Matches my voice perfectly." />
-                      <TestimonialCard name="David C." role="Content Manager" text="Tested 5 different tools. REDAI is the only one that passes Originality 3.0." />
-                      <TestimonialCard name="Priya M." role="Professor" text="The detection is incredibly accurate. I use it to filter out low-effort submissions." />
-                      <TestimonialCard name="James L." role="Affiliate Marketer" text="My product review sites are flourishing. The rewording tool handles bulk jobs." />
-                      <TestimonialCard name="Chris W." role="Editor" text="Uncanny cadence matching. The grammar check alone saves my team hours." />
-                      <TestimonialCard name="Anna B." role="Student" text="The essay writer provides an amazing starting point without raising any AI flags." />
-                      <TestimonialCard name="Luke D." role="Content Director" text="Streamlined our publishing workflow. AI detection score is now consistently 0%." />
-                      <TestimonialCard name="Sophia V." role="PhD Candidate" text="Flawless academic phrasing. Preserves my original arguments perfectly." />
-                      <TestimonialCard name="Marcus K." role="SEO Specialist" text="Completely revolutionized our local search campaigns. Zero drops in traffic." />
-                      <TestimonialCard name="Chloe P." role="Copywriter" text="The humanizer adds the perfect natural cadence. Feels like a top-tier copywriter." />
-                      <TestimonialCard name="Nate B." role="Digital Agency" text="Passes Copyleaks and GPTZero with ease. Absolutely robust security protocol." />
-                      <TestimonialCard name="Zoe T." role="Blog Owner" text="My readers love the new tone. Natural, engaging, and highly informative." />
-                      <TestimonialCard name="Ethan F." role="Tech Journalist" text="The best paraphraser in the market. Retains context perfectly." />
-                   </div>
                 </div>
               </section>
 
@@ -648,14 +684,14 @@ function TestimonialCard({ name, role, text, isCompact = false }: { name: string
 
 function BottomAdBar() {
   return (
-    <div className="fixed bottom-0 left-0 right-0 h-16 sm:h-32 bg-black border-t-[3px] sm:border-t-4 border-white z-50 flex items-center overflow-hidden">
-      <div className="w-8 sm:w-12 h-full bg-[var(--theme-accent)] border-r-2 sm:border-r-4 border-white flex flex-col items-center justify-center flex-shrink-0">
-         <span className="text-white font-orbitron italic font-bold tracking-widest text-[6px] sm:text-[10px] uppercase rotate-[-90deg] whitespace-nowrap">SPONSORED</span>
+    <div className="hidden sm:flex fixed bottom-0 left-0 right-0 h-32 bg-black border-t-4 border-white z-50 items-center overflow-hidden">
+      <div className="w-12 h-full bg-[var(--theme-accent)] border-r-4 border-white flex flex-col items-center justify-center flex-shrink-0">
+         <span className="text-white font-orbitron italic font-bold tracking-widest text-[10px] uppercase rotate-[-90deg] whitespace-nowrap">SPONSORED</span>
       </div>
-      <div className="flex-1 h-full grid grid-cols-2 sm:grid-cols-4 divide-x-2 sm:divide-x-4 divide-white">
+      <div className="flex-1 h-full grid grid-cols-4 divide-x-4 divide-white">
          {[1, 2, 3, 4].map((slot) => (
-            <div key={slot} className={`relative h-full bg-gray-900 group ${slot > 2 ? 'hidden sm:block' : ''}`}>
-               <div className="absolute inset-0 flex items-center justify-center opacity-40 font-orbitron font-bold text-white text-[8px] sm:text-xs z-0 uppercase tracking-widest">
+            <div key={slot} className="relative h-full bg-gray-900 group">
+               <div className="absolute inset-0 flex items-center justify-center opacity-40 font-orbitron font-bold text-white text-xs z-0 uppercase tracking-widest">
                  Ad Slot {slot}
                </div>
                {/* Autoplaying, muted, looping ad placeholder video */}
@@ -668,7 +704,7 @@ function BottomAdBar() {
                  className="w-full h-full object-cover opacity-80 mix-blend-luminosity group-hover:mix-blend-normal group-hover:opacity-100 transition-all z-10 relative pointer-events-none"
                />
                <div className="absolute bottom-1 right-2 z-20">
-                 <span className="bg-black text-white text-[6px] sm:text-[9px] font-bold px-1 uppercase border border-white leading-none">AD</span>
+                 <span className="bg-black text-white text-[9px] font-bold px-1 uppercase border border-white leading-none">AD</span>
                </div>
             </div>
          ))}
@@ -1171,32 +1207,32 @@ function CareerTab() {
        <AnimatePresence>
          {selectedRole && (
            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-             <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }} className="brutal-container bg-white border-4 border-black p-5 sm:p-8 max-w-md w-full relative max-h-[90vh] overflow-y-auto brutal-scrollbar">
-               <button onClick={() => setSelectedRole(null)} className="absolute top-4 right-4 text-black hover:text-[var(--theme-accent)] transition-colors">
-                 <X size={20} />
+             <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }} className="brutal-container bg-white border-4 border-black p-4 sm:p-6 max-w-md w-full relative max-h-[85vh] overflow-y-auto brutal-scrollbar">
+               <button onClick={() => setSelectedRole(null)} className="absolute top-3 right-3 text-black hover:text-[var(--theme-accent)] transition-colors">
+                 <X size={18} />
                </button>
-               <h3 className="text-xl sm:text-2xl font-orbitron italic font-bold mb-3 sm:mb-4 uppercase leading-tight text-black break-words pr-6">Apply: {selectedRole}</h3>
+               <h3 className="text-lg sm:text-xl font-orbitron italic font-bold mb-2 sm:mb-3 uppercase leading-tight text-black break-words pr-6">Apply: {selectedRole}</h3>
                
-               <div className="bg-black text-white p-4 mb-4 border-2 border-black shadow-[3px_3px_0_var(--theme-accent)] relative">
-                 <p className="font-jakarta text-[11px] sm:text-xs font-bold leading-relaxed relative z-10 text-white">
+               <div className="bg-black text-white p-3 mb-3 border-2 border-black shadow-[2px_2px_0_var(--theme-accent)] relative">
+                 <p className="font-jakarta text-[10px] sm:text-[11px] font-bold leading-relaxed relative z-10 text-white">
                    However, this career is currently vacant, but the team will let you know about the movement of REDAI. For now, your information will be collected and for future reference we can reach out to you. Don't wait for the email, we will email you instead.
                  </p>
                </div>
 
-               <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); setSelectedRole(null); }}>
+               <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); setSelectedRole(null); }}>
                  <div>
-                   <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Full Name</label>
-                   <input type="text" required placeholder="John Doe" className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-black text-white focus:border-[var(--theme-accent)]" />
+                   <label className="block text-[9px] font-orbitron font-bold uppercase mb-0.5 text-black tracking-widest">Full Name</label>
+                   <input type="text" required placeholder="John Doe" className="w-full border-2 border-black p-2 font-jakarta font-bold outline-none bg-black text-white focus:border-[var(--theme-accent)] text-xs" />
                  </div>
                  <div>
-                   <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Email Address</label>
-                   <input type="email" required placeholder="john@example.com" className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-black text-white focus:border-[var(--theme-accent)]" />
+                   <label className="block text-[9px] font-orbitron font-bold uppercase mb-0.5 text-black tracking-widest">Email Address</label>
+                   <input type="email" required placeholder="john@example.com" className="w-full border-2 border-black p-2 font-jakarta font-bold outline-none bg-black text-white focus:border-[var(--theme-accent)] text-xs" />
                  </div>
                  <div>
-                   <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">LinkedIn / Portfolio</label>
-                   <input type="url" placeholder="https://linkedin.com/in/johndoe" className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-black text-white focus:border-[var(--theme-accent)]" />
+                   <label className="block text-[9px] font-orbitron font-bold uppercase mb-0.5 text-black tracking-widest">LinkedIn / Portfolio</label>
+                   <input type="url" placeholder="https://linkedin.com/in/johndoe" className="w-full border-2 border-black p-2 font-jakarta font-bold outline-none bg-black text-white focus:border-[var(--theme-accent)] text-xs" />
                  </div>
-                 <button type="submit" className="w-full bg-[var(--theme-accent)] text-white font-orbitron font-bold py-4 border-2 border-black hover:bg-black hover:border-white hover:shadow-[4px_4px_0_var(--theme-cyan)] transition-all uppercase mt-4">
+                 <button type="submit" className="w-full bg-[var(--theme-accent)] text-white font-orbitron font-bold py-2.5 border-2 border-black hover:bg-black hover:border-white hover:shadow-[3px_3px_0_var(--theme-cyan)] transition-all uppercase mt-3 text-xs tracking-wider">
                    Submit Application
                  </button>
                </form>
@@ -1884,28 +1920,37 @@ function MarketplaceTab() {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-md p-4">
             <motion.div initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }} transition={{ duration: 0.3, ease: "easeOut" }} className="w-full h-auto max-h-[90vh] max-w-4xl flex flex-col relative bg-white shadow-[4px_4px_0_rgba(0,0,0,1)] border-2 border-black overflow-y-auto brutal-scrollbar">
               
-              <button onClick={() => setIsCheckoutOpen(false)} className="absolute top-2 right-2 z-50 p-1 bg-black text-white hover:bg-[var(--theme-accent)] transition-colors border border-black">
-                <X size={16} strokeWidth={2} />
+              <button onClick={() => setIsCheckoutOpen(false)} className="absolute top-2.5 right-2.5 z-50 p-1 bg-black text-white hover:bg-[var(--theme-accent)] transition-all border-2 border-black hover:border-white shadow-[2px_2px_0_#000] active:translate-x-0.5 active:translate-y-0.5 flex items-center justify-center cursor-pointer">
+                <X size={14} strokeWidth={3} />
               </button>
               
               {/* Order Summary Horizontal Strip */}
-              <div className="w-full bg-gray-50 p-3 border-b-2 border-black flex flex-col md:flex-row md:items-center justify-between gap-4 flex-shrink-0">
+              <div className="w-full bg-gray-50 p-3 md:pr-14 border-b-2 border-black flex flex-col md:flex-row md:items-center justify-between gap-4 flex-shrink-0">
                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 w-full md:w-auto">
                     <h3 className="text-[9px] sm:text-[10px] font-orbitron font-bold uppercase tracking-widest text-black border-b border-black sm:border-b-0 sm:border-r-2 border-black pb-1 sm:pb-0 pr-0 sm:pr-3 flex-shrink-0">Order Summary</h3>
                     <div className="flex items-center gap-2 overflow-x-auto brutal-scrollbar max-w-full md:max-w-[400px] py-1">
                        {checkoutItems.map((item, idx) => (
-                          <div key={idx} className="flex items-center gap-1.5 flex-shrink-0 bg-white border border-black p-1">
-                             <img src={item.image} className="w-6 h-8 object-cover bg-gray-200" alt={item.name} />
-                             <div className="leading-tight">
-                                <p className="font-orbitron font-bold text-[8px] uppercase tracking-wide truncate max-w-[80px] sm:max-w-[100px]">{item.name}</p>
-                                <p className="font-jakarta text-[9px] text-[var(--theme-accent)] font-bold">{item.priceStr}</p>
+                          <div key={idx} className="flex items-center gap-2 flex-shrink-0 bg-white border border-black p-1 pr-2">
+                             {/* Sleek placeholder fallback if product image fails */}
+                             <div className="w-8 h-10 bg-gray-100 flex-shrink-0 relative overflow-hidden flex items-center justify-center border border-black">
+                                <img 
+                                  src={item.image} 
+                                  className="absolute inset-0 w-full h-full object-cover" 
+                                  alt={item.name} 
+                                  onError={(e) => { e.currentTarget.style.opacity = '0'; }} 
+                                />
+                                <span className="font-orbitron font-black text-[9px] text-gray-400 select-none uppercase">REDI</span>
+                             </div>
+                             <div className="leading-tight flex flex-col justify-center">
+                                <p className="font-orbitron font-bold text-[8px] sm:text-[9px] uppercase tracking-wide truncate max-w-[90px] sm:max-w-[120px] text-black">{item.name}</p>
+                                <p className="font-jakarta text-[9px] text-[var(--theme-accent)] font-black mt-0.5">{item.priceStr}</p>
                              </div>
                           </div>
                        ))}
                     </div>
                  </div>
                  
-                 <div className="flex flex-wrap items-center justify-between sm:justify-end gap-3 font-orbitron font-bold uppercase tracking-widest text-[8px] text-gray-600 w-full md:w-auto flex-shrink-0">
+                 <div className="flex flex-wrap items-center justify-between sm:justify-end gap-4 font-orbitron font-bold uppercase tracking-widest text-[8px] text-gray-600 w-full md:w-auto flex-shrink-0">
                     <div>
                        <span>Subtotal: </span>
                        <span className="text-black ml-1 font-black">PHP {totalCheckoutPrice.toLocaleString()}</span>
@@ -1914,7 +1959,7 @@ function MarketplaceTab() {
                        <span>Shipping: </span>
                        <span className="text-black ml-1 font-black">Via Email</span>
                     </div>
-                    <div className="text-[10px] text-black border-l border-black pl-3 flex items-center gap-1">
+                    <div className="text-[10px] text-black border-l border-black pl-3 flex items-center gap-1.5">
                        <span>Total:</span>
                        <span className="text-[var(--theme-accent)] font-black text-[11px]">PHP {totalCheckoutPrice.toLocaleString()}</span>
                     </div>
