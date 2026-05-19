@@ -4,7 +4,7 @@ import {
   Cpu, Zap, Layers, Shield, Terminal, Code2,
   TrendingUp, Users, DollarSign, Share2, Tag,
   ChevronRight, Link, BarChart, PenTool, LayoutTemplate,
-  Store, Network, MessageSquare, ArrowRight, Activity, Sliders, CheckCircle, Star, Plus, Minus, X, AlertTriangle, Award, Menu, Lock, ShieldAlert
+  Store, Network, MessageSquare, ArrowRight, Activity, Sliders, CheckCircle, Star, Plus, Minus, X, AlertTriangle, Award, Menu, Lock, ShieldAlert, Eye, EyeOff
 } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -34,7 +34,7 @@ const TOOLS_LIST = [
 export default function App() {
   const [activeTab, setActiveTab] = useState<TabState | "admin">("home");
   const [activeTool, setActiveTool] = useState<string>("Text Humanizer");
-  const [credits, setCredits] = useState(5);
+  const [credits, setCredits] = useState<number | "Unlimited">(5);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [conscienceCleansed, setConscienceCleansed] = useState(false);
@@ -47,6 +47,7 @@ export default function App() {
   const [isSignUpMode, setIsSignUpMode] = useState(false);
   const [signInEmail, setSignInEmail] = useState("");
   const [signInPassword, setSignInPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [signUpName, setSignUpName] = useState("");
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
 
@@ -112,7 +113,7 @@ export default function App() {
           <div className="flex items-center gap-2 sm:gap-6">
             <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-black border-2 border-white">
               <Zap size={16} className="text-[var(--theme-cyan)]" />
-              <span className="text-sm font-orbitron italic font-bold text-white">{credits} UNITS</span>
+              <span className="text-sm font-orbitron italic font-bold text-white">{credits === "Unlimited" ? "UNLIMITED" : `${credits} UNITS`}</span>
             </div>
             {user ? (
               <div className="relative">
@@ -140,7 +141,7 @@ export default function App() {
                     </p>
                     <p className="flex justify-between items-center mb-3">
                       <span className="text-gray-500 uppercase tracking-widest text-[8px] font-orbitron font-black">Credits:</span>
-                      <span className="text-[var(--theme-accent)] font-extrabold text-sm">{credits} Units</span>
+                      <span className="text-[var(--theme-accent)] font-extrabold text-sm">{credits === "Unlimited" ? "UNLIMITED" : `${credits} Units`}</span>
                     </p>
 
                     {user.role === 'admin' && (
@@ -165,6 +166,7 @@ export default function App() {
                     <button
                       onClick={() => {
                         setUser(null);
+                        setCredits(5);
                         setIsProfileDropdownOpen(false);
                         if (activeTab === "admin") setActiveTab("home");
                       }}
@@ -794,6 +796,7 @@ export default function App() {
                         provider: "email"
                       });
                       setActiveTab("admin");
+                      setCredits("Unlimited");
                       alert("Signed in successfully as Administrator! Routing to Admin Panel.");
                     } else {
                       setUser({
@@ -844,14 +847,23 @@ export default function App() {
                   <label className="block text-[9px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">
                     Password
                   </label>
-                  <input
-                    type="password"
-                    required
-                    value={signInPassword}
-                    onChange={(e) => setSignInPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="w-full border-2 border-black p-2.5 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)] text-xs"
-                  />
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      required
+                      value={signInPassword}
+                      onChange={(e) => setSignInPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="w-full border-2 border-black p-2.5 pr-10 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)] text-xs"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-500 hover:text-black transition-colors cursor-pointer"
+                    >
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
                 </div>
 
                 <button
@@ -908,8 +920,8 @@ function WorkspaceProcessor({
   setShowInsufficientAlert 
 }: { 
   activeTool: string;
-  credits: number;
-  setCredits: React.Dispatch<React.SetStateAction<number>>;
+  credits: number | "Unlimited";
+  setCredits: React.Dispatch<React.SetStateAction<number | "Unlimited">>;
   setShowInsufficientAlert: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [input, setInput] = useState("");
@@ -929,7 +941,7 @@ function WorkspaceProcessor({
 
     // Check if the user has enough credits for premium parameters
     const isPaid = activeParam !== "Free";
-    if (isPaid && credits <= 0) {
+    if (isPaid && credits !== "Unlimited" && credits <= 0) {
       setShowInsufficientAlert(true);
       return;
     }
@@ -938,8 +950,8 @@ function WorkspaceProcessor({
 
     try {
       // Deduct 1 credit for paid parameters immediately upon request
-      if (isPaid) {
-        setCredits(prev => Math.max(0, prev - 1));
+      if (isPaid && credits !== "Unlimited") {
+        setCredits(prev => prev === "Unlimited" ? "Unlimited" : Math.max(0, prev - 1));
       }
 
       // 1. Call Puter AI via our utility function
