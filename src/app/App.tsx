@@ -6,6 +6,9 @@ import {
   ChevronRight, Link, BarChart, PenTool, LayoutTemplate, 
   Store, Network, MessageSquare, ArrowRight, Activity, Sliders, CheckCircle, Star, Plus, Minus, X, AlertTriangle, Award, Menu
 } from "lucide-react";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { processAiRequest } from "./utils/ai";
 
 type TabState = "home" | "blog" | "ads" | "marketplace" | "referral" | "career";
 
@@ -31,11 +34,20 @@ const TOOLS_LIST = [
 export default function App() {
   const [activeTab, setActiveTab] = useState<TabState>("home");
   const [activeTool, setActiveTool] = useState<string>("Text Humanizer");
-  const [credits] = useState(5);
+  const [credits, setCredits] = useState(5);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [conscienceCleansed, setConscienceCleansed] = useState(false);
   const [copiedShare, setCopiedShare] = useState(false);
+  const [showInsufficientAlert, setShowInsufficientAlert] = useState(false);
+
+  // Auto-dismiss credit alert pop message
+  useEffect(() => {
+    if (showInsufficientAlert) {
+      const timer = setTimeout(() => setShowInsufficientAlert(false), 6000);
+      return () => clearTimeout(timer);
+    }
+  }, [showInsufficientAlert]);
 
   return (
     <div className="relative min-h-screen pb-12 sm:pb-32 bg-[var(--theme-bg)] selection:bg-[var(--theme-accent)] selection:text-white">
@@ -201,7 +213,7 @@ export default function App() {
                 </div>
 
                  {/* Two-Pane Workspace */}
-                 <WorkspaceProcessor activeTool={activeTool} />
+                 <WorkspaceProcessor activeTool={activeTool} credits={credits} setCredits={setCredits} setShowInsufficientAlert={setShowInsufficientAlert} />
 
                  {/* THE FREE RIDER'S ABSOLUTION PROTOCOL (Moral Conscience Arbitrage) */}
                  <div className="mt-8 brutal-container bg-white border-4 border-black p-5 sm:p-8 relative overflow-hidden group shadow-[6px_6px_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[8px_8px_0_var(--theme-accent)] transition-all">
@@ -246,19 +258,19 @@ export default function App() {
                                 onClick={() => {
                                    navigator.clipboard.writeText("https://redaihumanizer.com");
                                    setCopiedShare(true);
-                                   setConscienceCleansed(true);
+                                   setConscienceCleansed(true); setCredits(prev => prev + 5);
                                    setTimeout(() => setCopiedShare(false), 3000);
                                 }}
                                 className={`px-4 py-2 font-orbitron font-black text-[9px] uppercase tracking-wider border-2 transition-all shadow-[2px_2px_0_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none ${conscienceCleansed ? 'bg-green-500 text-white border-black' : 'bg-black text-white border-black hover:bg-[var(--theme-accent)]'}`}
                              >
-                                {copiedShare ? "Link Copied! Conscience +100" : "Copy Share Link"}
+                                {copiedShare ? "Link Copied! Conscience +100 (+5 Credits)" : "Copy Share Link"}
                              </button>
 
                              <a 
                                 href="https://twitter.com/intent/tweet?text=Bypassing%20AI%20detection%20instantly%20with%20REDAI%20Humanizer!%20Check%20it%20out:%20https://redaihumanizer.com"
                                 target="_blank"
                                 rel="noreferrer"
-                                onClick={() => setConscienceCleansed(true)}
+                                onClick={() => { setConscienceCleansed(true); setCredits(prev => prev + 5); }}
                                 className="px-3.5 py-2 bg-[var(--theme-cyan)] text-black border-2 border-black font-orbitron font-black text-[9px] uppercase tracking-wider hover:bg-black hover:text-white transition-colors active:translate-y-0.5 shadow-[2px_2px_0_#000] active:shadow-none"
                              >
                                 Tweet It
@@ -517,7 +529,7 @@ export default function App() {
           {activeTab === "blog" && <PageWrapper key="blog"><BlogTab /></PageWrapper>}
           {activeTab === "ads" && <PageWrapper key="ads"><MarketingDealsTab /></PageWrapper>}
           {activeTab === "marketplace" && <PageWrapper key="marketplace"><MarketplaceTab /></PageWrapper>}
-          {activeTab === "referral" && <PageWrapper key="referral"><ReferralTab /></PageWrapper>}
+          {activeTab === "referral" && <PageWrapper key="referral"><ReferralTab setCredits={setCredits} /></PageWrapper>}
           {activeTab === "career" && <PageWrapper key="career"><CareerTab /></PageWrapper>}
         </AnimatePresence>
       </main>
@@ -529,33 +541,90 @@ export default function App() {
       {/* FULL-LENGTH BOTTOM AD CONTAINER */}
       <BottomAdBar />
       
+      {showInsufficientAlert && (
+         <>
+            {/* Dark Blur Overlay Backdrop over the whole viewport */}
+            <div 
+               onClick={() => setShowInsufficientAlert(false)}
+               className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[99998] animate-fade-in"
+            />
+            
+            {/* Centered Brutalist Modal */}
+            <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[99999] w-[90%] max-w-md bg-[var(--theme-accent)] text-white border-4 border-black p-5 shadow-[6px_6px_0_#000] flex items-start gap-4 animate-scale-in">
+               <div className="bg-black text-white px-2.5 py-1.5 border-2 border-black font-orbitron font-black text-sm leading-none select-none">
+                  ⚠
+               </div>
+               <div className="flex-1 min-w-0">
+                  <h4 className="font-orbitron font-extrabold text-xs sm:text-sm uppercase tracking-wider mb-1.5 text-[var(--theme-cyan)]">NEURAL BLOCKADE ACTIVATED</h4>
+                  <p className="font-jakarta text-[11px] sm:text-xs leading-relaxed uppercase font-bold text-white">
+                     INSUFFICIENT NEURAL CREDITS. PLEASE EARN CREDITS BY COPYING THE SHARE LINK OR SUBMITTING REFERRAL CLAIMS BELOW TO GENERATE MORE.
+                  </p>
+               </div>
+               <button 
+                  onClick={() => setShowInsufficientAlert(false)} 
+                  className="bg-black text-white hover:bg-white hover:text-black border-2 border-black px-2 py-1 text-xs font-orbitron font-bold transition-colors shadow-[2px_2px_0_#000] active:translate-y-0.5 active:shadow-none"
+               >
+                  ✕
+               </button>
+            </div>
+         </>
+      )}
+      
     </div>
   );
 }
 
 // --- WORKSPACE COMPONENTS ---
 
-function WorkspaceProcessor({ activeTool }: { activeTool: string }) {
+function WorkspaceProcessor({ 
+  activeTool, 
+  credits, 
+  setCredits,
+  setShowInsufficientAlert
+}: { 
+  activeTool: string; 
+  credits: number; 
+  setCredits: React.Dispatch<React.SetStateAction<number>>; 
+  setShowInsufficientAlert: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
   const [status, setStatus] = useState<"idle" | "scanning" | "processing" | "complete">("idle");
   const [activeParam, setActiveParam] = useState("Standard");
+  const [customInstructions, setCustomInstructions] = useState("");
 
-  // Force reset when tool changes
-  useState(() => {
+  // Reset output and status when tool or parameter changes so the user can execute again immediately
+  useEffect(() => {
     setStatus("idle");
-    setInput("");
     setOutput("");
-  });
+  }, [activeTool, activeParam]);
 
-  const handleProcess = () => {
-    if (!input.trim() || status !== "idle") return;
-    setStatus("scanning");
+  const handleProcess = async () => {
+    if (!input.trim() || status === "processing" || status === "scanning") return;
 
-    setTimeout(() => {
+    // Free parameter is free, other parameters cost 1 credit
+    const isPaid = activeParam !== "Free";
+    if (isPaid && credits <= 0) {
+      setShowInsufficientAlert(true);
+      return;
+    }
+
+    setStatus("processing");
+
+    try {
+      const result = await processAiRequest(activeTool, activeParam, input, customInstructions);
+      setOutput(result);
       setStatus("complete");
-      setOutput(`[${activeTool.toUpperCase()} REPORT]\n\nAnalysis complete against ChatGPT, Claude, and Gemini models.\n\nResult:\nHuman cadence verified. The neural structures in this text successfully bypass predictive detection layers. AdSense compatibility is extremely high.`);
-    }, 1500);
+      
+      // Deduct credit for paid parameters
+      if (isPaid) {
+        setCredits(prev => Math.max(0, prev - 1));
+      }
+    } catch (error) {
+      console.error(error);
+      setOutput("Error processing request.");
+      setStatus("complete");
+    }
   };
 
   return (
@@ -588,8 +657,23 @@ function WorkspaceProcessor({ activeTool }: { activeTool: string }) {
             <textarea
               value={input} onChange={(e) => setInput(e.target.value)} disabled={status !== "idle" && status !== "complete"}
               placeholder="Start typing or paste your document..."
-              className="flex-1 w-full bg-transparent resize-none outline-none font-jakarta text-sm lg:text-lg leading-relaxed text-black pb-16"
+              style={{ color: 'white' }}
+              className="flex-1 w-full bg-transparent resize-none outline-none font-jakarta text-sm lg:text-lg leading-relaxed text-white placeholder-gray-400 pb-16"
             />
+            
+            {activeParam === "Custom" && (
+               <div className="absolute bottom-16 left-4 right-4 bg-black border-2 border-black p-2.5 shadow-[2px_2px_0_#000] z-20 animate-fade-in">
+                  <label className="block text-[8px] sm:text-[9px] font-orbitron font-black uppercase mb-1 text-[var(--theme-cyan)] tracking-wider">Custom Prompts & Constraints</label>
+                  <input 
+                     type="text" 
+                     value={customInstructions} 
+                     onChange={(e) => setCustomInstructions(e.target.value)} 
+                     placeholder="e.g. Write as a pirate, avoid the word 'the', use academic jargon" 
+                     style={{ backgroundColor: 'white', color: 'black' }}
+                     className="w-full px-2 py-1.5 font-jakarta text-[11px] border border-black outline-none focus:ring-1 ring-[var(--theme-cyan)]"
+                  />
+               </div>
+            )}
             
             <div className="absolute bottom-4 right-4 flex gap-2">
                {input.length === 0 && (
@@ -607,10 +691,20 @@ function WorkspaceProcessor({ activeTool }: { activeTool: string }) {
          </div>
 
          {/* Right Pane: Output */}
-         <div className={`flex flex-col bg-white p-4 transition-colors h-[320px] lg:h-full ${status === "complete" ? "bg-[var(--theme-cyan)]/10" : ""}`}>
-            <div className="flex justify-between items-center mb-2">
+         <div className={`flex flex-col bg-white p-4 transition-colors h-[320px] lg:h-full relative overflow-hidden min-h-0 ${status === "complete" ? "bg-[var(--theme-cyan)]/10" : ""}`}>
+            <div className="flex justify-between items-center mb-2 z-10 shrink-0">
                <span className="font-bold text-[10px] lg:text-xs text-black uppercase">Output will appear here</span>
-               {status === "complete" && <span className="font-bold text-[10px] lg:text-xs bg-black text-[var(--theme-cyan)] px-2 py-0.5">ANALYSIS READY</span>}
+               {status === "complete" && (
+                 <div className="flex gap-2">
+                   <button 
+                     onClick={() => navigator.clipboard.writeText(output)}
+                     className="font-bold text-[10px] lg:text-xs bg-black text-white px-2 py-0.5 hover:bg-[var(--theme-accent)] transition-colors cursor-pointer"
+                   >
+                     COPY TEXT
+                   </button>
+                   <span className="font-bold text-[10px] lg:text-xs bg-black text-[var(--theme-cyan)] px-2 py-0.5">ANALYSIS READY</span>
+                 </div>
+               )}
             </div>
             {status === "idle" && (
                <div className="flex-1 flex items-center justify-center text-gray-400 font-bold uppercase text-center p-8 text-xs lg:text-sm">
@@ -624,11 +718,9 @@ function WorkspaceProcessor({ activeTool }: { activeTool: string }) {
                </div>
             )}
             {status === "complete" && (
-               <textarea
-                 value={output}
-                 readOnly
-                 className="flex-1 w-full bg-transparent resize-none outline-none font-jakarta text-sm lg:text-lg leading-relaxed text-black font-medium pb-4"
-               />
+               <div className="flex-1 w-full bg-transparent overflow-y-auto brutal-scrollbar pb-4 prose prose-sm md:prose-base max-w-none prose-headings:font-orbitron prose-headings:uppercase prose-headings:italic prose-headings:m-0 prose-h1:text-xl prose-h1:mb-3 prose-h2:text-lg prose-h2:mb-2 prose-h3:text-base prose-h3:mb-2 prose-p:font-jakarta prose-p:text-black prose-p:mb-2 prose-strong:text-black text-black">
+                 <ReactMarkdown remarkPlugins={[remarkGfm]} children={output} />
+               </div>
             )}
          </div>
 
@@ -1043,7 +1135,7 @@ function ReferralCard({ brand }: { brand: any }) {
   );
 }
 
-function ReferralTab() {
+function ReferralTab({ setCredits }: { setCredits: React.Dispatch<React.SetStateAction<number>> }) {
   const brandsData = [
     { name: "Maya", domain: "maya.ph", adUrl: "https://media.w3.org/2010/05/sintel/trailer.mp4" },
     { name: "SMDC", domain: "smdc.com", adUrl: "https://www.w3schools.com/html/mov_bbb.mp4" },
@@ -1153,7 +1245,7 @@ function ReferralTab() {
           <h2 className="text-4xl font-orbitron italic font-bold uppercase mb-2 text-black">Referral Claim Form</h2>
           <p className="font-jakarta font-bold text-gray-600 uppercase text-sm">Submit your proof of successful conversion here</p>
         </div>
-        <form className="grid grid-cols-1 md:grid-cols-2 gap-8" onSubmit={(e) => { e.preventDefault(); alert('Claim submitted! We will email you instead.'); }}>
+        <form className="grid grid-cols-1 md:grid-cols-2 gap-8" onSubmit={(e) => { e.preventDefault(); setCredits(prev => prev + 20); alert('Claim submitted successfully! +20 Neural Credits have been loaded into your account. We will email you instead.'); }}>
           <div className="space-y-6">
             <div>
               <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black">Full Name</label>
