@@ -4,7 +4,7 @@ import {
   Cpu, Zap, Layers, Shield, Terminal, Code2,
   TrendingUp, Users, DollarSign, Share2, Tag,
   ChevronRight, Link, BarChart, PenTool, LayoutTemplate,
-  Store, Network, MessageSquare, ArrowRight, Activity, Sliders, CheckCircle, Star, Plus, Minus, X, AlertTriangle, Award, Menu, Lock
+  Store, Network, MessageSquare, ArrowRight, Activity, Sliders, CheckCircle, Star, Plus, Minus, X, AlertTriangle, Award, Menu, Lock, ShieldAlert
 } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -39,6 +39,7 @@ export default function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [conscienceCleansed, setConscienceCleansed] = useState(false);
   const [copiedShare, setCopiedShare] = useState(false);
+  const [showInsufficientAlert, setShowInsufficientAlert] = useState(false);
 
   // Authentication & Role States
   const [user, setUser] = useState<{ email: string; name: string; role: 'user' | 'admin'; provider: 'email' | 'google' } | null>(null);
@@ -637,6 +638,51 @@ export default function App() {
 
       {/* FULL-LENGTH BOTTOM AD CONTAINER */}
       <BottomAdBar />
+
+      {/* INSUFFICIENT CREDITS MODAL (NEURAL BLOCKADE) */}
+      <AnimatePresence>
+        {showInsufficientAlert && (
+          <motion.div 
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }}
+              className="brutal-container bg-white border-4 border-black p-6 sm:p-8 max-w-md w-full text-center relative"
+            >
+              <button onClick={() => setShowInsufficientAlert(false)} className="absolute top-3 right-3 text-black hover:text-[var(--theme-accent)] transition-colors">
+                <X size={24} />
+              </button>
+              
+              <div className="w-16 h-16 bg-[var(--theme-accent)] flex items-center justify-center mx-auto mb-4 border-2 border-black shadow-[4px_4px_0_#000]">
+                <ShieldAlert size={32} className="text-white" />
+              </div>
+              
+              <h2 className="font-orbitron font-black italic text-2xl uppercase text-black mb-2 leading-tight">Neural Blockade Active</h2>
+              <p className="font-jakarta text-sm text-gray-700 font-bold mb-6">Your token reserves are completely depleted. Premium parameters require active credits to bypass algorithmic filters.</p>
+              
+              <div className="flex flex-col gap-3">
+                <button 
+                  onClick={() => {
+                    setShowInsufficientAlert(false);
+                    setActiveTab("marketplace");
+                    window.scrollTo(0, 0);
+                  }}
+                  className="w-full py-3 bg-[var(--theme-cyan)] text-black border-2 border-black font-orbitron font-bold uppercase shadow-[4px_4px_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_#000] transition-all"
+                >
+                  Acquire Tokens
+                </button>
+                <button 
+                  onClick={() => setShowInsufficientAlert(false)}
+                  className="w-full py-3 bg-white text-gray-500 border-2 border-gray-300 font-orbitron font-bold uppercase hover:bg-gray-100 transition-all text-sm"
+                >
+                  Cancel
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Sign-In & Auth Modal */}
       <AnimatePresence>

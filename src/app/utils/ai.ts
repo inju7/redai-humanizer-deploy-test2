@@ -81,7 +81,7 @@ export async function processAiRequest(tool: string, parameter: string, input: s
   const fullPrompt = `${systemPrompt}\n\nInput Text:\n${input}`;
 
   try {
-    const response = await puter.ai.chat(fullPrompt);
+    const response: any = await puter.ai.chat(fullPrompt);
     console.log("Puter response received");
 
     if (!response) {
