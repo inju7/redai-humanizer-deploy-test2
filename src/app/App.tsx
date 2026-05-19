@@ -309,7 +309,7 @@ export default function App() {
                 </div>
 
                 {/* Two-Pane Workspace */}
-                <WorkspaceProcessor activeTool={activeTool} />
+                <WorkspaceProcessor activeTool={activeTool} credits={credits} setCredits={setCredits} setShowInsufficientAlert={setShowInsufficientAlert} />
 
                 {/* THE FREE RIDER'S ABSOLUTION PROTOCOL (Moral Conscience Arbitrage) */}
                 <div className="mt-8 brutal-container bg-white border-4 border-black p-5 sm:p-8 relative overflow-hidden group shadow-[6px_6px_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[8px_8px_0_var(--theme-accent)] transition-all">
@@ -855,7 +855,17 @@ export default function App() {
 
 // --- WORKSPACE COMPONENTS ---
 
-function WorkspaceProcessor({ activeTool }: { activeTool: string }) {
+function WorkspaceProcessor({ 
+  activeTool, 
+  credits, 
+  setCredits, 
+  setShowInsufficientAlert 
+}: { 
+  activeTool: string;
+  credits: number;
+  setCredits: React.Dispatch<React.SetStateAction<number>>;
+  setShowInsufficientAlert: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
   const [status, setStatus] = useState<"idle" | "scanning" | "processing" | "complete">("idle");
@@ -871,7 +881,7 @@ function WorkspaceProcessor({ activeTool }: { activeTool: string }) {
   const handleProcess = async () => {
     if (!input.trim() || status === "processing" || status === "scanning") return;
 
-    // Free parameter is free, other parameters cost 1 credit
+    // Check if the user has enough credits for premium parameters
     const isPaid = activeParam !== "Free";
     if (isPaid && credits <= 0) {
       setShowInsufficientAlert(true);
@@ -881,11 +891,22 @@ function WorkspaceProcessor({ activeTool }: { activeTool: string }) {
     setStatus("processing");
 
     try {
-      const result = await processAiRequest(activeTool, activeParam, input, customInstructions);
-      setOutput(result);
+      // Deduct 1 credit for paid parameters immediately upon request
+      if (isPaid) {
+        setCredits(prev => Math.max(0, prev - 1));
+      }
+
+      // 1. Call Puter AI via our utility function
+      const aiResponse = await processAiRequest(activeTool, activeParam, input, customInstructions);
+
+      // 2. Set the complete status and output the actual AI response
       setStatus("complete");
-      setOutput(`[${activeTool.toUpperCase()} REPORT]\n\nAnalysis complete against ChatGPT, Claude, and Gemini models.\n\nResult:\nHuman cadence verified. The neural structures in this text successfully bypass predictive detection layers. AdSense compatibility is extremely high.`);
-    }, 1500);
+      setOutput(aiResponse);
+    } catch (error) {
+      console.error("Puter AI Request Failed:", error);
+      setStatus("complete");
+      setOutput("Error: The Aeternum Protocol encountered a severe neural disconnect. Please try again later.");
+    }
   };
 
   return (
@@ -917,8 +938,23 @@ function WorkspaceProcessor({ activeTool }: { activeTool: string }) {
           <textarea
             value={input} onChange={(e) => setInput(e.target.value)} disabled={status !== "idle" && status !== "complete"}
             placeholder="Start typing or paste your document..."
-            className="flex-1 w-full bg-transparent resize-none outline-none font-jakarta text-sm lg:text-lg leading-relaxed text-black pb-16"
+            style={{ color: 'white' }}
+            className="flex-1 w-full bg-transparent resize-none outline-none font-jakarta text-sm lg:text-lg leading-relaxed text-white placeholder-gray-400 pb-16"
           />
+
+          {activeParam === "Custom" && (
+            <div className="absolute bottom-16 left-4 right-4 bg-black border-2 border-black p-2.5 shadow-[2px_2px_0_#000] z-20 animate-fade-in">
+              <label className="block text-[8px] sm:text-[9px] font-orbitron font-black uppercase mb-1 text-[var(--theme-cyan)] tracking-wider">Custom Prompts & Constraints</label>
+              <input
+                type="text"
+                value={customInstructions}
+                onChange={(e) => setCustomInstructions(e.target.value)}
+                placeholder="e.g. Write as a pirate, avoid the word 'the', use academic jargon"
+                style={{ backgroundColor: 'white', color: 'black' }}
+                className="w-full px-2 py-1.5 font-jakarta text-[11px] border border-black outline-none focus:ring-1 ring-[var(--theme-cyan)]"
+              />
+            </div>
+          )}
 
           <div className="absolute bottom-4 right-4 flex gap-2">
             {input.length === 0 && (
@@ -936,7 +972,7 @@ function WorkspaceProcessor({ activeTool }: { activeTool: string }) {
         </div>
 
         {/* Right Pane: Output */}
-        <div className={`flex flex-col bg-white p-4 transition-colors h-[320px] lg:h-full ${status === "complete" ? "bg-[var(--theme-cyan)]/10" : ""}`}>
+        <div className={`flex flex-col bg-white p-4 transition-colors h-[320px] lg:h-full relative overflow-hidden min-h-0 ${status === "complete" ? "bg-[var(--theme-cyan)]/10" : ""}`}>
           <div className="flex justify-between items-center mb-2">
             <span className="font-bold text-[10px] lg:text-xs text-black uppercase">Output will appear here</span>
             {status === "complete" && <span className="font-bold text-[10px] lg:text-xs bg-black text-[var(--theme-cyan)] px-2 py-0.5">ANALYSIS READY</span>}
@@ -953,11 +989,9 @@ function WorkspaceProcessor({ activeTool }: { activeTool: string }) {
             </div>
           )}
           {status === "complete" && (
-            <textarea
-              value={output}
-              readOnly
-              className="flex-1 w-full bg-transparent resize-none outline-none font-jakarta text-sm lg:text-lg leading-relaxed text-black font-medium pb-4"
-            />
+            <div className="flex-1 w-full bg-transparent overflow-y-auto brutal-scrollbar pb-4 prose prose-sm md:prose-base max-w-none prose-headings:font-orbitron prose-headings:uppercase prose-headings:italic prose-headings:m-0 prose-h1:text-xl prose-h1:mb-3 prose-h2:text-lg prose-h2:mb-2 prose-h3:text-base prose-h3:mb-2 prose-p:font-jakarta prose-p:text-black prose-p:mb-2 prose-strong:text-black text-black">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{output}</ReactMarkdown>
+            </div>
           )}
         </div>
 
