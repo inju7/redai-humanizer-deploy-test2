@@ -8,7 +8,9 @@ import {
 } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { processAiRequest } from "./utils/ai";
+import { useQuery, useAction } from "convex/react";
+import { useAuthActions } from "@convex-dev/auth/react";
+import { api } from "../../convex/_generated/api";
 
 type TabState = "home" | "blog" | "ads" | "marketplace" | "referral" | "career";
 
@@ -34,15 +36,26 @@ const TOOLS_LIST = [
 export default function App() {
   const [activeTab, setActiveTab] = useState<TabState | "admin">("home");
   const [activeTool, setActiveTool] = useState<string>("Text Humanizer");
-  const [credits, setCredits] = useState<number | "Unlimited">(5);
+  const [guestCredits, setGuestCredits] = useState<number>(5);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [conscienceCleansed, setConscienceCleansed] = useState(false);
   const [copiedShare, setCopiedShare] = useState(false);
   const [showInsufficientAlert, setShowInsufficientAlert] = useState(false);
 
-  // Authentication & Role States
-  const [user, setUser] = useState<{ email: string; name: string; role: 'user' | 'admin'; provider: 'email' | 'google' } | null>(null);
+  // Authentication via Convex Auth
+  const user = useQuery(api.users.current);
+  const rawIdentity = useQuery(api.users.checkAuth);
+  const { signIn, signOut } = useAuthActions();
+
+  // Log auth state to browser console for debugging
+  useEffect(() => {
+    console.log("REDAI Auth Debug:", { user, rawIdentity, convexUrl: import.meta.env.VITE_CONVEX_URL });
+  }, [user, rawIdentity]);
+
+  // Credits: admin = unlimited, logged-in user = from DB, guest = local state
+  const isAdmin = user?.role === "admin";
+  const credits: number | "Unlimited" = isAdmin ? "Unlimited" : (user?.credits ?? guestCredits);
   const [isSignInModalOpen, setIsSignInModalOpen] = useState(false);
   const [isSignUpMode, setIsSignUpMode] = useState(false);
   const [signInEmail, setSignInEmail] = useState("");
@@ -50,21 +63,30 @@ export default function App() {
   const [showPassword, setShowPassword] = useState(false);
   const [signUpName, setSignUpName] = useState("");
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [authLoading, setAuthLoading] = useState(false);
+
+  // Auto-redirect admin users to admin panel when they sign in
+  useEffect(() => {
+    if (user?.role === "admin" && activeTab !== "admin") {
+      setActiveTab("admin");
+    }
+  }, [user?.role]);
 
   // Active Tab in Admin Dashboard
   const [adminActiveTab, setAdminActiveTab] = useState<"overview" | "careers" | "marketplace" | "marketing" | "referrals">("overview");
 
   // Dynamic Captured Career Applications
   const [careerApplications, setCareerApplications] = useState<Array<{
-    name: string;
-    email: string;
-    portfolio: string;
-    role: string;
+    id: string;
+    fullName: string;
+    emailAddress: string;
+    portfolioLink: string;
     date: string;
   }>>([
-    { name: "Adrian O'Connor", email: "adrian@example.com", portfolio: "https://github.com/adrian", role: "Senior AI Engineer", date: "2026-05-15" },
-    { name: "John Doe", email: "john@example.com", portfolio: "https://johndoe.dev", role: "Frontend Architect", date: "2026-05-16" },
-    { name: "Jane Smith", email: "jane@smith.io", portfolio: "https://linkedin.com/in/janesmith", role: "Growth Hacker", date: "2026-05-17" }
+    { id: "APP-001", fullName: "Adrian O'Connor", emailAddress: "adrian@example.com", portfolioLink: "https://github.com/adrian", date: "2026-05-15" },
+    { id: "APP-002", fullName: "John Doe", emailAddress: "john@example.com", portfolioLink: "https://johndoe.dev", date: "2026-05-16" },
+    { id: "APP-003", fullName: "Jane Smith", emailAddress: "jane@smith.io", portfolioLink: "https://linkedin.com/in/janesmith", date: "2026-05-17" }
   ]);
 
   // Dynamic Captured Marketing Collaboration/Consignment Proposals
@@ -122,21 +144,21 @@ export default function App() {
                   className="brutal-button bg-[var(--theme-cyan)] hover:bg-[var(--theme-accent)] border-white text-black hover:text-white !px-3 !py-1.5 lg:!px-4 lg:!py-2.5 !text-xs font-orbitron font-black uppercase flex items-center gap-2 cursor-pointer shadow-[2px_2px_0_#fff] active:translate-x-0.5 active:translate-y-0.5 select-none"
                 >
                   <div className="w-5 h-5 bg-black text-white rounded-full flex items-center justify-center font-orbitron font-extrabold text-[9px] uppercase border border-white">
-                    {user.name.charAt(0)}
+                    {(user.name ?? user.email ?? "U").charAt(0).toUpperCase()}
                   </div>
-                  <span className="max-w-[70px] truncate">{user.name.split(" ")[0]}</span>
+                  <span className="max-w-[70px] truncate">{(user.name ?? user.email ?? "User").split(" ")[0]}</span>
                 </button>
 
                 {isProfileDropdownOpen && (
                   <div className="absolute right-0 mt-3 w-56 bg-white border-4 border-black text-black font-jakarta p-4 z-[9999] shadow-[6px_6px_0_#000] text-xs font-bold leading-normal">
                     <p className="font-orbitron font-extrabold uppercase text-[8px] text-gray-500 tracking-widest leading-none mb-1">Logged In As</p>
-                    <p className="text-black font-extrabold truncate text-sm leading-tight">{user.name}</p>
-                    <p className="text-gray-500 truncate text-[10px] mb-3 leading-tight">{user.email}</p>
+                    <p className="text-black font-extrabold truncate text-sm leading-tight">{user.name ?? "User"}</p>
+                    <p className="text-gray-500 truncate text-[10px] mb-3 leading-tight">{user.email ?? ""}</p>
                     <div className="h-[2px] bg-black my-3"></div>
                     <p className="flex justify-between items-center mb-2">
                       <span className="text-gray-500 uppercase tracking-widest text-[8px] font-orbitron font-black">Role:</span>
                       <span className={`px-2 py-0.5 text-[9px] font-orbitron font-black uppercase text-white ${user.role === 'admin' ? 'bg-red-600' : 'bg-green-600'}`}>
-                        {user.role}
+                        {user.role ?? "user"}
                       </span>
                     </p>
                     <p className="flex justify-between items-center mb-3">
@@ -165,8 +187,7 @@ export default function App() {
                     <div className="h-[2px] bg-black my-3"></div>
                     <button
                       onClick={() => {
-                        setUser(null);
-                        setCredits(5);
+                        void signOut();
                         setIsProfileDropdownOpen(false);
                         if (activeTab === "admin") setActiveTab("home");
                       }}
@@ -312,7 +333,7 @@ export default function App() {
                 </div>
 
                 {/* Two-Pane Workspace */}
-                <WorkspaceProcessor activeTool={activeTool} credits={credits} setCredits={setCredits} setShowInsufficientAlert={setShowInsufficientAlert} />
+                <WorkspaceProcessor activeTool={activeTool} credits={credits} setGuestCredits={setGuestCredits} setShowInsufficientAlert={setShowInsufficientAlert} />
 
                 {/* THE FREE RIDER'S ABSOLUTION PROTOCOL (Moral Conscience Arbitrage) */}
                 <div className="mt-8 brutal-container bg-white border-4 border-black p-5 sm:p-8 relative overflow-hidden group shadow-[6px_6px_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[8px_8px_0_var(--theme-accent)] transition-all">
@@ -628,8 +649,25 @@ export default function App() {
           {activeTab === "blog" && <PageWrapper key="blog"><BlogTab /></PageWrapper>}
           {activeTab === "ads" && <PageWrapper key="ads"><MarketingDealsTab onAddSubmission={(sub) => setMarketingSubmissions([sub, ...marketingSubmissions])} /></PageWrapper>}
           {activeTab === "marketplace" && <PageWrapper key="marketplace"><MarketplaceTab /></PageWrapper>}
-          {activeTab === "referral" && <PageWrapper key="referral"><ReferralTab /></PageWrapper>}
-          {activeTab === "career" && <PageWrapper key="career"><CareerTab onAddApplication={(app) => setCareerApplications([app, ...careerApplications])} /></PageWrapper>}
+          {activeTab === "referral" && <PageWrapper key="referral"><ReferralTab setCredits={setGuestCredits} /></PageWrapper>}
+          {activeTab === "career" && (
+            <PageWrapper key="career">
+              <CareerTab
+                onAddApplication={(app) =>
+                  setCareerApplications([
+                    {
+                      id: `APP-${Math.floor(100 + Math.random() * 900)}`,
+                      fullName: app.name,
+                      emailAddress: app.email,
+                      portfolioLink: app.portfolio,
+                      date: app.date,
+                    },
+                    ...careerApplications,
+                  ])
+                }
+              />
+            </PageWrapper>
+          )}
           {activeTab === "admin" && <PageWrapper key="admin"><AdminDashboardTab user={user} setIsSignInModalOpen={setIsSignInModalOpen} careerApplications={careerApplications} marketingSubmissions={marketingSubmissions} /></PageWrapper>}
         </AnimatePresence>
       </main>
@@ -742,77 +780,46 @@ export default function App() {
               {/* Auth Form */}
               <form
                 className="space-y-4"
-                onSubmit={(e) => {
+                onSubmit={async (e) => {
                   e.preventDefault();
-                  if (isSignUpMode) {
-                    if (!signUpName || !signInEmail || !signInPassword) {
-                      alert("Please fill in all details.");
-                      return;
-                    }
-                    setUser({
-                      email: signInEmail.toLowerCase().trim(),
-                      name: signUpName,
-                      role: "user",
-                      provider: "email"
-                    });
-                    alert(`Account created successfully for ${signUpName}!`);
-                  } else {
-                    if (!signInEmail || !signInPassword) {
-                      alert("Please enter email and password.");
-                      return;
-                    }
-
-                    // Secure position-based cipher character check so it is invisible to source code inspections
-                    const encrypt = (text: string): string => {
-                      let result = "";
-                      for (let i = 0; i < text.length; i++) {
-                        result += ("0" + (text.charCodeAt(i) ^ (i * 17 + 43)).toString(16)).slice(-2);
-                      }
-                      return result;
-                    };
-
-                    const inputEmailEnc = encrypt(signInEmail.toLowerCase().trim());
-                    const inputPasswordEnc = encrypt(signInPassword);
-
-                    // Precomputed admin values:
-                    // irishmancera267@gmail.com -> 424e242d07edf0ccd0a1a787c53e2e6a5c213c0713bec2ddae
-                    // allorde.arian@gmail.com   -> 4a5021311de4f48cd2b6bc8799487e475a2531401cffcc
-                    // VINIMANgo9090#@ivm        -> 7d75031722c1dfc5dcfde5dfc72b59434d21
-                    const isAdminEmail =
-                      inputEmailEnc === "424e242d07edf0ccd0a1a787c53e2e6a5c213c0713bec2ddae" ||
-                      inputEmailEnc === "4a5021311de4f48cd2b6bc8799487e475a2531401cffcc";
-
-                    const isAdminPassword = inputPasswordEnc === "7d75031722c1dfc5dcfde5dfc72b59434d21";
-
-                    if (isAdminEmail) {
-                      if (!isAdminPassword) {
-                        alert("Invalid credentials for administrator protocol access.");
-                        return;
-                      }
-                      setUser({
-                        email: signInEmail.toLowerCase().trim(),
-                        name: signInEmail.split("@")[0].toUpperCase(),
-                        role: "admin",
-                        provider: "email"
-                      });
-                      setActiveTab("admin");
-                      setCredits("Unlimited");
-                      alert("Signed in successfully as Administrator! Routing to Admin Panel.");
-                    } else {
-                      setUser({
-                        email: signInEmail.toLowerCase().trim(),
-                        name: signInEmail.split("@")[0].toUpperCase(),
-                        role: "user",
-                        provider: "email"
-                      });
-                      alert(`Welcome back!`);
-                    }
+                  setAuthError(null);
+                  if (isSignUpMode && signInPassword.length < 8) {
+                    setAuthError("Password must be at least 8 characters long.");
+                    return;
                   }
-                  setIsSignInModalOpen(false);
-                  setIsSignUpMode(false);
-                  setSignInEmail("");
-                  setSignInPassword("");
-                  setSignUpName("");
+                  setAuthLoading(true);
+                  try {
+                    if (isSignUpMode) {
+                      await signIn("password", {
+                        email: signInEmail,
+                        password: signInPassword,
+                        name: signUpName,
+                        flow: "signUp",
+                      });
+                    } else {
+                      await signIn("password", {
+                        email: signInEmail,
+                        password: signInPassword,
+                        flow: "signIn",
+                      });
+                    }
+                    setIsSignInModalOpen(false);
+                    setIsSignUpMode(false);
+                    setSignInEmail("");
+                    setSignInPassword("");
+                    setSignUpName("");
+                  } catch (err: any) {
+                    const msg = err.message ?? "";
+                    if (msg.includes("InvalidAccountId")) {
+                      setAuthError("Account not found. Click 'Register' above to create a new account!");
+                    } else if (msg.includes("InvalidPassword") || msg.includes("password") || msg.includes("authorize")) {
+                      setAuthError("Incorrect email or password. Please try again.");
+                    } else {
+                      setAuthError(err.message ?? "Authentication failed. Please check your credentials.");
+                    }
+                  } finally {
+                    setAuthLoading(false);
+                  }
                 }}
               >
                 {isSignUpMode && (
@@ -868,10 +875,14 @@ export default function App() {
 
                 <button
                   type="submit"
-                  className="w-full bg-black text-white font-orbitron font-bold py-3 border-2 border-black hover:bg-[var(--theme-accent)] hover:text-white transition-all uppercase text-xs tracking-widest shadow-[3px_3px_0_var(--theme-cyan)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer mt-2"
+                  disabled={authLoading}
+                  className="w-full bg-black text-white font-orbitron font-bold py-3 border-2 border-black hover:bg-[var(--theme-accent)] hover:text-white transition-all uppercase text-xs tracking-widest shadow-[3px_3px_0_var(--theme-cyan)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer mt-2 disabled:opacity-60 disabled:cursor-wait"
                 >
-                  {isSignUpMode ? "REGISTER ACCOUNT" : "SIGN IN TO PROTOCOL"}
+                  {authLoading ? "PROCESSING..." : isSignUpMode ? "REGISTER ACCOUNT" : "SIGN IN TO PROTOCOL"}
                 </button>
+                {authError && (
+                  <p className="text-red-600 font-jakarta font-bold text-xs mt-2 text-center border-2 border-red-600 p-2">{authError}</p>
+                )}
               </form>
 
               {/* Social Login Divider */}
@@ -885,15 +896,9 @@ export default function App() {
 
               {/* Google OAuth Direct Sign-In */}
               <button
+                type="button"
                 onClick={() => {
-                  setUser({
-                    email: "google.user@gmail.com",
-                    name: "Google Authenticated User",
-                    role: "user",
-                    provider: "google"
-                  });
-                  setIsSignInModalOpen(false);
-                  alert("Signed in successfully via Google Google OAuth protocol!");
+                  setAuthError("Google Sign-In is not yet available. Please use email and password.");
                 }}
                 className="w-full bg-white text-black font-orbitron font-bold py-3 border-2 border-black hover:bg-black hover:text-white transition-all uppercase text-xs tracking-widest shadow-[3px_3px_0_var(--theme-accent)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer flex items-center justify-center gap-2"
               >
@@ -913,15 +918,15 @@ export default function App() {
 
 // --- WORKSPACE COMPONENTS ---
 
-function WorkspaceProcessor({ 
-  activeTool, 
-  credits, 
-  setCredits, 
-  setShowInsufficientAlert 
-}: { 
+function WorkspaceProcessor({
+  activeTool,
+  credits,
+  setGuestCredits,
+  setShowInsufficientAlert
+}: {
   activeTool: string;
   credits: number | "Unlimited";
-  setCredits: React.Dispatch<React.SetStateAction<number | "Unlimited">>;
+  setGuestCredits: React.Dispatch<React.SetStateAction<number>>;
   setShowInsufficientAlert: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [input, setInput] = useState("");
@@ -929,6 +934,7 @@ function WorkspaceProcessor({
   const [status, setStatus] = useState<"idle" | "scanning" | "processing" | "complete">("idle");
   const [activeParam, setActiveParam] = useState("Standard");
   const [customInstructions, setCustomInstructions] = useState("");
+  const generateAi = useAction(api.ai.generate);
 
   // Reset output and status when tool or parameter changes so the user can execute again immediately
   useEffect(() => {
@@ -941,6 +947,7 @@ function WorkspaceProcessor({
 
     // Check if the user has enough credits for premium parameters
     const isPaid = activeParam !== "Free";
+    const isAnonymous = typeof credits === "number" && credits <= 5 && !window.location.search.includes("loggedIn");
     if (isPaid && credits !== "Unlimited" && credits <= 0) {
       setShowInsufficientAlert(true);
       return;
@@ -949,19 +956,28 @@ function WorkspaceProcessor({
     setStatus("processing");
 
     try {
-      // Deduct 1 credit for paid parameters immediately upon request
-      if (isPaid && credits !== "Unlimited") {
-        setCredits(prev => prev === "Unlimited" ? "Unlimited" : Math.max(0, prev - 1));
+      // Optimistically deduct 1 guest credit for paid params if anonymous
+      if (isPaid && credits !== "Unlimited" && isAnonymous) {
+        setGuestCredits(prev => Math.max(0, prev - 1));
       }
 
-      // 1. Call Puter AI via our utility function
-      const aiResponse = await processAiRequest(activeTool, activeParam, input, customInstructions);
+      // Call the secure Convex backend action (which handles deduction for logged-in users)
+      const aiResponse = await generateAi({
+        tool: activeTool,
+        parameter: activeParam,
+        input: input,
+        customInstructions: customInstructions,
+        isAnonymous: isAnonymous,
+      });
 
-      // 2. Set the complete status and output the actual AI response
       setStatus("complete");
-      setOutput(aiResponse);
-    } catch (error) {
-      console.error("Puter AI Request Failed:", error);
+      setOutput(aiResponse as string);
+    } catch (error: any) {
+      console.error("Generation Failed:", error);
+      // Refund optimistic guest credit deduction on error
+      if (isPaid && credits !== "Unlimited" && isAnonymous) {
+        setGuestCredits(prev => prev + 1);
+      }
       setStatus("complete");
       setOutput("Error: The Aeternum Protocol encountered a severe neural disconnect. Please try again later.");
     }

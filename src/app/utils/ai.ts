@@ -1,5 +1,3 @@
-import puter from '@heyputer/puter.js';
-
 export async function processAiRequest(tool: string, parameter: string, input: string, customInstructions?: string): Promise<string> {
   let systemPrompt = "";
   let toneInstruction = "";
@@ -81,72 +79,74 @@ export async function processAiRequest(tool: string, parameter: string, input: s
   const fullPrompt = `${systemPrompt}\n\nInput Text:\n${input}`;
 
   try {
-    const response: any = await puter.ai.chat(fullPrompt);
-    console.log("Puter response received");
+    const response: any = await callGroq(fullPrompt);
+    // Flexible parsing: try common fields, then stringify fallback
+    if (!response) return "No response generated.";
 
-    if (!response) {
-      return "No response generated.";
-    }
+    // If it's already a string
+    if (typeof response === 'string') return response;
 
-    // 1. If it's already a string, return it directly
-    if (typeof response === 'string') {
-      return response;
-    }
-
-    // 2. If it's a robust ChatResponse object
+    // Common Groq/LLM response shapes
     if (typeof response === 'object') {
-      // Check message.content
-      if (response.message) {
-        // If it's the Claude messages array structure: response.message.content = [{ type: 'text', text: '...' }]
-        if (Array.isArray(response.message.content)) {
-          const textParts = response.message.content
-            .filter((part: any) => part && part.type === 'text' && typeof part.text === 'string')
-            .map((part: any) => part.text);
-          if (textParts.length > 0) {
-            return textParts.join('\n');
+      // Example: { output: 'text' } or { output_text: '...' }
+      if (typeof response.output === 'string') return response.output;
+      if (typeof response.output_text === 'string') return response.output_text;
+      if (typeof response.text === 'string') return response.text;
+      // Some APIs return an array of choices
+      if (Array.isArray(response.choices) && response.choices[0]) {
+        const choice = response.choices[0];
+        if (typeof choice.text === 'string') return choice.text;
+        if (choice.output && typeof choice.output === 'string') return choice.output;
+        if (choice.message && typeof choice.message === 'string') return choice.message;
+        if (choice.message && choice.message.content) {
+          if (typeof choice.message.content === 'string') return choice.message.content;
+          if (Array.isArray(choice.message.content)) {
+            const texts = choice.message.content.map((p: any) => (p && p.text) || '').filter(Boolean);
+            if (texts.length) return texts.join('\n');
           }
-        }
-        
-        if (typeof response.message.content === 'string') {
-          return response.message.content;
-        }
-        if (typeof response.message === 'string') {
-          return response.message;
-        }
-      }
-      
-      // Check .text
-      if (typeof response.text === 'string') {
-        return response.text;
-      }
-      if (typeof response.text === 'function') {
-        try {
-          const textResult = response.text();
-          if (typeof textResult === 'string') {
-            return textResult;
-          }
-        } catch (e) {
-          // ignore
         }
       }
 
-      // Check direct .content
-      if (typeof response.content === 'string') {
-        return response.content;
-      }
-
-      // If it has a toString method that isn't the default Object.toString
+      // If it has a toString override
       if (typeof response.toString === 'function' && response.toString !== Object.prototype.toString) {
         return response.toString();
       }
 
-      // Fallback: stringify the object
       return JSON.stringify(response);
     }
 
     return String(response) || "No response generated.";
   } catch (error) {
-    console.error("Puter API Error:", error);
-    return "Error communicating with Puter AI. Please try again later.";
+    console.error("Groq API Error:", error);
+    return "Error communicating with Groq API. Please try again later.";
   }
+}
+
+// Helper: call local proxy at /api/groq. The proxy keeps the secret key on the server.
+async function callGroq(prompt: string): Promise<any> {
+  // Build an OpenAI-compatible chat payload for Groq's OpenAI-compatible endpoint
+  const body = {
+    model: 'llama-3.3-70b-versatile',
+    messages: [
+      { role: 'user', content: prompt }
+    ],
+    // Optional: adjust as needed
+    temperature: 0.2,
+    max_tokens: 2000,
+  };
+
+  const res = await fetch('/api/groq', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Proxy error: ${res.status} ${res.statusText} - ${text}`);
+  }
+
+  return res.json();
 }

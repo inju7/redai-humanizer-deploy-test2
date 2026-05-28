@@ -5,9 +5,12 @@
   "type": "module",
   "scripts": {
     "build": "vite build",
-    "dev": "vite"
+    "dev": "vite",
+    "start:proxy": "node server.js"
   },
   "dependencies": {
+    "@better-auth/infra": "^0.2.10",
+    "@convex-dev/auth": "^0.0.92",
     "@emotion/react": "11.14.0",
     "@emotion/styled": "11.14.1",
     "@mui/icons-material": "7.3.5",
@@ -39,10 +42,12 @@
     "@radix-ui/react-toggle": "1.1.2",
     "@radix-ui/react-toggle-group": "1.1.2",
     "@radix-ui/react-tooltip": "1.1.8",
+    "better-auth": "^1.6.11",
     "canvas-confetti": "1.9.4",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
     "cmdk": "1.1.1",
+    "convex": "^1.39.1",
     "date-fns": "3.6.0",
     "embla-carousel-react": "8.6.0",
     "input-otp": "1.4.2",
@@ -53,23 +58,25 @@
     "react-dnd": "16.0.1",
     "react-dnd-html5-backend": "16.0.1",
     "react-hook-form": "7.55.0",
+    "react-markdown": "^9.0.1",
     "react-popper": "2.3.0",
     "react-resizable-panels": "2.1.7",
     "react-responsive-masonry": "2.7.1",
     "react-router": "7.13.0",
     "react-slick": "0.31.0",
     "recharts": "2.15.2",
+    "remark-gfm": "^4.0.0",
     "sonner": "2.0.3",
     "tailwind-merge": "3.2.0",
     "tw-animate-css": "1.3.8",
     "vaul": "1.1.2",
-    "@heyputer/puter.js": "latest",
-    "react-markdown": "^9.0.1",
-    "remark-gfm": "^4.0.0"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@tailwindcss/vite": "4.1.12",
     "@vitejs/plugin-react": "4.7.0",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
     "tailwindcss": "4.1.12",
     "vite": "^6.4.2"
   },
@@ -84,6 +91,11 @@
     "react-dom": {
       "optional": true
     }
+  },
+  "overrides": {
+    "uuid": "^14.0.0",
+    "ws": "^8.21.0",
+    "samlify": "^2.13.1"
   },
   "pnpm": {
     "overrides": {
