@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "build": "vite build",
+    "build": "convex codegen && vite build",
     "dev": "vite",
     "start:proxy": "node server.js"
   },
