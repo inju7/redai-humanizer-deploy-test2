@@ -26,9 +26,6 @@ build/
 .DS_Store
 Thumbs.db
 
-# Convex generated files
-convex/_generated/
-
 # Agent/AI temporary files
 .agents/
 .claude/
