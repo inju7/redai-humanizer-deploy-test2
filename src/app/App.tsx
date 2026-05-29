@@ -1,14 +1,16 @@
 import { motion, AnimatePresence } from "motion/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Cpu, Zap, Layers, Shield, Terminal, Code2,
   TrendingUp, Users, DollarSign, Share2, Tag,
   ChevronRight, Link, BarChart, PenTool, LayoutTemplate,
-  Store, Network, MessageSquare, ArrowRight, Activity, Sliders, CheckCircle, Star, Plus, Minus, X, AlertTriangle, Award, Menu, Lock, ShieldAlert, Eye, EyeOff
+  Store, Network, MessageSquare, ArrowRight, Activity, Sliders, CheckCircle, Star, Plus, Minus, X, AlertTriangle, Award, Menu, Lock, ShieldAlert, Eye, EyeOff,
+  Bold, Italic, Underline, Strikethrough, Heading, List, ListOrdered, Quote
 } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { useQuery, useAction } from "convex/react";
+import rehypeRaw from 'rehype-raw';
+import { useQuery, useAction, useMutation } from "convex/react";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { api } from "../../convex/_generated/api";
 
@@ -682,27 +684,27 @@ export default function App() {
       {/* INSUFFICIENT CREDITS MODAL (NEURAL BLOCKADE) */}
       <AnimatePresence>
         {showInsufficientAlert && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4"
           >
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }}
               className="brutal-container bg-white border-4 border-black p-6 sm:p-8 max-w-md w-full text-center relative"
             >
               <button onClick={() => setShowInsufficientAlert(false)} className="absolute top-3 right-3 text-black hover:text-[var(--theme-accent)] transition-colors">
                 <X size={24} />
               </button>
-              
+
               <div className="w-16 h-16 bg-[var(--theme-accent)] flex items-center justify-center mx-auto mb-4 border-2 border-black shadow-[4px_4px_0_#000]">
                 <ShieldAlert size={32} className="text-white" />
               </div>
-              
+
               <h2 className="font-orbitron font-black italic text-2xl uppercase text-black mb-2 leading-tight">Neural Blockade Active</h2>
               <p className="font-jakarta text-sm text-gray-700 font-bold mb-6">Your token reserves are completely depleted. Premium parameters require active credits to bypass algorithmic filters.</p>
-              
+
               <div className="flex flex-col gap-3">
-                <button 
+                <button
                   onClick={() => {
                     setShowInsufficientAlert(false);
                     setActiveTab("marketplace");
@@ -712,7 +714,7 @@ export default function App() {
                 >
                   Acquire Tokens
                 </button>
-                <button 
+                <button
                   onClick={() => setShowInsufficientAlert(false)}
                   className="w-full py-3 bg-white text-gray-500 border-2 border-gray-300 font-orbitron font-bold uppercase hover:bg-gray-100 transition-all text-sm"
                 >
@@ -1064,7 +1066,7 @@ function WorkspaceProcessor({
           )}
           {status === "complete" && (
             <div className="flex-1 w-full bg-transparent overflow-y-auto brutal-scrollbar pb-4 prose prose-sm md:prose-base max-w-none prose-headings:font-orbitron prose-headings:uppercase prose-headings:italic prose-headings:m-0 prose-h1:text-xl prose-h1:mb-3 prose-h2:text-lg prose-h2:mb-2 prose-h3:text-base prose-h3:mb-2 prose-p:font-jakarta prose-p:text-black prose-p:mb-2 prose-strong:text-black text-black">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{output}</ReactMarkdown>
+              <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>{output}</ReactMarkdown>
             </div>
           )}
         </div>
@@ -1180,11 +1182,25 @@ function MiniAdContainer() {
 }
 
 function BlogDetailView({ blog, onBack }: { blog: any, onBack: () => void }) {
+  const user = useQuery(api.users.current);
+  const isAdmin = user?.role === "admin";
+  const removeBlog = useAction(api.blogs.remove) || useMutation(api.blogs.remove); // fallback if mutation
+  const [showConfirm, setShowConfirm] = useState(false);
+
   return (
     <div className="bg-white border-4 border-black p-4 sm:p-8 md:p-12 animate-in fade-in slide-in-from-bottom-4 duration-500 overflow-hidden w-full">
-      <button onClick={onBack} className="mb-6 sm:mb-8 flex items-center gap-2 font-orbitron font-bold uppercase text-xs sm:text-sm hover:text-[var(--theme-accent)] transition-colors">
-        <ArrowRight size={20} className="rotate-180" /> Back to Blogs
-      </button>
+      <div className="flex justify-between items-center mb-6 sm:mb-8">
+        <button onClick={onBack} className="flex items-center gap-2 font-orbitron font-bold uppercase text-xs sm:text-sm hover:text-[var(--theme-accent)] transition-colors">
+          <ArrowRight size={20} className="rotate-180" /> Back to Blogs
+        </button>
+        {isAdmin && (
+          <button
+            onClick={async () => setShowConfirm(true)}
+            className="px-3 py-1 bg-red-600 text-white font-orbitron font-bold text-[10px] uppercase tracking-wider cursor-pointer">
+            DELETE
+          </button>
+        )}
+      </div>
 
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center gap-4 mb-4 sm:mb-6">
@@ -1210,28 +1226,10 @@ function BlogDetailView({ blog, onBack }: { blog: any, onBack: () => void }) {
             <img src={blog.image} className="w-full h-full object-cover" alt={blog.title} />
           </div>
 
-          <div className="prose prose-xl max-w-none font-jakarta text-black w-full overflow-hidden break-words">
-            <h2 className="text-xl sm:text-3xl font-orbitron italic font-bold uppercase mb-4 border-l-[6px] sm:border-l-8 border-black pl-3 sm:pl-4 break-words">Introduction</h2>
-            <p className="leading-relaxed mb-8 text-sm sm:text-lg">{blog.intro}</p>
-
-            <div className="my-8 sm:my-12 aspect-[21/9] border-4 border-black overflow-hidden shadow-[4px_4px_0_var(--theme-cyan)] sm:shadow-[8px_8px_0_var(--theme-cyan)]">
-              <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&auto=format&fit=crop&q=80" className="w-full h-full object-cover" alt="Detail Image 1" />
-            </div>
-
-            <h2 className="text-xl sm:text-3xl font-orbitron italic font-bold uppercase mb-4 border-l-[6px] sm:border-l-8 border-[var(--theme-accent)] pl-3 sm:pl-4 break-words">Deep Dive Discussion</h2>
-            <p className="leading-relaxed mb-8 text-sm sm:text-lg">{blog.discussion}</p>
-
-            <div className="my-8 sm:my-12 aspect-[21/9] border-4 border-black overflow-hidden shadow-[4px_4px_0_var(--theme-accent)] sm:shadow-[8px_8px_0_var(--theme-accent)]">
-              <img src="https://images.unsplash.com/photo-1620712943543-bcc4628c9757?w=1200&auto=format&fit=crop&q=80" className="w-full h-full object-cover" alt="Detail Image 2" />
-            </div>
-
-            <div className="bg-gray-50 border-4 border-black p-4 sm:p-8 mb-8 sm:mb-12">
-              <h2 className="text-lg sm:text-2xl font-orbitron italic font-bold uppercase mb-3 sm:mb-4">Summary</h2>
-              <p className="italic text-gray-700 text-xs sm:text-base leading-relaxed">The neural structures in this text successfully bypass predictive detection layers. AI writing is a powerful tool, maintaining human authenticity is critical for SEO and academic integrity. Always verify your content with a robust detection protocol.</p>
-            </div>
-
-            <h2 className="text-xl sm:text-3xl font-orbitron italic font-bold uppercase mb-4 border-l-[6px] sm:border-l-8 border-[var(--theme-cyan)] pl-3 sm:pl-4 break-words">Conclusion</h2>
-            <p className="leading-relaxed mb-12 text-sm sm:text-lg">{blog.conclusion}</p>
+          <div className="prose prose-xl max-w-none font-jakarta text-black w-full overflow-hidden break-words blog-markdown">
+            <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+              {blog.content || "No content"}
+            </ReactMarkdown>
           </div>
         </div>
 
@@ -1266,6 +1264,62 @@ function BlogDetailView({ blog, onBack }: { blog: any, onBack: () => void }) {
           </div>
         </div>
       </div>
+      {/* CUSTOM CONFIRMATION DIALOG (NEO-BRUTALIST OVERLAY) */}
+      <AnimatePresence>
+        {showConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="brutal-container bg-white border-4 border-black p-6 sm:p-8 max-w-sm w-full text-center relative"
+            >
+              {/* Close Button */}
+              <button
+                onClick={() => setShowConfirm(false)}
+                className="absolute top-3 right-3 text-black hover:text-[var(--theme-accent)] transition-colors cursor-pointer"
+              >
+                <X size={20} />
+              </button>
+
+              {/* Warning Sign icon */}
+              <div className="w-16 h-16 bg-[var(--theme-accent)] flex items-center justify-center mx-auto mb-4 border-2 border-black shadow-[4px_4px_0_#000]">
+                <AlertTriangle size={32} className="text-white" />
+              </div>
+
+              {/* Header & Body */}
+              <h2 className="font-orbitron font-black italic text-xl uppercase text-black mb-2 leading-tight">Confirm Deletion</h2>
+              <p className="font-jakarta text-xs text-gray-700 font-bold mb-6">Are you sure you want to delete this blog post? This action is irreversible.</p>
+
+              {/* Actions */}
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <button
+                  onClick={() => setShowConfirm(false)}
+                  className="w-full py-2 bg-white text-black border-2 border-black font-orbitron font-bold uppercase hover:bg-gray-100 active:translate-y-[1px] transition-all text-xs cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={async () => {
+                    await removeBlog({ id: blog._id });
+                    setShowConfirm(false);
+                    onBack();
+                  }}
+                  className="w-full py-2 bg-red-600 text-white border-2 border-black font-orbitron font-bold uppercase hover:bg-black active:translate-y-[1px] transition-all text-xs cursor-pointer"
+                >
+                  Delete Post
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     </div>
   );
 }
@@ -1298,95 +1352,24 @@ function BlogCard({ blog, onClick }: { blog: any, onClick: () => void }) {
 
 function BlogTab() {
   const [selectedBlog, setSelectedBlog] = useState<any>(null);
+  const [isEditingBlog, setIsEditingBlog] = useState(false);
   const [activeCategory, setActiveCategory] = useState("All");
   const [sortBy, setSortBy] = useState<"newest" | "oldest">("newest");
 
-  const blogs = [
-    {
-      id: 1,
-      title: "Bypassing Turnitin in 2026",
-      category: "Technology",
-      subtitle: "How to safely humanize academic submissions without triggering secondary patterns.",
-      author: "Sarah Connor",
-      dateStr: "MAY 17, 2026",
-      dateVal: new Date("2026-05-17").getTime(),
-      intro: "Academic integrity guidelines are evolving quickly. This article discusses modern Turnitin algorithms.",
-      discussion: "The algorithms now parse syntactic diversity in addition to word frequencies. Bypassing Turnitin requires styling structure variance.",
-      conclusion: "A human-guided rewrite pipeline remains the most secure method for digital work validation.",
-      image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&q=80"
-    },
-    {
-      id: 2,
-      title: "SEO Optimization Tactics",
-      category: "SEO & Content",
-      subtitle: "Why search engines penalize dry, repetitive AI content and how to bypass them.",
-      author: "Alex Smith",
-      dateStr: "MAY 16, 2026",
-      dateVal: new Date("2026-05-16").getTime(),
-      intro: "Google Search's helpful content update targets synthetic blog spam with high severity.",
-      discussion: "To maintain search traffic, programmatic writers must inject perplexity and voice cadence variance.",
-      conclusion: "Investing in content humanization guarantees high visibility on modern search results.",
-      image: "https://images.unsplash.com/photo-1542435503-956c469947f6?w=400&q=80"
-    },
-    {
-      id: 3,
-      title: "Generative Cadence Secrets",
-      category: "Technology",
-      subtitle: "Deep-diving into LLM frequency matching and perplexity variations.",
-      author: "Jane Doe",
-      dateStr: "MAY 15, 2026",
-      dateVal: new Date("2026-05-15").getTime(),
-      intro: "LLMs operate on standard mathematical token prediction, leaving systemic fingerprints.",
-      discussion: "Analyzing token choices allows security scanners to easily flags plain generations.",
-      conclusion: "Breaking predictions using organic humanized layers is the absolute protocol.",
-      image: "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=400&q=80"
-    },
-    {
-      id: 4,
-      title: "Google AdSense Approval Loop",
-      category: "SEO & Content",
-      subtitle: "Bypassing the low-value content flag for programmatic SEO websites.",
-      author: "Alex Smith",
-      dateStr: "MAY 14, 2026",
-      dateVal: new Date("2026-05-14").getTime(),
-      intro: "Getting approved for AdSense requires highly engaging content that doesn't feel robotic.",
-      discussion: "AdSense checkers verify the structural integrity of your blogs before allowing banner spots.",
-      conclusion: "Humanizing your mass-generated copy results in instant approvals.",
-      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&q=80"
-    },
-    {
-      id: 5,
-      title: "ChatGPT vs Claude: Detection Rules",
-      category: "Technology",
-      subtitle: "An editorial analysis of standard output structures and bypass ratings.",
-      author: "Sarah Connor",
-      dateStr: "MAY 13, 2026",
-      dateVal: new Date("2026-05-13").getTime(),
-      intro: "Different models maintain distinct stylistic fingerprints under normal prompts.",
-      discussion: "Claude uses highly formal, structured prose, whereas ChatGPT is predictable and repetitive.",
-      conclusion: "Adapting your humanizing settings to the source model delivers highly stealth results.",
-      image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&q=80"
-    },
-    {
-      id: 6,
-      title: "Scaling Programmatic Blogs",
-      category: "SEO & Content",
-      subtitle: "How to mass-humanize thousands of landing pages using our automated pipeline API.",
-      author: "Jane Doe",
-      dateStr: "MAY 12, 2026",
-      dateVal: new Date("2026-05-12").getTime(),
-      intro: "Programmatic SEO allows rapid scaling, but content quality must remain premium.",
-      discussion: "Our batch processing engine humanizes thousands of records at rapid speeds with high integrity.",
-      conclusion: "Automation coupled with premium detection scanning is the roadmap to programmatic success.",
-      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&q=80"
-    }
-  ];
+  const user = useQuery(api.users.current);
+  const isAdmin = user?.role === "admin";
+
+  const blogs = useQuery(api.blogs.list) || [];
 
   const categories = ["All", "SEO & Content", "Technology"];
 
   const filteredBlogs = blogs
-    .filter(b => activeCategory === "All" || b.category === activeCategory)
-    .sort((a, b) => sortBy === "newest" ? b.dateVal - a.dateVal : a.dateVal - b.dateVal);
+    .filter((b: any) => activeCategory === "All" || b.category === activeCategory)
+    .sort((a: any, b: any) => sortBy === "newest" ? b.createdAt - a.createdAt : a.createdAt - b.createdAt);
+
+  if (isEditingBlog) {
+    return <BlogEditor blogToEdit={null} onCancel={() => setIsEditingBlog(false)} onComplete={() => setIsEditingBlog(false)} />;
+  }
 
   if (selectedBlog) {
     return <BlogDetailView blog={selectedBlog} onBack={() => setSelectedBlog(null)} />;
@@ -1401,8 +1384,15 @@ function BlogTab() {
           <p className="text-[10px] text-gray-500 font-jakarta font-bold uppercase tracking-wider">AETERNUM KNOWLEDGE REPOSITORY</p>
         </div>
 
-        {/* Compact Filtering & Date Sorting Bar */}
         <div className="flex flex-wrap items-center gap-3">
+          {isAdmin && (
+            <button
+              onClick={() => setIsEditingBlog(true)}
+              className="px-3 py-1 bg-black text-white font-orbitron font-bold text-[8px] uppercase transition-all"
+            >
+              + ADD BLOG
+            </button>
+          )}
           {/* Categories */}
           <div className="flex bg-gray-100 p-1 border-2 border-black">
             {categories.map((c) => (
@@ -3221,5 +3211,418 @@ function Footer() {
         </div>
       </div>
     </footer>
+  );
+}
+
+function BlogEditor({ blogToEdit, onCancel, onComplete }: { blogToEdit?: any, onCancel: () => void, onComplete: () => void }) {
+  const addBlog = useMutation(api.blogs.add);
+  const updateBlog = useMutation(api.blogs.update);
+  const [formData, setFormData] = useState({
+    title: blogToEdit?.title || "",
+    category: blogToEdit?.category || "Technology",
+    subtitle: blogToEdit?.subtitle || "",
+    author: blogToEdit?.author || "",
+    dateStr: blogToEdit?.dateStr || new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase(),
+    content: blogToEdit?.content || "",
+    image: blogToEdit?.image || "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&q=80"
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const insertFormatting = (type: string, value?: string) => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = formData.content;
+    const selectedText = text.substring(start, end);
+
+    let replacement = "";
+    let selectStartOffset = 0;
+    let selectEndOffset = 0;
+
+    if (selectedText) {
+      // Trim leading/trailing whitespace from the selection and keep it outside the tags
+      const matchLeading = selectedText.match(/^\s*/);
+      const matchTrailing = selectedText.match(/\s*$/);
+      const leadingWs = matchLeading ? matchLeading[0] : "";
+      const trailingWs = matchTrailing ? matchTrailing[0] : "";
+      const coreText = selectedText.substring(leadingWs.length, selectedText.length - trailingWs.length);
+
+      let coreReplacement = "";
+
+      switch (type) {
+        case "bold":
+          coreReplacement = `**${coreText}**`;
+          break;
+        case "italic":
+          coreReplacement = `*${coreText}*`;
+          break;
+        case "underline":
+          coreReplacement = `<u>${coreText}</u>`;
+          break;
+        case "strikethrough":
+          coreReplacement = `~~${coreText}~~`;
+          break;
+        case "h1":
+          coreReplacement = `\n# ${coreText}\n`;
+          break;
+        case "h2":
+          coreReplacement = `\n## ${coreText}\n`;
+          break;
+        case "h3":
+          coreReplacement = `\n### ${coreText}\n`;
+          break;
+        case "font-size":
+          if (!value) return;
+          coreReplacement = `<span style="font-size: ${value}">${coreText}</span>`;
+          break;
+        case "list":
+          coreReplacement = `\n- ${coreText}\n`;
+          break;
+        case "numlist":
+          coreReplacement = `\n1. ${coreText}\n`;
+          break;
+        case "quote":
+          coreReplacement = `\n> ${coreText}\n`;
+          break;
+        case "link":
+          coreReplacement = `[${coreText}](https://)`;
+          break;
+        default:
+          return;
+      }
+
+      replacement = leadingWs + coreReplacement + trailingWs;
+
+      if (type === "link") {
+        // Position cursor in the URL parenthesis
+        selectStartOffset = leadingWs.length + coreText.length + 3; // length of '[' + coreText + ']('
+        selectEndOffset = replacement.length - trailingWs.length - 1; // exclude closing ')'
+      } else if (type === "h1" || type === "h2" || type === "h3" || type === "list" || type === "numlist" || type === "quote") {
+        // Exclude the leading and trailing newlines from cursor selection
+        selectStartOffset = leadingWs.length + 1;
+        selectEndOffset = replacement.length - trailingWs.length - 1;
+      } else {
+        selectStartOffset = leadingWs.length;
+        selectEndOffset = replacement.length - trailingWs.length;
+      }
+    } else {
+      // Insert placeholder text and select it
+      const placeholder = {
+        bold: "bold text",
+        italic: "italic text",
+        underline: "underlined text",
+        strikethrough: "strikethrough text",
+        h1: "Heading 1",
+        h2: "Heading 2",
+        h3: "Heading 3",
+        list: "List item",
+        numlist: "List item",
+        quote: "Blockquote",
+        link: "link text"
+      }[type] || "text";
+
+      switch (type) {
+        case "bold":
+          replacement = `**${placeholder}**`;
+          selectStartOffset = 2;
+          selectEndOffset = 2 + placeholder.length;
+          break;
+        case "italic":
+          replacement = `*${placeholder}*`;
+          selectStartOffset = 1;
+          selectEndOffset = 1 + placeholder.length;
+          break;
+        case "underline":
+          replacement = `<u>${placeholder}</u>`;
+          selectStartOffset = 3;
+          selectEndOffset = 3 + placeholder.length;
+          break;
+        case "strikethrough":
+          replacement = `~~${placeholder}~~`;
+          selectStartOffset = 2;
+          selectEndOffset = 2 + placeholder.length;
+          break;
+        case "h1":
+          replacement = `\n# ${placeholder}\n`;
+          selectStartOffset = 3; // \n + # + space
+          selectEndOffset = 3 + placeholder.length;
+          break;
+        case "h2":
+          replacement = `\n## ${placeholder}\n`;
+          selectStartOffset = 4; // \n + ## + space
+          selectEndOffset = 4 + placeholder.length;
+          break;
+        case "h3":
+          replacement = `\n### ${placeholder}\n`;
+          selectStartOffset = 5; // \n + ### + space
+          selectEndOffset = 5 + placeholder.length;
+          break;
+        case "font-size":
+          if (!value) return;
+          const fontPlaceholder = "large text";
+          replacement = `<span style="font-size: ${value}">${fontPlaceholder}</span>`;
+          selectStartOffset = 26 + value.length; // length of '<span style="font-size: ' (24) + value.length + '">' (2)
+          selectEndOffset = selectStartOffset + fontPlaceholder.length;
+          break;
+        case "list":
+          replacement = `\n- ${placeholder}\n`;
+          selectStartOffset = 3; // \n + - + space
+          selectEndOffset = 3 + placeholder.length;
+          break;
+        case "numlist":
+          replacement = `\n1. ${placeholder}\n`;
+          selectStartOffset = 4; // \n + 1. + space
+          selectEndOffset = 4 + placeholder.length;
+          break;
+        case "quote":
+          replacement = `\n> ${placeholder}\n`;
+          selectStartOffset = 3; // \n + > + space
+          selectEndOffset = 3 + placeholder.length;
+          break;
+        case "link":
+          replacement = `[${placeholder}](https://example.com)`;
+          selectStartOffset = 1;
+          selectEndOffset = 1 + placeholder.length;
+          break;
+        default:
+          return;
+      }
+    }
+
+    const newContent = text.substring(0, start) + replacement + text.substring(end);
+    setFormData({ ...formData, content: newContent });
+
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + selectStartOffset, start + selectEndOffset);
+    }, 0);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      if (blogToEdit?._id) {
+        await updateBlog({ id: blogToEdit._id, ...formData });
+      } else {
+        await addBlog(formData);
+      }
+      onComplete();
+    } catch (error) {
+      console.error(error);
+      alert("Failed to save blog.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="bg-white border-4 border-black p-4 sm:p-8 md:p-12 animate-in fade-in slide-in-from-bottom-4 duration-500 overflow-hidden w-full max-w-4xl mx-auto">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-orbitron font-bold uppercase">{blogToEdit ? "Edit Blog" : "Create Blog"}</h2>
+        <button type="button" onClick={onCancel} className="text-sm font-bold uppercase hover:text-[var(--theme-accent)]">Cancel</button>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-[10px] font-bold uppercase mb-1">Title</label>
+            <input required type="text" className="w-full border-2 border-black p-2 font-jakarta text-sm text-white"
+              value={formData.title}
+              onChange={e => setFormData({ ...formData, title: e.target.value })}
+              style={{ color: 'white' }}
+            />
+          </div>
+          <div>
+            <label className="block text-[10px] font-bold uppercase mb-1">Category</label>
+            <input required type="text" className="w-full border-2 border-black p-2 font-jakarta text-sm"
+              value={formData.category}
+              onChange={e => setFormData({ ...formData, category: e.target.value })}
+              style={{ color: 'white' }} />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-[10px] font-bold uppercase mb-1">Author</label>
+            <input required type="text" className="w-full border-2 border-black p-2 font-jakarta text-sm"
+              value={formData.author}
+              onChange={e => setFormData({ ...formData, author: e.target.value })}
+              style={{ color: 'white' }} />
+          </div>
+          <div>
+            <label className="block text-[10px] font-bold uppercase mb-1">Date String</label>
+            <input required type="text" className="w-full border-2 border-black p-2 font-jakarta text-sm"
+              value={formData.dateStr}
+              onChange={e => setFormData({ ...formData, dateStr: e.target.value })}
+              style={{ color: 'white' }} />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-[10px] font-bold uppercase mb-1">Subtitle</label>
+          <input required type="text" className="w-full border-2 border-black p-2 font-jakarta text-sm"
+            value={formData.subtitle}
+            onChange={e => setFormData({ ...formData, subtitle: e.target.value })}
+            style={{ color: 'white' }} />
+        </div>
+
+        <div>
+          <label className="block text-[10px] font-bold uppercase mb-1">Image URL</label>
+          <input required type="text" className="w-full border-2 border-black p-2 font-jakarta text-sm"
+            value={formData.image}
+            onChange={e => setFormData({ ...formData, image: e.target.value })}
+            style={{ color: 'white' }} />
+        </div>
+
+        <div>
+          <label className="block text-[10px] font-bold uppercase mb-1 flex justify-between">
+            <span>Blog Content</span>
+            <span className="text-[var(--theme-accent)]">Format with toolbar below or Markdown syntax</span>
+          </label>
+
+          <div className="border-2 border-black flex flex-col">
+            {/* Neo-Brutalist Formatting Toolbar */}
+            <div className="bg-gray-50 border-b-2 border-black p-2 flex flex-wrap items-center gap-1.5 select-none">
+              <button
+                type="button"
+                onClick={() => insertFormatting("bold")}
+                className="p-1.5 text-black hover:bg-[var(--theme-cyan)] hover:text-black border border-transparent hover:border-black active:translate-y-[1px] transition-all rounded-sm flex items-center justify-center cursor-pointer"
+                title="Bold"
+              >
+                <Bold size={14} />
+              </button>
+              <button
+                type="button"
+                onClick={() => insertFormatting("italic")}
+                className="p-1.5 text-black hover:bg-[var(--theme-cyan)] hover:text-black border border-transparent hover:border-black active:translate-y-[1px] transition-all rounded-sm flex items-center justify-center cursor-pointer"
+                title="Italic"
+              >
+                <Italic size={14} />
+              </button>
+              <button
+                type="button"
+                onClick={() => insertFormatting("underline")}
+                className="p-1.5 text-black hover:bg-[var(--theme-cyan)] hover:text-black border border-transparent hover:border-black active:translate-y-[1px] transition-all rounded-sm flex items-center justify-center cursor-pointer"
+                title="Underline"
+              >
+                <Underline size={14} />
+              </button>
+              <button
+                type="button"
+                onClick={() => insertFormatting("strikethrough")}
+                className="p-1.5 text-black hover:bg-[var(--theme-cyan)] hover:text-black border border-transparent hover:border-black active:translate-y-[1px] transition-all rounded-sm flex items-center justify-center cursor-pointer"
+                title="Strikethrough"
+              >
+                <Strikethrough size={14} />
+              </button>
+
+              <div className="w-[1px] h-4 bg-black mx-1" />
+
+              <button
+                type="button"
+                onClick={() => insertFormatting("h1")}
+                className="px-2 py-0.5 text-black font-orbitron font-black text-xs hover:bg-[var(--theme-cyan)] border border-transparent hover:border-black active:translate-y-[1px] transition-all rounded-sm cursor-pointer"
+                title="Heading 1"
+              >
+                H1
+              </button>
+              <button
+                type="button"
+                onClick={() => insertFormatting("h2")}
+                className="px-2 py-0.5 text-black font-orbitron font-black text-xs hover:bg-[var(--theme-cyan)] border border-transparent hover:border-black active:translate-y-[1px] transition-all rounded-sm cursor-pointer"
+                title="Heading 2"
+              >
+                H2
+              </button>
+              <button
+                type="button"
+                onClick={() => insertFormatting("h3")}
+                className="px-2 py-0.5 text-black font-orbitron font-black text-xs hover:bg-[var(--theme-cyan)] border border-transparent hover:border-black active:translate-y-[1px] transition-all rounded-sm cursor-pointer"
+                title="Heading 3"
+              >
+                H3
+              </button>
+
+              <div className="w-[1px] h-4 bg-black mx-1" />
+
+              {/* Font Size Dropdown */}
+              <select
+                onChange={(e) => {
+                  if (e.target.value) {
+                    insertFormatting("font-size", e.target.value);
+                    e.target.value = ""; // Reset value so it can be re-selected
+                  }
+                }}
+                value=""
+                className="border border-black bg-white px-1.5 py-0.5 text-[10px] font-bold font-orbitron focus:outline-none hover:bg-gray-100 cursor-pointer h-[24px]"
+              >
+                <option value="" disabled>Size</option>
+                <option value="12px">12px</option>
+                <option value="14px">14px</option>
+                <option value="16px">16px</option>
+                <option value="18px">18px</option>
+                <option value="20px">20px</option>
+                <option value="24px">24px</option>
+                <option value="32px">32px</option>
+              </select>
+
+              <div className="w-[1px] h-4 bg-black mx-1" />
+
+              <button
+                type="button"
+                onClick={() => insertFormatting("list")}
+                className="p-1.5 text-black hover:bg-[var(--theme-cyan)] hover:text-black border border-transparent hover:border-black active:translate-y-[1px] transition-all rounded-sm flex items-center justify-center cursor-pointer"
+                title="Bullet List"
+              >
+                <List size={14} />
+              </button>
+              <button
+                type="button"
+                onClick={() => insertFormatting("numlist")}
+                className="p-1.5 text-black hover:bg-[var(--theme-cyan)] hover:text-black border border-transparent hover:border-black active:translate-y-[1px] transition-all rounded-sm flex items-center justify-center cursor-pointer"
+                title="Numbered List"
+              >
+                <ListOrdered size={14} />
+              </button>
+              <button
+                type="button"
+                onClick={() => insertFormatting("quote")}
+                className="p-1.5 text-black hover:bg-[var(--theme-cyan)] hover:text-black border border-transparent hover:border-black active:translate-y-[1px] transition-all rounded-sm flex items-center justify-center cursor-pointer"
+                title="Quote"
+              >
+                <Quote size={14} />
+              </button>
+              <button
+                type="button"
+                onClick={() => insertFormatting("link")}
+                className="p-1.5 text-black hover:bg-[var(--theme-cyan)] hover:text-black border border-transparent hover:border-black active:translate-y-[1px] transition-all rounded-sm flex items-center justify-center cursor-pointer"
+                title="Link"
+              >
+                <Link size={14} />
+              </button>
+            </div>
+
+            {/* Textarea */}
+            <textarea
+              ref={textareaRef}
+              required
+              className="w-full p-3 font-jakarta text-sm min-h-[350px] focus:outline-none resize-y"
+              value={formData.content}
+              onChange={e => setFormData({ ...formData, content: e.target.value })}
+              placeholder="Start writing... Use the formatting bar above to help style your content."
+              style={{ color: 'white' }}
+            />
+          </div>
+        </div>
+
+        <button type="submit" disabled={isSubmitting} className="w-full bg-[var(--theme-cyan)] border-2 border-black p-3 font-orbitron font-bold uppercase text-black hover:bg-black hover:text-white transition-colors mt-4 cursor-pointer">
+          {isSubmitting ? "Saving..." : "Save Blog Post"}
+        </button>
+      </form>
+    </div>
   );
 }

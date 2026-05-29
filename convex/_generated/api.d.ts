@@ -10,6 +10,7 @@
 
 import type * as ai from "../ai.js";
 import type * as auth from "../auth.js";
+import type * as blogs from "../blogs.js";
 import type * as credits from "../credits.js";
 import type * as http from "../http.js";
 import type * as users from "../users.js";
@@ -23,6 +24,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   ai: typeof ai;
   auth: typeof auth;
+  blogs: typeof blogs;
   credits: typeof credits;
   http: typeof http;
   users: typeof users;

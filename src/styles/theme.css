@@ -200,3 +200,16 @@
   margin-bottom: 0.75rem !important;
 }
 
+/* Markdown elements styling */
+.blog-markdown strong, .blog-markdown b, .prose strong, .prose b {
+  font-weight: 700 !important;
+}
+
+.blog-markdown u, .prose u {
+  text-decoration: underline !important;
+}
+
+.blog-markdown del, .prose del, .blog-markdown s, .prose s {
+  text-decoration: line-through !important;
+}
+

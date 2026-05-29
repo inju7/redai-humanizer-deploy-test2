@@ -34,4 +34,15 @@ export default defineSchema({
     detail2: v.optional(v.string()),
     timestamp: v.number(),
   }),
+
+  blogs: defineTable({
+    title: v.string(),
+    category: v.string(),
+    subtitle: v.string(),
+    author: v.string(),
+    dateStr: v.string(),
+    content: v.string(), // Markdown content
+    image: v.string(),
+    createdAt: v.number(),
+  }),
 });
