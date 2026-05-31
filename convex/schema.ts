@@ -45,4 +45,49 @@ export default defineSchema({
     image: v.string(),
     createdAt: v.number(),
   }),
+
+  careerApplications: defineTable({
+    fullName: v.string(),
+    emailAddress: v.string(),
+    portfolioLink: v.optional(v.string()),
+    appliedRole: v.string(),
+    message: v.optional(v.string()),
+    status: v.union(
+      v.literal("pending"),
+      v.literal("approved"),
+      v.literal("rejected")
+    ),
+    appliedAt: v.number(),
+  })
+    .index("by_status", ["status"])
+    .index("by_email_and_role", ["emailAddress", "appliedRole"]),
+
+  jobRoles: defineTable({
+    title: v.string(),
+    badge: v.string(),
+    color: v.string(),
+    salary: v.string(),
+    type: v.string(),
+    desc: v.string(),
+    requirements: v.array(v.string()),
+    isActive: v.boolean(),
+  }),
+
+  marketplaceOrders: defineTable({
+    item: v.string(),
+    subtotal: v.number(),
+    vat: v.number(),
+    total: v.number(),
+    timestamp: v.number(),
+    userId: v.optional(v.id("users")),
+  }),
+
+  referralClaims: defineTable({
+    userId: v.optional(v.id("users")),
+    fullName: v.string(),
+    brandReferred: v.string(),
+    referralLinks: v.optional(v.string()), // we might not need this if the UI doesn't have it, wait UI doesn't have links right now? 
+    walletAddress: v.optional(v.string()), // let's check UI again
+    timestamp: v.number(),
+  }),
 });

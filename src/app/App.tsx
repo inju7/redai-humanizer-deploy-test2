@@ -78,35 +78,6 @@ export default function App() {
   // Active Tab in Admin Dashboard
   const [adminActiveTab, setAdminActiveTab] = useState<"overview" | "careers" | "marketplace" | "marketing" | "referrals">("overview");
 
-  // Dynamic Captured Career Applications
-  const [careerApplications, setCareerApplications] = useState<Array<{
-    id: string;
-    fullName: string;
-    emailAddress: string;
-    portfolioLink: string;
-    date: string;
-  }>>([
-    { id: "APP-001", fullName: "Adrian O'Connor", emailAddress: "adrian@example.com", portfolioLink: "https://github.com/adrian", date: "2026-05-15" },
-    { id: "APP-002", fullName: "John Doe", emailAddress: "john@example.com", portfolioLink: "https://johndoe.dev", date: "2026-05-16" },
-    { id: "APP-003", fullName: "Jane Smith", emailAddress: "jane@smith.io", portfolioLink: "https://linkedin.com/in/janesmith", date: "2026-05-17" }
-  ]);
-
-  // Dynamic Captured Marketing Collaboration/Consignment Proposals
-  const [marketingSubmissions, setMarketingSubmissions] = useState<Array<{
-    id: string;
-    type: "Partnership" | "Affiliate" | "Influencer" | "Creator";
-    name: string;
-    email: string;
-    detail1: string; // Product/Website link, Traffic Source, Handle, or Art Style
-    detail2?: string; // Commission Proposal, Payout Method, GCash, or Commission Rate
-    date: string;
-  }>>([
-    { id: "MKT-101", type: "Partnership", name: "SaaS Booster Corp", email: "partner@booster.com", detail1: "https://booster.com", detail2: "15% flat dealership tier", date: "2026-05-14" },
-    { id: "MKT-102", type: "Affiliate", name: "Mark Thompson", email: "mark@seoagency.net", detail1: "SEO Blogs Network", detail2: "GCash (0917-123-4567)", date: "2026-05-15" },
-    { id: "MKT-103", type: "Influencer", name: "Chloe Park", email: "chloe@tiktok.me", detail1: "@chloecodes (250K followers)", detail2: "GCash (0918-987-6543)", date: "2026-05-16" },
-    { id: "MKT-104", type: "Creator", name: "Ethan Fox", email: "ethan@artstudio.com", detail1: "Cyberpunk Cartoon Vectors", detail2: "5% comm + PHP 100 buyout", date: "2026-05-17" }
-  ]);
-
   return (
     <div className="relative min-h-screen pb-12 sm:pb-32 bg-[var(--theme-bg)] selection:bg-[var(--theme-accent)] selection:text-white">
 
@@ -649,28 +620,15 @@ export default function App() {
           )}
 
           {activeTab === "blog" && <PageWrapper key="blog"><BlogTab /></PageWrapper>}
-          {activeTab === "ads" && <PageWrapper key="ads"><MarketingDealsTab onAddSubmission={(sub) => setMarketingSubmissions([sub, ...marketingSubmissions])} /></PageWrapper>}
+          {activeTab === "ads" && <PageWrapper key="ads"><MarketingDealsTab /></PageWrapper>}
           {activeTab === "marketplace" && <PageWrapper key="marketplace"><MarketplaceTab /></PageWrapper>}
           {activeTab === "referral" && <PageWrapper key="referral"><ReferralTab setCredits={setGuestCredits} /></PageWrapper>}
           {activeTab === "career" && (
             <PageWrapper key="career">
-              <CareerTab
-                onAddApplication={(app) =>
-                  setCareerApplications([
-                    {
-                      id: `APP-${Math.floor(100 + Math.random() * 900)}`,
-                      fullName: app.name,
-                      emailAddress: app.email,
-                      portfolioLink: app.portfolio,
-                      date: app.date,
-                    },
-                    ...careerApplications,
-                  ])
-                }
-              />
+              <CareerTab user={user} />
             </PageWrapper>
           )}
-          {activeTab === "admin" && <PageWrapper key="admin"><AdminDashboardTab user={user} setIsSignInModalOpen={setIsSignInModalOpen} careerApplications={careerApplications} marketingSubmissions={marketingSubmissions} /></PageWrapper>}
+          {activeTab === "admin" && <PageWrapper key="admin"><AdminDashboardTab user={user} setIsSignInModalOpen={setIsSignInModalOpen} /></PageWrapper>}
         </AnimatePresence>
       </main>
 
@@ -1471,6 +1429,8 @@ function ReferralCard({ brand }: { brand: any }) {
 }
 
 function ReferralTab({ setCredits }: { setCredits: React.Dispatch<React.SetStateAction<number>> }) {
+  const submitClaim = useMutation(api.referrals.submitClaim);
+  const [claimStatus, setClaimStatus] = useState<"idle" | "loading" | "success">("idle");
   const brandsData = [
     { name: "Maya", domain: "maya.ph", adUrl: "https://media.w3.org/2010/05/sintel/trailer.mp4" },
     { name: "SMDC", domain: "smdc.com", adUrl: "https://www.w3schools.com/html/mov_bbb.mp4" },
@@ -1580,15 +1540,45 @@ function ReferralTab({ setCredits }: { setCredits: React.Dispatch<React.SetState
           <h2 className="text-4xl font-orbitron italic font-bold uppercase mb-2 text-black">Referral Claim Form</h2>
           <p className="font-jakarta font-bold text-gray-600 uppercase text-sm">Submit your proof of successful conversion here</p>
         </div>
-        <form className="grid grid-cols-1 md:grid-cols-2 gap-8" onSubmit={(e) => { e.preventDefault(); setCredits(prev => prev + 20); alert('Claim submitted successfully! +20 Neural Credits have been loaded into your account. We will email you instead.'); }}>
+        <form className="grid grid-cols-1 md:grid-cols-2 gap-8" onSubmit={async (e) => { 
+          e.preventDefault(); 
+          setClaimStatus("loading");
+          
+          const formData = new FormData(e.currentTarget);
+          const fullName = formData.get("fullName") as string;
+          const brandReferred = formData.get("brandReferred") as string;
+
+          try {
+            await submitClaim({ fullName, brandReferred });
+            // Optimistic update for guests (real users will get their credits synced via Convex query if we had one)
+            setCredits(prev => prev + 20); 
+            setClaimStatus("success");
+            
+            setTimeout(() => {
+              setClaimStatus("idle");
+              (e.target as HTMLFormElement).reset();
+            }, 3000);
+          } catch (error) {
+            console.error("Failed to submit claim", error);
+            setClaimStatus("idle");
+          }
+        }}>
+          {claimStatus === "success" && (
+            <div className="md:col-span-2">
+              <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="bg-green-50 border-4 border-green-600 p-4 shadow-[4px_4px_0_#16a34a] flex items-center justify-center gap-3">
+                <CheckCircle className="text-green-600" size={24} />
+                <span className="font-orbitron font-black uppercase tracking-widest text-green-800">Claim Registered! +20 Neural Credits Added.</span>
+              </motion.div>
+            </div>
+          )}
           <div className="space-y-6">
             <div>
               <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black">Full Name</label>
-              <input type="text" required placeholder="Enter your full name" className="w-full border-4 border-black p-4 font-jakarta font-bold outline-none bg-gray-50 focus:bg-white focus:ring-4 ring-[var(--theme-accent)]/20 transition-all" />
+              <input type="text" name="fullName" required placeholder="Enter your full name" className="w-full border-4 border-black p-4 font-jakarta font-bold outline-none bg-gray-50 focus:bg-white focus:ring-4 ring-[var(--theme-accent)]/20 transition-all" />
             </div>
             <div>
               <label className="block text-xs font-orbitron font-bold uppercase mb-2 text-black">Brand Referred</label>
-              <select className="w-full border-4 border-black p-4 font-jakarta font-bold outline-none bg-gray-50 focus:bg-white appearance-none cursor-pointer">
+              <select name="brandReferred" className="w-full border-4 border-black p-4 font-jakarta font-bold outline-none bg-gray-50 focus:bg-white appearance-none cursor-pointer">
                 {brandsData.map(b => <option key={b.name} value={b.name}>{b.name}</option>)}
               </select>
             </div>
@@ -1604,8 +1594,8 @@ function ReferralTab({ setCredits }: { setCredits: React.Dispatch<React.SetState
             </div>
           </div>
           <div className="md:col-span-2 pt-6">
-            <button type="submit" className="w-full bg-[var(--theme-accent)] text-white font-orbitron font-bold py-6 text-xl border-4 border-black hover:bg-black hover:border-white transition-all uppercase shadow-[8px_8px_0_#000] hover:translate-x-1 hover:translate-y-1 hover:shadow-none active:scale-95">
-              Submit Claim For Review
+            <button type="submit" disabled={claimStatus !== "idle"} className="w-full bg-[var(--theme-accent)] text-white font-orbitron font-bold py-6 text-xl border-4 border-black hover:bg-black hover:border-white transition-all uppercase shadow-[8px_8px_0_#000] hover:translate-x-1 hover:translate-y-1 hover:shadow-none active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+              {claimStatus === "loading" ? "Processing..." : claimStatus === "success" ? "Success!" : "Submit Claim For Review"}
             </button>
             <div className="bg-gray-100 border-2 border-black p-4 mt-8">
               <p className="text-center text-[10px] font-bold uppercase text-gray-700 leading-relaxed">
@@ -1619,78 +1609,324 @@ function ReferralTab({ setCredits }: { setCredits: React.Dispatch<React.SetState
   );
 }
 
-function CareerTab({ onAddApplication }: { onAddApplication: (app: { name: string; email: string; portfolio: string; role: string; date: string }) => void }) {
-  const [selectedRole, setSelectedRole] = useState<string | null>(null);
+// ── JOB ROLE METADATA ─────────────────────────────────────────────────────
+const JOB_ROLES = [
+  {
+    id: "Senior AI Engineer",
+    badge: "ENGINEERING",
+    color: "var(--theme-accent)",
+    salary: "PHP 80,000–120,000 / mo",
+    type: "Remote · Full-Time",
+    desc: "Lead development of AETERNUM PROTOCOL V5. Own the core bypass engine architecture.",
+    requirements: ["3+ yrs ML/NLP experience", "Python & TypeScript", "LLM fine-tuning expertise", "AI detection model knowledge"],
+  },
+  {
+    id: "Frontend Architect",
+    badge: "DESIGN",
+    color: "#7c3aed",
+    salary: "PHP 60,000–95,000 / mo",
+    type: "Remote · Full-Time",
+    desc: "Build high-density neobrutalist React interfaces with Framer Motion and stellar performance.",
+    requirements: ["React + TypeScript expert", "Framer Motion / animations", "CSS architecture (no frameworks)", "Pixel-perfect eye for design"],
+  },
+  {
+    id: "Growth Hacker",
+    badge: "MARKETING",
+    color: "#16a34a",
+    salary: "PHP 40,000–70,000 / mo + commission",
+    type: "Hybrid · Full-Time",
+    desc: "Scale affiliate programs and manage B2B ad partnerships. Own top-of-funnel growth.",
+    requirements: ["Proven SaaS growth experience", "Google & Meta Ads expertise", "Affiliate network management", "Data-driven decision making"],
+  },
+  {
+    id: "Cybersecurity Analyst",
+    badge: "SECURITY",
+    color: "#dc2626",
+    salary: "PHP 70,000–110,000 / mo",
+    type: "Remote · Full-Time",
+    desc: "Ensure protocol integrity and user data protection against synthetic attacks and adversarial inputs.",
+    requirements: ["OWASP Top 10 knowledge", "Penetration testing skills", "Serverless security focus", "Incident response experience"],
+  },
+  {
+    id: "Community Manager",
+    badge: "COMMUNITY",
+    color: "#0891b2",
+    salary: "PHP 30,000–50,000 / mo",
+    type: "Remote · Part-Time OK",
+    desc: "Moderate creator networks and facilitate marketplace connections. Be the face of REDAI.",
+    requirements: ["Strong communication skills", "Social media proficiency", "Discord/Telegram moderation", "Content scheduling tools"],
+  },
+  {
+    id: "Sales Director (B2B)",
+    badge: "SALES",
+    color: "#b45309",
+    salary: "PHP 60,000 base + uncapped commission",
+    type: "Hybrid · Full-Time",
+    desc: "Onboard enterprise clients, SEO agencies, and universities onto REDAI subscription plans.",
+    requirements: ["B2B SaaS sales experience", "CRM tools (HubSpot/Pipedrive)", "Proposal & contract negotiation", "Network in PH tech ecosystem"],
+  },
+];
+
+function CareerTab({ user }: { user?: any }) {
+  if (user && user.role === "admin") {
+    return (
+      <div className="max-w-6xl mx-auto space-y-12">
+        <div className="text-center">
+          <h2 className="text-5xl md:text-7xl font-orbitron italic font-black uppercase text-black drop-shadow-[4px_4px_0_var(--theme-cyan)] mb-4">Admin Matrix</h2>
+          <p className="text-gray-600 font-jakarta font-bold text-lg uppercase tracking-widest">Review applications natively</p>
+        </div>
+        <AdminCareersLedger />
+      </div>
+    );
+  }
+
+  const jobRoles = useQuery(api.jobs.list) ?? [];
+  const [selectedRole, setSelectedRole] = useState<typeof jobRoles[0] | null>(null);
+  const [formState, setFormState] = useState<"idle" | "loading" | "success" | "duplicate" | "error">("idle");
+  const submitApplication = useMutation(api.careers.submit);
+
+  const handleClose = () => {
+    setSelectedRole(null);
+    setFormState("idle");
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!selectedRole || formState === "loading") return;
+    const fd = new FormData(e.currentTarget);
+    setFormState("loading");
+    try {
+      await submitApplication({
+        fullName: (fd.get("fullName") as string).trim(),
+        emailAddress: (fd.get("emailAddress") as string).trim(),
+        portfolioLink: (fd.get("portfolioLink") as string)?.trim() || undefined,
+        appliedRole: selectedRole.title,
+        message: (fd.get("message") as string)?.trim() || undefined,
+      });
+      setFormState("success");
+      setTimeout(() => handleClose(), 3200);
+    } catch (err: any) {
+      if (err?.message?.includes("DUPLICATE_APPLICATION")) {
+        setFormState("duplicate");
+      } else {
+        setFormState("error");
+      }
+    }
+  };
 
   return (
-    <TabContainer title="CAREERS" subtitle="Join the REDAI Protocol team." gridClass="grid-cols-1 md:grid-cols-3 lg:grid-cols-6">
-      <BrutalCard onClick={() => setSelectedRole("Senior AI Engineer")} title="Senior AI Engineer" desc="Lead the development of AETERNUM PROTOCOL V5. Remote, competitive equity." icon={<Cpu size={28} className="text-white" />} badge="ENGINEERING" />
-      <BrutalCard onClick={() => setSelectedRole("Frontend Architect")} title="Frontend Architect" desc="Build high-density React/Tailwind interfaces. React, Framer Motion, Neumorphism." icon={<Code2 size={28} className="text-white" />} badge="DESIGN" />
-      <BrutalCard onClick={() => setSelectedRole("Growth Hacker")} title="Growth Hacker" desc="Scale our affiliate programs and manage B2B ad partnerships." icon={<TrendingUp size={28} className="text-white" />} badge="MARKETING" />
-      <BrutalCard onClick={() => setSelectedRole("Cybersecurity Analyst")} title="Cybersecurity Analyst" desc="Ensure protocol integrity and user data protection against synthetic attacks." icon={<Shield size={28} className="text-white" />} badge="SECURITY" />
-      <BrutalCard onClick={() => setSelectedRole("Community Manager")} title="Community Manager" desc="Moderate our creator networks and facilitate marketplace connections." icon={<Users size={28} className="text-white" />} badge="COMMUNITY" />
-      <BrutalCard onClick={() => setSelectedRole("Sales Director (B2B)")} title="Sales Director (B2B)" desc="Onboard enterprise clients, SEO agencies, and universities." icon={<DollarSign size={28} className="text-white" />} badge="SALES" />
+    <div className="max-w-7xl mx-auto px-4 py-6 space-y-8">
+      {/* Header */}
+      <div className="border-b-4 border-black pb-6">
+        <span className="inline-block text-[9px] font-orbitron font-black bg-black text-white px-2 py-0.5 border border-black uppercase tracking-widest mb-2">
+          AETERNUM RECRUITMENT PROTOCOL
+        </span>
+        <h2 className="text-3xl md:text-5xl font-orbitron italic font-bold uppercase text-black leading-none mb-2">
+          JOIN THE REDAI TEAM
+        </h2>
+        <p className="font-jakarta font-bold text-sm text-gray-600 max-w-2xl">
+          We're building the most powerful AI bypass infrastructure on the planet. All roles are currently in a{" "}
+          <span className="text-[var(--theme-accent)] font-black">talent pipeline</span> — submit your application and we'll reach out when a position opens.
+        </p>
+      </div>
 
+      {/* Job Cards Grid */}
+      {jobRoles.length === 0 ? (
+        <div className="col-span-3 text-center py-20 border-4 border-dashed border-gray-300">
+          <p className="font-orbitron font-bold uppercase text-gray-400">No open positions at this time.</p>
+          <p className="font-jakarta text-sm text-gray-400 mt-1">Check back soon — we're always growing.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {jobRoles.map((role) => (
+            <motion.div
+              key={role._id}
+              whileHover={{ y: -4, x: -2 }}
+              className="bg-white border-2 border-black p-5 shadow-[4px_4px_0_#000] hover:shadow-[8px_8px_0_#000] transition-shadow cursor-pointer group flex flex-col"
+              onClick={() => { setSelectedRole(role); setFormState("idle"); }}
+            >
+              {/* Badge + Type */}
+              <div className="flex items-center justify-between mb-3">
+                <span
+                  className="text-[8px] font-orbitron font-black uppercase tracking-widest px-2 py-0.5 border border-black text-white"
+                  style={{ backgroundColor: role.color }}
+                >
+                  {role.badge}
+                </span>
+                <span className="text-[8px] font-jakarta font-bold text-gray-500 uppercase tracking-wide">{role.type}</span>
+              </div>
+              {/* Title */}
+              <h3 className="text-base font-orbitron italic font-bold uppercase text-black leading-tight mb-2 group-hover:text-[var(--theme-accent)] transition-colors">
+                {role.title}
+              </h3>
+              {/* Salary */}
+              <div className="flex items-center gap-1.5 mb-3">
+                <DollarSign size={11} className="text-green-600 flex-shrink-0" />
+                <span className="font-jakarta font-black text-[11px] text-green-700">{role.salary}</span>
+              </div>
+              {/* Description */}
+              <p className="font-jakarta font-bold text-xs text-gray-700 leading-relaxed mb-4 flex-1">{role.desc}</p>
+              {/* Requirements */}
+              <ul className="space-y-1 mb-4">
+                {role.requirements.map((req, i) => (
+                  <li key={i} className="flex items-start gap-1.5 font-jakarta text-[10px] font-bold text-black">
+                    <CheckCircle size={10} className="text-green-600 flex-shrink-0 mt-0.5" />
+                    {req}
+                  </li>
+                ))}
+              </ul>
+              {/* CTA */}
+              <button className="w-full border-2 border-black bg-black text-white font-orbitron font-black uppercase text-[10px] tracking-wider py-2 hover:bg-[var(--theme-accent)] transition-colors shadow-[2px_2px_0_#555] group-hover:shadow-[2px_2px_0_var(--theme-accent)]">
+                Apply to Pipeline →
+              </button>
+            </motion.div>
+          ))}
+        </div>
+      )}
+
+      {/* Application Modal */}
       <AnimatePresence>
         {selectedRole && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-            <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }} className="brutal-container bg-white border-4 border-black p-4 sm:p-6 max-w-md w-full relative max-h-[85vh] overflow-y-auto brutal-scrollbar">
-              <button onClick={() => setSelectedRole(null)} className="absolute top-3 right-3 text-black hover:text-[var(--theme-accent)] transition-colors">
-                <X size={18} />
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+            onClick={(e) => e.target === e.currentTarget && handleClose()}
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="bg-white border-4 border-black p-5 sm:p-7 max-w-lg w-full relative max-h-[90vh] overflow-y-auto brutal-scrollbar shadow-[8px_8px_0_#000]"
+            >
+              <button onClick={handleClose} className="absolute top-3 right-3 text-black hover:text-[var(--theme-accent)] transition-colors">
+                <X size={20} />
               </button>
-              <h3 className="text-lg sm:text-xl font-orbitron italic font-bold mb-2 sm:mb-3 uppercase leading-tight text-black break-words pr-6">Apply: {selectedRole}</h3>
 
-              <div className="bg-black text-white p-3 mb-3 border-2 border-black shadow-[2px_2px_0_var(--theme-accent)] relative">
-                <p className="font-jakarta text-[10px] sm:text-[11px] font-bold leading-relaxed relative z-10 text-white">
-                  However, this career is currently vacant, but the team will let you know about the movement of REDAI. For now, your information will be collected and for future reference we can reach out to you. Don't wait for the email, we will email you instead.
+              {/* Role Header */}
+              <div className="mb-4">
+                <span
+                  className="text-[8px] font-orbitron font-black uppercase tracking-widest px-2 py-0.5 border border-black text-white mb-2 inline-block"
+                  style={{ backgroundColor: selectedRole.color }}
+                >
+                  {selectedRole.badge}
+                </span>
+                <h3 className="text-xl font-orbitron italic font-bold uppercase text-black leading-tight pr-6">
+                  {selectedRole.title}
+                </h3>
+                <p className="font-jakarta font-bold text-[11px] text-gray-500 mt-0.5">{selectedRole.type} · {selectedRole.salary}</p>
+              </div>
+
+              {/* Pipeline notice */}
+              <div className="bg-black text-white p-3 mb-4 border-2 border-black shadow-[2px_2px_0_var(--theme-accent)]">
+                <p className="font-jakarta text-[10px] sm:text-[11px] font-bold leading-relaxed">
+                  This role is currently in our{" "}
+                  <span className="text-[var(--theme-cyan)]">talent pipeline</span>. Submit your details now and we'll contact you directly when the position opens.{" "}
+                  <span className="italic text-gray-300">We'll email you — don't wait.</span>
                 </p>
               </div>
 
-              <form className="space-y-3" onSubmit={(e) => {
-                e.preventDefault();
-                const formData = new FormData(e.currentTarget);
-                const name = formData.get("fullName") as string;
-                const email = formData.get("emailAddress") as string;
-                const portfolio = formData.get("portfolioLink") as string;
-                onAddApplication({
-                  name: name || "Anonymous Candidate",
-                  email: email || "no-email@example.com",
-                  portfolio: portfolio || "N/A",
-                  role: selectedRole || "",
-                  date: new Date().toISOString().split("T")[0]
-                });
-                alert('Application submitted successfully! Your details are stored in the Admin database.');
-                setSelectedRole(null);
-              }}>
-                <div>
-                  <label className="block text-[9px] font-orbitron font-bold uppercase mb-0.5 text-black tracking-widest">Full Name</label>
-                  <input type="text" name="fullName" required placeholder="John Doe" className="w-full border-2 border-black p-2 font-jakarta font-bold outline-none bg-black text-white focus:border-[var(--theme-accent)] text-xs" />
-                </div>
-                <div>
-                  <label className="block text-[9px] font-orbitron font-bold uppercase mb-0.5 text-black tracking-widest">Email Address</label>
-                  <input type="email" name="emailAddress" required placeholder="john@example.com" className="w-full border-2 border-black p-2 font-jakarta font-bold outline-none bg-black text-white focus:border-[var(--theme-accent)] text-xs" />
-                </div>
-                <div>
-                  <label className="block text-[9px] font-orbitron font-bold uppercase mb-0.5 text-black tracking-widest">LinkedIn / Portfolio</label>
-                  <input type="url" name="portfolioLink" placeholder="https://linkedin.com/in/johndoe" className="w-full border-2 border-black p-2 font-jakarta font-bold outline-none bg-black text-white focus:border-[var(--theme-accent)] text-xs" />
-                </div>
-                <button type="submit" className="w-full bg-[var(--theme-accent)] text-white font-orbitron font-bold py-2.5 border-2 border-black hover:bg-black hover:border-white hover:shadow-[3px_3px_0_var(--theme-cyan)] transition-all uppercase mt-3 text-xs tracking-wider">
-                  Submit Application
-                </button>
-              </form>
+              {/* SUCCESS STATE */}
+              {formState === "success" && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="bg-green-50 border-2 border-green-600 p-6 text-center space-y-3 shadow-[3px_3px_0_#16a34a]"
+                >
+                  <div className="w-14 h-14 bg-green-600 border-2 border-black flex items-center justify-center mx-auto">
+                    <CheckCircle size={28} className="text-white" />
+                  </div>
+                  <h4 className="font-orbitron font-black uppercase text-green-800 text-base">Application Received!</h4>
+                  <p className="font-jakarta font-bold text-xs text-green-700">
+                    Your application for <span className="font-black">{selectedRole.title}</span> is now in our pipeline. We'll reach out via email when the role opens.
+                  </p>
+                  <p className="font-orbitron text-[9px] text-green-600 uppercase tracking-widest animate-pulse">Auto-closing…</p>
+                </motion.div>
+              )}
+
+              {/* DUPLICATE / ERROR STATES */}
+              {(formState === "duplicate" || formState === "error") && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className={`border-2 p-3 mb-4 flex items-start gap-2 ${formState === "duplicate" ? "bg-orange-50 border-orange-500" : "bg-red-50 border-red-500"}`}
+                >
+                  <AlertTriangle size={14} className={`flex-shrink-0 mt-0.5 ${formState === "duplicate" ? "text-orange-600" : "text-red-600"}`} />
+                  <div>
+                    <p className="font-jakarta font-black text-xs text-black">
+                      {formState === "duplicate"
+                        ? "You've already applied for this role with that email address."
+                        : "Something went wrong. Please try again in a moment."}
+                    </p>
+                    <button onClick={() => setFormState("idle")} className="mt-1.5 text-[9px] font-orbitron font-black uppercase tracking-wider text-gray-600 hover:text-black underline">
+                      Try again
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* APPLICATION FORM */}
+              {formState !== "success" && (
+                <form className="space-y-3" onSubmit={handleSubmit}>
+                  <div>
+                    <label className="block text-[9px] font-orbitron font-bold uppercase mb-0.5 text-black tracking-widest">
+                      Full Name <span className="text-[var(--theme-accent)]">*</span>
+                    </label>
+                    <input type="text" name="fullName" required placeholder="John Doe"
+                      className="w-full border-2 border-black p-2.5 font-jakarta font-bold outline-none bg-black text-white focus:border-[var(--theme-accent)] text-xs placeholder:text-gray-500" />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-orbitron font-bold uppercase mb-0.5 text-black tracking-widest">
+                      Email Address <span className="text-[var(--theme-accent)]">*</span>
+                    </label>
+                    <input type="email" name="emailAddress" required placeholder="john@example.com"
+                      className="w-full border-2 border-black p-2.5 font-jakarta font-bold outline-none bg-black text-white focus:border-[var(--theme-accent)] text-xs placeholder:text-gray-500" />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-orbitron font-bold uppercase mb-0.5 text-black tracking-widest">
+                      LinkedIn / Portfolio / GitHub
+                    </label>
+                    <input type="text" name="portfolioLink" placeholder="https://linkedin.com/in/yourprofile"
+                      className="w-full border-2 border-black p-2.5 font-jakarta font-bold outline-none bg-black text-white focus:border-[var(--theme-accent)] text-xs placeholder:text-gray-500" />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-orbitron font-bold uppercase mb-0.5 text-black tracking-widest">
+                      Cover Message <span className="text-gray-400 normal-case font-jakarta font-semibold">(optional)</span>
+                    </label>
+                    <textarea name="message" rows={3} placeholder="Tell us why you're a great fit for this role…"
+                      className="w-full border-2 border-black p-2.5 font-jakarta font-bold outline-none bg-black text-white focus:border-[var(--theme-accent)] text-xs placeholder:text-gray-500 resize-none" />
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={formState === "loading"}
+                    className={`w-full font-orbitron font-bold py-3 border-2 border-black uppercase mt-1 text-xs tracking-wider transition-all shadow-[3px_3px_0_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none ${
+                      formState === "loading"
+                        ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+                        : "bg-[var(--theme-accent)] text-white hover:bg-black hover:border-white hover:shadow-[3px_3px_0_var(--theme-cyan)]"
+                    }`}
+                  >
+                    {formState === "loading" ? "Submitting…" : "Submit Application →"}
+                  </button>
+                </form>
+              )}
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
-    </TabContainer>
+    </div>
   );
 }
 
-function MarketingDealsTab({ onAddSubmission }: { onAddSubmission: (sub: { id: string; type: "Partnership" | "Affiliate" | "Influencer" | "Creator"; name: string; email: string; detail1: string; detail2?: string; date: string }) => void }) {
+
+
+function MarketingDealsTab() {
   const [viewMode, setViewMode] = useState<"cards" | "agreement" | "form">("cards");
   const [selectedDeal, setSelectedDeal] = useState<string | null>(null);
   const [dealsMode, setDealsMode] = useState<"opportunities" | "history">("opportunities");
   const [agreedToRules, setAgreedToRules] = useState(false);
+  const [formState, setFormState] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const submitMarketing = useMutation(api.marketing.submit);
 
   const handleSelectDeal = (deal: string) => {
     setSelectedDeal(deal);
@@ -1878,155 +2114,196 @@ function MarketingDealsTab({ onAddSubmission }: { onAddSubmission: (sub: { id: s
           </h2>
           <p className="font-jakarta font-bold text-[var(--theme-accent)] text-base mb-4 border-b-2 border-black pb-1.5">Please fill out all required fields.</p>
 
-          <form className="space-y-4" onSubmit={(e) => {
-            e.preventDefault();
-            const formData = new FormData(e.currentTarget);
-            const name = (formData.get("creatorName") || formData.get("fullName") || formData.get("companyName")) as string || "Anonymous";
-            const email = (formData.get("emailAddress") || formData.get("contactEmail") || formData.get("email")) as string || "no-email@example.com";
-            let detail1 = "";
-            let detail2 = "";
-
-            if (selectedDeal === "Partnership") {
-              detail1 = formData.get("companyWebsite") as string || "";
-              detail2 = formData.get("proposedCommission") as string || "";
-            } else if (selectedDeal === "Affiliate") {
-              detail1 = formData.get("trafficSource") as string || "";
-              detail2 = `GCash Payout Method: ${(formData.get("payoutMethod") as string || "GCash").toUpperCase()}`;
-            } else if (selectedDeal === "Influencer") {
-              detail1 = `${(formData.get("platform") as string || "TikTok").toUpperCase()} (${formData.get("followers") || 0} followers)`;
-              detail2 = formData.get("profileLink") as string || "";
-            } else if (selectedDeal === "Creator") {
-              detail1 = formData.get("socialLink") as string || "";
-              detail2 = "Art Buyout Design Submission";
-            }
-
-            onAddSubmission({
-              id: `MKT-${Math.floor(100 + Math.random() * 900)}`,
-              type: selectedDeal as any,
-              name,
-              email,
-              detail1,
-              detail2,
-              date: new Date().toISOString().split("T")[0]
-            });
-
-            alert('Application submitted successfully! Your submission is stored in the Admin database.');
-            handleBack();
-            handleBack();
-          }}>
-
-            {/* PARTNERSHIP FORM */}
-            {selectedDeal === "Partnership" && (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Brand/Company Name</label>
-                  <input type="text" name="companyName" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
-                </div>
-                <div>
-                  <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Contact Email</label>
-                  <input type="email" name="contactEmail" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
-                </div>
-                <div>
-                  <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Product Link / Website</label>
-                  <input type="url" name="companyWebsite" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
-                </div>
-                <div className="col-span-1 md:col-span-3">
-                  <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Proposed Commission Structure</label>
-                  <textarea name="proposedCommission" required placeholder="Outline your dealership/commission proposal..." className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)] resize-none" rows={3}></textarea>
-                </div>
+          {formState === "success" ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-green-50 border-4 border-green-600 p-8 text-center space-y-4 shadow-[4px_4px_0_#16a34a]"
+            >
+              <div className="w-16 h-16 bg-green-600 border-4 border-black flex items-center justify-center mx-auto shadow-[2px_2px_0_#000]">
+                <CheckCircle size={32} className="text-white" />
               </div>
-            )}
-
-            {/* AFFILIATE FORM */}
-            {selectedDeal === "Affiliate" && (
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div>
-                  <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Full Name</label>
-                  <input type="text" name="fullName" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
-                </div>
-                <div>
-                  <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Email Address</label>
-                  <input type="email" name="emailAddress" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
-                </div>
-                <div>
-                  <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Primary Traffic Source</label>
-                  <input type="text" name="trafficSource" required placeholder="URL or Handle" className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
-                </div>
-                <div>
-                  <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Preferred Payout</label>
-                  <select name="payoutMethod" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]">
-                    <option value="">Select Method...</option>
-                    <option value="gcash">GCash</option>
-                    <option value="bank">Bank Transfer</option>
-                  </select>
-                </div>
+              <h4 className="font-orbitron font-black uppercase text-green-800 text-lg">Application Registered!</h4>
+              <p className="font-jakarta font-bold text-sm text-green-700 leading-relaxed">
+                Your <span className="font-black">{selectedDeal}</span> proposal has been successfully persisted in the Aeternum database. REDAI Protocol manual review is queued.
+              </p>
+              <p className="font-orbitron text-[10px] text-green-600 uppercase tracking-widest animate-pulse">Auto-redirecting to programs list…</p>
+            </motion.div>
+          ) : formState === "error" ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="bg-red-50 border-4 border-red-500 p-6 text-center space-y-4 shadow-[4px_4px_0_#ef4444]"
+            >
+              <div className="w-16 h-16 bg-red-600 border-4 border-black flex items-center justify-center mx-auto shadow-[2px_2px_0_#000]">
+                <AlertTriangle size={32} className="text-white" />
               </div>
-            )}
-
-            {/* INFLUENCER FORM */}
-            {selectedDeal === "Influencer" && (
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="col-span-1 md:col-span-4 bg-[var(--theme-accent)] text-white p-2 border-2 border-black text-center">
-                  <p className="font-jakarta text-[10px] font-bold uppercase tracking-widest">Scripts and assets will be provided upon approval via email.</p>
-                </div>
-                <div>
-                  <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Full Name</label>
-                  <input type="text" name="fullName" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
-                </div>
-                <div>
-                  <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Email</label>
-                  <input type="email" name="email" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
-                </div>
-                <div>
-                  <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Platform</label>
-                  <select name="platform" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]">
-                    <option value="tiktok">TikTok</option>
-                    <option value="facebook">Facebook</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Followers</label>
-                  <input type="number" name="followers" required min="0" placeholder="e.g. 10000" className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
-                </div>
-                <div className="col-span-1 md:col-span-4">
-                  <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Profile Link</label>
-                  <input type="url" name="profileLink" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
-                </div>
-              </div>
-            )}
-
-            {/* CREATOR FORM */}
-            {selectedDeal === "Creator" && (
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="col-span-1 md:col-span-4 bg-black text-[var(--theme-cyan)] p-2 border-2 border-black text-center">
-                  <p className="font-jakarta text-[10px] font-bold uppercase tracking-widest">We buy cartoon designs for PHP 100.00. Upload your low-res watermarked design.</p>
-                </div>
-                <div className="col-span-1 md:col-span-2">
-                  <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Creator Name</label>
-                  <input type="text" name="creatorName" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
-                </div>
-                <div className="col-span-1 md:col-span-2">
-                  <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Email Address</label>
-                  <input type="email" name="emailAddress" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
-                </div>
-                <div className="col-span-1 md:col-span-2">
-                  <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Portfolio / Social Link</label>
-                  <input type="url" name="socialLink" className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
-                </div>
-                <div className="col-span-1 md:col-span-2">
-                  <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Upload Art File (PNG/JPG)</label>
-                  <input type="file" required accept="image/png, image/jpeg" className="w-full border-2 border-black p-2 font-jakarta font-bold outline-none bg-gray-50 text-black text-sm file:bg-black file:text-white file:border-0 file:px-3 file:py-1 file:font-orbitron file:uppercase file:cursor-pointer hover:file:bg-[var(--theme-accent)] transition-all cursor-pointer" />
-                </div>
-              </div>
-            )}
-
-            <div className="flex justify-end mt-6">
-              <button type="submit" className="px-12 bg-[var(--theme-accent)] text-white font-orbitron font-bold py-3 border-4 border-black hover:bg-black hover:border-white transition-all uppercase text-lg tracking-widest shadow-[4px_4px_0_var(--theme-cyan)]">
-                Submit Application
+              <h4 className="font-orbitron font-black uppercase text-red-800 text-lg">Submission Failed</h4>
+              <p className="font-jakarta font-bold text-sm text-red-700 leading-relaxed">
+                We encountered an error saving your submission. Please try again.
+              </p>
+              <button onClick={() => setFormState("idle")} className="px-6 py-2 bg-black text-white font-orbitron font-black uppercase text-xs tracking-wider border-2 border-black hover:bg-red-600 hover:text-white transition-all shadow-[2px_2px_0_#000]">
+                Try Again
               </button>
-            </div>
+            </motion.div>
+          ) : (
+            <form className="space-y-4" onSubmit={async (e) => {
+              e.preventDefault();
+              const formData = new FormData(e.currentTarget);
+              const name = (formData.get("creatorName") || formData.get("fullName") || formData.get("companyName")) as string || "Anonymous";
+              const email = (formData.get("emailAddress") || formData.get("contactEmail") || formData.get("email")) as string || "no-email@example.com";
+              let detail1 = "";
+              let detail2 = "";
 
-          </form>
+              if (selectedDeal === "Partnership") {
+                detail1 = formData.get("companyWebsite") as string || "";
+                detail2 = formData.get("proposedCommission") as string || "";
+              } else if (selectedDeal === "Affiliate") {
+                detail1 = formData.get("trafficSource") as string || "";
+                detail2 = `GCash Payout Method: ${(formData.get("payoutMethod") as string || "GCash").toUpperCase()}`;
+              } else if (selectedDeal === "Influencer") {
+                detail1 = `${(formData.get("platform") as string || "TikTok").toUpperCase()} (${formData.get("followers") || 0} followers)`;
+                detail2 = formData.get("profileLink") as string || "";
+              } else if (selectedDeal === "Creator") {
+                detail1 = formData.get("socialLink") as string || "";
+                detail2 = "Art Buyout Design Submission";
+              }
+
+              setFormState("loading");
+              try {
+                await submitMarketing({
+                  type: selectedDeal as string,
+                  name,
+                  email,
+                  detail1,
+                  detail2,
+                });
+                setFormState("success");
+                setTimeout(() => {
+                  setFormState("idle");
+                  setViewMode("cards");
+                  setSelectedDeal(null);
+                  setAgreedToRules(false);
+                }, 3000);
+              } catch (err) {
+                console.error(err);
+                setFormState("error");
+              }
+            }}>
+
+              {/* PARTNERSHIP FORM */}
+              {selectedDeal === "Partnership" && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Brand/Company Name</label>
+                    <input type="text" name="companyName" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Contact Email</label>
+                    <input type="email" name="contactEmail" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Product Link / Website</label>
+                    <input type="url" name="companyWebsite" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                  </div>
+                  <div className="col-span-1 md:col-span-3">
+                    <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Proposed Commission Structure</label>
+                    <textarea name="proposedCommission" required placeholder="Outline your dealership/commission proposal..." className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)] resize-none" rows={3}></textarea>
+                  </div>
+                </div>
+              )}
+
+              {/* AFFILIATE FORM */}
+              {selectedDeal === "Affiliate" && (
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Full Name</label>
+                    <input type="text" name="fullName" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Email Address</label>
+                    <input type="email" name="emailAddress" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Primary Traffic Source</label>
+                    <input type="text" name="trafficSource" required placeholder="URL or Handle" className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Preferred Payout</label>
+                    <select name="payoutMethod" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]">
+                      <option value="">Select Method...</option>
+                      <option value="gcash">GCash</option>
+                      <option value="bank">Bank Transfer</option>
+                    </select>
+                  </div>
+                </div>
+              )}
+
+              {/* INFLUENCER FORM */}
+              {selectedDeal === "Influencer" && (
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div className="col-span-1 md:col-span-4 bg-[var(--theme-accent)] text-white p-2 border-2 border-black text-center">
+                    <p className="font-jakarta text-[10px] font-bold uppercase tracking-widest">Scripts and assets will be provided upon approval via email.</p>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Full Name</label>
+                    <input type="text" name="fullName" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Email</label>
+                    <input type="email" name="email" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Platform</label>
+                    <select name="platform" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]">
+                      <option value="tiktok">TikTok</option>
+                      <option value="facebook">Facebook</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Followers</label>
+                    <input type="number" name="followers" required min="0" placeholder="e.g. 10000" className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                  </div>
+                  <div className="col-span-1 md:col-span-4">
+                    <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Profile Link</label>
+                    <input type="url" name="profileLink" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                  </div>
+                </div>
+              )}
+
+              {/* CREATOR FORM */}
+              {selectedDeal === "Creator" && (
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div className="col-span-1 md:col-span-4 bg-black text-[var(--theme-cyan)] p-2 border-2 border-black text-center">
+                    <p className="font-jakarta text-[10px] font-bold uppercase tracking-widest">We buy cartoon designs for PHP 100.00. Upload your low-res watermarked design.</p>
+                  </div>
+                  <div className="col-span-1 md:col-span-2">
+                    <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Creator Name</label>
+                    <input type="text" name="creatorName" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                  </div>
+                  <div className="col-span-1 md:col-span-2">
+                    <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Email Address</label>
+                    <input type="email" name="emailAddress" required className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                  </div>
+                  <div className="col-span-1 md:col-span-2">
+                    <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Portfolio / Social Link</label>
+                    <input type="url" name="socialLink" className="w-full border-2 border-black p-3 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)]" />
+                  </div>
+                  <div className="col-span-1 md:col-span-2">
+                    <label className="block text-[10px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Upload Art File (PNG/JPG)</label>
+                    <input type="file" required accept="image/png, image/jpeg" className="w-full border-2 border-black p-2 font-jakarta font-bold outline-none bg-gray-50 text-black text-sm file:bg-black file:text-white file:border-0 file:px-3 file:py-1 file:font-orbitron file:uppercase file:cursor-pointer hover:file:bg-[var(--theme-accent)] transition-all cursor-pointer" />
+                  </div>
+                </div>
+              )}
+
+              <div className="flex justify-end mt-6">
+                <button type="submit" disabled={formState === "loading"} className={`px-12 font-orbitron font-bold py-3 border-4 border-black transition-all uppercase text-lg tracking-widest shadow-[4px_4px_0_var(--theme-cyan)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none ${formState === "loading" ? "bg-gray-400 text-gray-200 cursor-not-allowed border-black shadow-none" : "bg-[var(--theme-accent)] text-white hover:bg-black hover:border-white"}`}>
+                  {formState === "loading" ? "Submitting…" : "Submit Application"}
+                </button>
+              </div>
+
+            </form>
+          )}
         </motion.div>
       )}
 
@@ -2118,7 +2395,12 @@ function MarketplaceTab() {
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [checkoutItems, setCheckoutItems] = useState<any[]>([]);
   const [activeFilter, setActiveFilter] = useState("All");
-  const [paymentMethod, setPaymentMethod] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("GCash");
+  
+  // Convex integration
+  const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
+  const [isCheckoutSuccess, setIsCheckoutSuccess] = useState(false);
+  const purchaseMutation = useMutation(api.marketplace.purchase);
 
   const products = [
     {
@@ -2454,12 +2736,40 @@ function MarketplaceTab() {
                     </div>
                   </div>
 
-                  <form className="space-y-3" onSubmit={(e) => {
+                  <form className="space-y-3" onSubmit={async (e) => {
                     e.preventDefault();
-                    alert('Purchase submitted! Confirmation details will be emailed to you.');
-                    setIsCheckoutOpen(false);
-                    setCart([]);
+                    setIsCheckoutLoading(true);
+                    
+                    try {
+                      // Log a combined order for all checkout items
+                      const itemName = checkoutItems.length > 1 
+                        ? `Multiple Items (${checkoutItems.length})` 
+                        : checkoutItems[0].name;
+                        
+                      await purchaseMutation({
+                        item: itemName,
+                        subtotal: totalCheckoutPrice,
+                        vat: Math.round(totalCheckoutPrice * 0.12),
+                        total: totalCheckoutPrice + Math.round(totalCheckoutPrice * 0.12)
+                      });
+                      
+                      setIsCheckoutSuccess(true);
+                      setTimeout(() => {
+                        setIsCheckoutOpen(false);
+                        setIsCheckoutSuccess(false);
+                        setCart([]);
+                      }, 2500);
+                    } catch (error) {
+                      console.error("Purchase failed", error);
+                    } finally {
+                      setIsCheckoutLoading(false);
+                    }
                   }}>
+                    {isCheckoutSuccess && (
+                      <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="p-3 bg-green-50 border-2 border-green-600 text-green-800 font-orbitron text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 shadow-[2px_2px_0_#16a34a]">
+                        <CheckCircle size={16} /> Order Received! Confirmation queued.
+                      </motion.div>
+                    )}
                     {/* Row 1: Full Name, Email, Shipping Address (3 Columns!) */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                       <div>
@@ -2506,8 +2816,8 @@ function MarketplaceTab() {
                       </div>
                     </div>
 
-                    <button type="submit" className="w-full bg-[var(--theme-accent)] text-white font-orbitron font-black py-2.5 border-2 border-black hover:bg-black hover:text-white transition-colors uppercase mt-2 text-[9px] tracking-widest shadow-[2px_2px_0_var(--theme-cyan)] rounded-none">
-                      Complete Order
+                    <button type="submit" disabled={isCheckoutLoading || isCheckoutSuccess} className="w-full bg-[var(--theme-accent)] text-white font-orbitron font-black py-2.5 border-2 border-black hover:bg-black hover:text-white transition-colors uppercase mt-2 text-[9px] tracking-widest shadow-[2px_2px_0_var(--theme-cyan)] rounded-none disabled:opacity-50">
+                      {isCheckoutLoading ? "Processing..." : "Complete Order"}
                     </button>
                   </form>
                 </div>
@@ -2521,46 +2831,347 @@ function MarketplaceTab() {
   );
 }
 
+function StatusBadge({ status }: { status: "pending" | "approved" | "rejected" }) {
+  const styles = {
+    pending: "bg-orange-500 text-white border-black",
+    approved: "bg-green-600 text-white border-black",
+    rejected: "bg-gray-600 text-white border-black",
+  };
+  return (
+    <span className={`inline-block text-[8px] font-orbitron font-black uppercase tracking-widest px-2 py-0.5 border-2 ${styles[status]}`}>
+      {status}
+    </span>
+  );
+}
+
+function AdminCareersLedger() {
+  const [subTab, setSubTab] = useState<"applications" | "jobs">("applications");
+
+  // Applications state
+  const [careerFilter, setCareerFilter] = useState<"all" | "pending" | "approved" | "rejected">("all");
+  const [expandedMsg, setExpandedMsg] = useState<string | null>(null);
+  const allApplications = useQuery(api.careers.list) ?? [];
+  const updateAppStatus = useMutation(api.careers.updateStatus);
+  const filteredApps = careerFilter === "all" ? allApplications : allApplications.filter(a => a.status === careerFilter);
+
+  // Job postings state
+  const allJobs = useQuery(api.jobs.listAll) ?? [];
+  const addJob = useMutation(api.jobs.add);
+  const removeJob = useMutation(api.jobs.remove);
+  const toggleJobActive = useMutation(api.jobs.toggleActive);
+  const [jobSuccess, setJobSuccess] = useState(false);
+  const [jobDeleteConfirm, setJobDeleteConfirm] = useState<string | null>(null);
+
+  return (
+    <div className="bg-white border-4 border-black p-4 sm:p-6 shadow-[8px_8px_0_#000] animate-fadeIn space-y-6">
+      {/* Dashboard Header */}
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between border-b-4 border-black pb-4 gap-4">
+        <div>
+          <span className="text-[9px] font-orbitron font-black bg-black text-white px-2 py-0.5 uppercase tracking-widest">ADMIN COMMAND</span>
+          <h3 className="text-xl sm:text-3xl font-orbitron font-black uppercase text-black leading-none mt-1">CAREERS DASHBOARD</h3>
+          <p className="font-jakarta font-bold text-[10px] text-gray-500 mt-0.5">Real-time · Backed by Convex DB</p>
+        </div>
+        {/* Sub-tab switcher */}
+        <div className="flex gap-0 border-2 border-black flex-shrink-0">
+          <button
+            onClick={() => setSubTab("applications")}
+            className={`px-4 py-2 font-orbitron font-black uppercase text-[9px] tracking-wider border-r-2 border-black transition-all ${subTab === "applications" ? "bg-black text-white" : "bg-white text-black hover:bg-gray-100"}`}
+          >
+            Applications
+            <span className={`ml-1.5 text-[8px] px-1 py-0.5 border ${subTab === "applications" ? "border-white text-white" : "border-black text-black"}`}>
+              {allApplications.filter(a => a.status === "pending").length}
+            </span>
+          </button>
+          <button
+            onClick={() => setSubTab("jobs")}
+            className={`px-4 py-2 font-orbitron font-black uppercase text-[9px] tracking-wider transition-all ${subTab === "jobs" ? "bg-[var(--theme-accent)] text-white" : "bg-white text-black hover:bg-gray-100"}`}
+          >
+            Job Postings
+            <span className={`ml-1.5 text-[8px] px-1 py-0.5 border ${subTab === "jobs" ? "border-white text-white" : "border-black text-black"}`}>
+              {allJobs.filter(j => j.isActive).length}
+            </span>
+          </button>
+        </div>
+      </div>
+
+      {/* ── APPLICATIONS PANEL ── */}
+      {subTab === "applications" && (
+        <div className="space-y-4 animate-fadeIn">
+          {/* Stats Row */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-[10px] bg-black text-white px-2.5 py-0.5 font-orbitron font-black uppercase tracking-widest">{allApplications.length} TOTAL</span>
+            <span className="text-[10px] bg-green-600 text-white px-2.5 py-0.5 font-orbitron font-black uppercase tracking-widest">{allApplications.filter(a=>a.status==="approved").length} APPROVED</span>
+            <span className="text-[10px] bg-orange-500 text-white px-2.5 py-0.5 font-orbitron font-black uppercase tracking-widest">{allApplications.filter(a=>a.status==="pending").length} PENDING</span>
+            <span className="text-[10px] bg-gray-600 text-white px-2.5 py-0.5 font-orbitron font-black uppercase tracking-widest">{allApplications.filter(a=>a.status==="rejected").length} REJECTED</span>
+          </div>
+
+          {/* Filter tabs */}
+          <div className="flex gap-1.5 flex-wrap">
+            {(["all", "pending", "approved", "rejected"] as const).map(f => (
+              <button key={f} onClick={() => setCareerFilter(f)} className={`px-3 py-1.5 font-orbitron font-black uppercase text-[9px] tracking-wider border-2 border-black transition-all ${careerFilter === f ? f === "approved" ? "bg-green-600 text-white shadow-none" : f === "rejected" ? "bg-gray-600 text-white shadow-none" : f === "pending" ? "bg-orange-500 text-white shadow-none" : "bg-[var(--theme-accent)] text-white shadow-none" : "bg-white text-black hover:bg-gray-50 shadow-[2px_2px_0_#000]"}`}>
+                {f === "all" ? `All (${allApplications.length})` : `${f} (${allApplications.filter(a=>a.status===f).length})`}
+              </button>
+            ))}
+          </div>
+
+          {/* Empty State */}
+          {filteredApps.length === 0 ? (
+            <div className="text-center py-12 bg-gray-50 border-2 border-black">
+              <p className="font-orbitron font-bold uppercase text-xs text-gray-500 mb-1">
+                {careerFilter === "all" ? "No applications in the pipeline yet." : `No ${careerFilter} applications.`}
+              </p>
+              <p className="font-jakarta text-xs text-gray-400 font-bold">Submit an application from the Careers tab to see it appear here in real-time.</p>
+            </div>
+          ) : (
+            <>
+              {/* Mobile Cards */}
+              <div className="block md:hidden space-y-4">
+                {filteredApps.map((app) => (
+                  <div key={app._id} className={`border-2 border-black p-4 font-jakarta font-bold text-xs space-y-2.5 shadow-[4px_4px_0_#000] ${app.status === "rejected" ? "opacity-60 bg-gray-100" : "bg-gray-50"}`}>
+                    <div className="flex justify-between items-start border-b-2 border-black pb-2">
+                      <div className="flex flex-col gap-1">
+                        <span className="font-orbitron text-[8px] bg-black text-white px-2 py-0.5 uppercase font-black tracking-wider self-start">{new Date(app.appliedAt).toLocaleDateString()}</span>
+                        <StatusBadge status={app.status} />
+                      </div>
+                      <span className="font-orbitron text-[8px] text-gray-500 font-bold text-right">{app.appliedRole}</span>
+                    </div>
+                    <div><span className="text-gray-400 uppercase tracking-widest text-[8px] font-orbitron block mb-0.5">Applicant</span><span className="uppercase text-xs text-black font-extrabold">{app.fullName}</span></div>
+                    <div><span className="text-gray-400 uppercase tracking-widest text-[8px] font-orbitron block mb-0.5">Email</span><span className="lowercase text-gray-700 break-all text-xs font-semibold">{app.emailAddress}</span></div>
+                    {app.portfolioLink && (<div><span className="text-gray-400 uppercase tracking-widest text-[8px] font-orbitron block mb-0.5">Portfolio</span><a href={app.portfolioLink} target="_blank" rel="noreferrer" className="text-[var(--theme-accent)] hover:underline break-all font-mono text-[10px] block">{app.portfolioLink}</a></div>)}
+                    {app.message && (<div><span className="text-gray-400 uppercase tracking-widest text-[8px] font-orbitron block mb-0.5">Cover Message</span><p className="text-[11px] text-gray-700 italic font-semibold leading-relaxed">{app.message}</p></div>)}
+                    {app.status === "pending" && (
+                      <div className="flex gap-2 pt-2 border-t border-black/15">
+                        <button onClick={() => void updateAppStatus({ id: app._id, status: "approved" })} className="flex-1 bg-green-600 hover:bg-black text-white font-orbitron font-black uppercase text-[9px] tracking-wider py-2 border-2 border-black transition-colors cursor-pointer shadow-[2px_2px_0_#000]">Approve</button>
+                        <button onClick={() => void updateAppStatus({ id: app._id, status: "rejected" })} className="flex-1 bg-gray-600 hover:bg-black text-white font-orbitron font-black uppercase text-[9px] tracking-wider py-2 border-2 border-black transition-colors cursor-pointer shadow-[2px_2px_0_#000]">Reject</button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Desktop Table */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full text-left border-collapse border-2 border-black">
+                  <thead>
+                    <tr className="bg-black text-white font-orbitron font-bold uppercase text-[9px] tracking-widest">
+                      <th className="p-3 border border-black">Date</th>
+                      <th className="p-3 border border-black">Applicant</th>
+                      <th className="p-3 border border-black">Role Applied</th>
+                      <th className="p-3 border border-black">Email</th>
+                      <th className="p-3 border border-black">Portfolio</th>
+                      <th className="p-3 border border-black">Message</th>
+                      <th className="p-3 border border-black">Status</th>
+                      <th className="p-3 border border-black text-center">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="font-jakarta font-bold text-xs bg-white text-black">
+                    {filteredApps.map((app) => (
+                      <tr key={app._id} className={`border-b-2 border-black transition-colors hover:bg-gray-50 ${app.status === "rejected" ? "opacity-50" : ""}`}>
+                        <td className="p-3 border border-black font-orbitron text-[9px] whitespace-nowrap">{new Date(app.appliedAt).toLocaleDateString()}</td>
+                        <td className="p-3 border border-black font-black uppercase whitespace-nowrap">{app.fullName}</td>
+                        <td className="p-3 border border-black"><span className="text-[9px] font-orbitron font-black uppercase tracking-wider text-[var(--theme-accent)]">{app.appliedRole}</span></td>
+                        <td className="p-3 border border-black lowercase text-gray-600 text-[11px]">{app.emailAddress}</td>
+                        <td className="p-3 border border-black max-w-[120px]">
+                          {app.portfolioLink ? (<a href={app.portfolioLink} target="_blank" rel="noreferrer" className="text-[var(--theme-accent)] hover:underline break-all font-mono text-[9px]">{app.portfolioLink}</a>) : <span className="text-gray-400 italic text-[10px]">—</span>}
+                        </td>
+                        <td className="p-3 border border-black max-w-[150px]">
+                          {app.message ? (
+                            <div>
+                              <p className={`text-[10px] text-gray-700 italic leading-snug ${expandedMsg === app._id ? "" : "line-clamp-2"}`}>{app.message}</p>
+                              <button onClick={() => setExpandedMsg(expandedMsg === app._id ? null : app._id)} className="text-[8px] font-orbitron font-black uppercase tracking-wider text-[var(--theme-accent)] hover:underline mt-0.5">{expandedMsg === app._id ? "Less" : "More"}</button>
+                            </div>
+                          ) : <span className="text-gray-400 italic text-[10px]">—</span>}
+                        </td>
+                        <td className="p-3 border border-black"><StatusBadge status={app.status} /></td>
+                        <td className="p-3 border border-black text-center">
+                          {app.status === "pending" ? (
+                            <div className="flex justify-center gap-1.5">
+                              <button onClick={() => void updateAppStatus({ id: app._id, status: "approved" })} className="bg-green-600 hover:bg-black text-white font-orbitron font-black uppercase text-[8px] tracking-wider px-2.5 py-1.5 border border-black transition-colors cursor-pointer">Approve</button>
+                              <button onClick={() => void updateAppStatus({ id: app._id, status: "rejected" })} className="bg-gray-600 hover:bg-black text-white font-orbitron font-black uppercase text-[8px] tracking-wider px-2.5 py-1.5 border border-black transition-colors cursor-pointer">Reject</button>
+                            </div>
+                          ) : <span className="font-orbitron text-[8px] uppercase text-gray-400 tracking-widest">—</span>}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* ── JOB POSTINGS PANEL ── */}
+      {subTab === "jobs" && (
+        <div className="space-y-8 animate-fadeIn">
+          {/* Add New Job Form */}
+          <div className="border-4 border-black p-5 bg-gray-50 shadow-[4px_4px_0_#000]">
+            <div className="flex items-center gap-3 mb-4 border-b-2 border-black pb-3">
+              <div className="w-8 h-8 bg-[var(--theme-accent)] border-2 border-black flex items-center justify-center flex-shrink-0">
+                <Plus size={16} className="text-white" />
+              </div>
+              <div>
+                <h4 className="font-orbitron font-black text-sm uppercase">Add New Career Post</h4>
+                <p className="font-jakarta font-bold text-[10px] text-gray-500">New posts appear on the live Careers page instantly.</p>
+              </div>
+            </div>
+            {jobSuccess && (
+              <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="bg-green-50 border-2 border-green-600 p-3 mb-4 flex items-center gap-2 shadow-[2px_2px_0_#16a34a]">
+                <CheckCircle size={14} className="text-green-600" />
+                <span className="font-orbitron font-black text-[10px] uppercase tracking-widest text-green-800">Job post published successfully!</span>
+              </motion.div>
+            )}
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                const fd = new FormData(e.currentTarget);
+                await addJob({
+                  title: fd.get("title") as string,
+                  badge: (fd.get("badge") as string).toUpperCase(),
+                  color: fd.get("color") as string,
+                  salary: fd.get("salary") as string,
+                  type: fd.get("type") as string,
+                  desc: fd.get("desc") as string,
+                  requirements: (fd.get("requirements") as string).split(",").map(r => r.trim()).filter(Boolean),
+                });
+                (e.target as HTMLFormElement).reset();
+                setJobSuccess(true);
+                setTimeout(() => setJobSuccess(false), 3000);
+              }}
+              className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+            >
+              <div>
+                <label className="block text-[9px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Job Title <span className="text-[var(--theme-accent)]">*</span></label>
+                <input name="title" required placeholder="e.g. Senior AI Engineer" className="w-full border-2 border-black p-2.5 font-jakarta font-bold text-xs bg-white outline-none focus:border-[var(--theme-accent)] transition-colors" />
+              </div>
+              <div>
+                <label className="block text-[9px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Department Badge <span className="text-[var(--theme-accent)]">*</span></label>
+                <input name="badge" required placeholder="e.g. ENGINEERING" className="w-full border-2 border-black p-2.5 font-jakarta font-bold text-xs bg-white outline-none focus:border-[var(--theme-accent)] transition-colors" />
+              </div>
+              <div>
+                <label className="block text-[9px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Badge Color <span className="text-[var(--theme-accent)]">*</span></label>
+                <div className="flex gap-2">
+                  <input name="color" required type="color" defaultValue="#dc2626" className="w-10 h-10 border-2 border-black cursor-pointer bg-white p-0.5" />
+                  <input name="colorText" placeholder="#7c3aed or CSS var" className="flex-1 border-2 border-black p-2.5 font-jakarta font-bold text-xs bg-white outline-none focus:border-[var(--theme-accent)] transition-colors"
+                    onChange={(e) => {
+                      const colorInput = e.currentTarget.closest("div")?.querySelector("input[type=color]") as HTMLInputElement;
+                      if (colorInput && e.target.value) colorInput.value = e.target.value;
+                    }}
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-[9px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Salary Range <span className="text-[var(--theme-accent)]">*</span></label>
+                <input name="salary" required placeholder="e.g. PHP 80,000–120,000 / mo" className="w-full border-2 border-black p-2.5 font-jakarta font-bold text-xs bg-white outline-none focus:border-[var(--theme-accent)] transition-colors" />
+              </div>
+              <div>
+                <label className="block text-[9px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Work Type <span className="text-[var(--theme-accent)]">*</span></label>
+                <input name="type" required placeholder="e.g. Remote · Full-Time" className="w-full border-2 border-black p-2.5 font-jakarta font-bold text-xs bg-white outline-none focus:border-[var(--theme-accent)] transition-colors" />
+              </div>
+              <div>
+                <label className="block text-[9px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Requirements <span className="text-[var(--theme-accent)]">*</span> <span className="normal-case font-jakarta text-gray-400">(comma-separated)</span></label>
+                <input name="requirements" required placeholder="React, TypeScript, 3+ yrs experience" className="w-full border-2 border-black p-2.5 font-jakarta font-bold text-xs bg-white outline-none focus:border-[var(--theme-accent)] transition-colors" />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="block text-[9px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Job Description <span className="text-[var(--theme-accent)]">*</span></label>
+                <textarea name="desc" required rows={2} placeholder="Brief description of the role and what you'll be building…" className="w-full border-2 border-black p-2.5 font-jakarta font-bold text-xs bg-white outline-none focus:border-[var(--theme-accent)] transition-colors resize-none" />
+              </div>
+              <div className="sm:col-span-2">
+                <button type="submit" className="w-full bg-black text-white font-orbitron font-black uppercase text-xs tracking-widest py-3 border-2 border-black hover:bg-[var(--theme-accent)] transition-colors shadow-[3px_3px_0_#555] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none">
+                  Publish Job Post →
+                </button>
+              </div>
+            </form>
+          </div>
+
+          {/* Existing Job Postings List */}
+          <div className="space-y-3">
+            <h4 className="font-orbitron font-black text-sm uppercase border-b-2 border-black pb-2">
+              Current Postings
+              <span className="ml-2 text-[9px] font-normal text-gray-500">({allJobs.filter(j => j.isActive).length} active · {allJobs.filter(j => !j.isActive).length} archived)</span>
+            </h4>
+            {allJobs.length === 0 ? (
+              <div className="text-center py-10 bg-gray-50 border-2 border-black">
+                <p className="font-orbitron font-bold text-xs text-gray-500 uppercase">No job posts yet. Add one above!</p>
+              </div>
+            ) : (
+              allJobs.map(job => (
+                <div key={job._id} className={`border-2 border-black p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 transition-opacity ${!job.isActive ? "opacity-50 bg-gray-100" : "bg-white shadow-[2px_2px_0_#000]"}`}>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <span className="text-[8px] font-orbitron font-black uppercase tracking-widest px-2 py-0.5 border border-black text-white" style={{ backgroundColor: job.color }}>{job.badge}</span>
+                      {!job.isActive && <span className="text-[8px] font-orbitron font-black uppercase tracking-widest px-2 py-0.5 border-2 border-gray-400 text-gray-500">ARCHIVED</span>}
+                    </div>
+                    <h5 className="font-orbitron font-black text-sm uppercase">{job.title}</h5>
+                    <p className="font-jakarta font-bold text-[10px] text-gray-500 mt-0.5">{job.type} · {job.salary}</p>
+                    <p className="font-jakarta text-xs text-gray-600 mt-1 line-clamp-1">{job.desc}</p>
+                  </div>
+                  <div className="flex gap-2 flex-shrink-0">
+                    <button
+                      onClick={() => void toggleJobActive({ id: job._id, isActive: !job.isActive })}
+                      className="px-3 py-1.5 border-2 border-black font-orbitron font-black uppercase text-[9px] tracking-wider hover:bg-gray-100 transition-colors"
+                    >
+                      {job.isActive ? "Archive" : "Activate"}
+                    </button>
+                    {jobDeleteConfirm === job._id ? (
+                      <div className="flex gap-1">
+                        <button onClick={() => { void removeJob({ id: job._id }); setJobDeleteConfirm(null); }} className="px-3 py-1.5 bg-red-600 text-white border-2 border-black font-orbitron font-black uppercase text-[9px] tracking-wider hover:bg-black transition-colors">Confirm</button>
+                        <button onClick={() => setJobDeleteConfirm(null)} className="px-3 py-1.5 bg-white border-2 border-black font-orbitron font-black uppercase text-[9px] tracking-wider hover:bg-gray-100 transition-colors">Cancel</button>
+                      </div>
+                    ) : (
+                      <button onClick={() => setJobDeleteConfirm(job._id)} className="px-3 py-1.5 border-2 border-red-600 text-red-600 font-orbitron font-black uppercase text-[9px] tracking-wider hover:bg-red-600 hover:text-white transition-colors">Delete</button>
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+
 function AdminDashboardTab({
   user,
   setIsSignInModalOpen,
-  careerApplications,
-  marketingSubmissions
 }: {
   user: any;
   setIsSignInModalOpen: (open: boolean) => void;
-  careerApplications: Array<{ id: string; fullName: string; emailAddress: string; portfolioLink: string; date: string }>;
-  marketingSubmissions: Array<{ id: string; type: "Partnership" | "Affiliate" | "Influencer" | "Creator"; name: string; email: string; detail1: string; detail2?: string; date: string }>;
 }) {
   const [adminTab, setAdminTab] = useState<"overview" | "careers" | "marketplace" | "marketing">("overview");
+  
+  // Custom states for Overview filtering
+  const allApplications = useQuery(api.careers.list) ?? [];
+  // Live marketing submissions from Convex (admin-only query — returns [] if not admin yet)
+  const marketingSubmissions = useQuery(api.marketing.list) ?? [];
 
-  // Custom states for Transaction ledger (Marketplace VAT calculator)
-  const [transactions, setTransactions] = useState([
-    { id: "TXN-704", item: "REDAI Developer API - 100K Units", subtotal: 9000, vat: 1080, total: 10080, date: "2026-05-16" },
-    { id: "TXN-703", item: "REDAI Enterprise Plan (Annual)", subtotal: 45000, vat: 5400, total: 50400, date: "2026-05-15" },
-    { id: "TXN-702", item: "Neo-Brutalism Premium UI Toolkit", subtotal: 2500, vat: 300, total: 2800, date: "2026-05-15" },
-    { id: "TXN-701", item: "Aeternum Collaboration Protocol", subtotal: 12000, vat: 1440, total: 13440, date: "2026-05-14" },
-  ]);
+  // Live states for Transaction ledger (Marketplace VAT calculator)
+  const transactions = useQuery(api.marketplace.list) ?? [];
+  const logOrder = useMutation(api.marketplace.logOrder);
+  
   const [newItemName, setNewItemName] = useState("");
   const [newItemSubtotal, setNewItemSubtotal] = useState<number>(0);
+  const [txSuccess, setTxSuccess] = useState(false);
 
-  const handleAddTransaction = (e: React.FormEvent) => {
+  const handleAddTransaction = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newItemName || newItemSubtotal <= 0) return;
     const vat = Math.round(newItemSubtotal * 0.12);
     const total = newItemSubtotal + vat;
-    const newTx = {
-      id: `TXN-${Math.floor(705 + Math.random() * 200)}`,
+    
+    await logOrder({
       item: newItemName,
       subtotal: newItemSubtotal,
       vat,
       total,
-      date: new Date().toISOString().split("T")[0]
-    };
-    setTransactions([newTx, ...transactions]);
+    });
+    
     setNewItemName("");
     setNewItemSubtotal(0);
-    alert("Transaction added successfully!");
+    setTxSuccess(true);
+    setTimeout(() => setTxSuccess(false), 3000);
   };
 
   // Access Control check
@@ -2621,7 +3232,7 @@ function AdminDashboardTab({
       <div className="flex overflow-x-auto md:flex-wrap gap-2 mb-8 border-b-2 border-black pb-4 scrollbar-none px-1">
         {[
           { id: "overview", label: "Overview & Clicks" },
-          { id: "careers", label: `Careers (${careerApplications.length})` },
+          { id: "careers", label: `Careers (${allApplications.length})` },
           { id: "marketplace", label: "Marketplace & VAT Ledger" },
           { id: "marketing", label: `Marketing & Referrals (${marketingSubmissions.length})` },
         ].map((tab) => (
@@ -2754,116 +3365,7 @@ function AdminDashboardTab({
 
       {/* Career Applications Panel */}
       {adminTab === "careers" && (
-        <div className="brutal-container bg-white border-4 border-black p-4 sm:p-6 shadow-[8px_8px_0_#000] animate-fadeIn">
-          <h3 className="text-base sm:text-xl font-orbitron font-bold uppercase text-black mb-4 flex flex-col sm:flex-row sm:items-center justify-between border-b-2 border-black pb-2 gap-2">
-            <span>CAREERS APPLICATIONS LEDGER</span>
-            <span className="text-[10px] sm:text-xs bg-black text-white px-2.5 py-0.5 font-black uppercase tracking-widest self-start sm:self-auto">{careerApplications.length} CANDIDATES</span>
-          </h3>
-
-          {careerApplications.length === 0 ? (
-            <div className="text-center py-12 bg-gray-50 border-2 border-black">
-              <p className="font-orbitron font-bold uppercase text-xs text-gray-500 mb-2">No submissions captured yet.</p>
-              <p className="font-jakarta text-xs text-gray-400 font-bold">Apply using the Careers Tab to test dynamic pipeline syncing!</p>
-            </div>
-          ) : (
-            <>
-              {/* Mobile Card Stack View (Visible on small screens) */}
-              <div className="block md:hidden space-y-4">
-                {careerApplications.map((app) => (
-                  <div key={app.id} className="border-2 border-black p-4 bg-gray-50 font-jakarta font-bold text-xs space-y-2.5 relative shadow-[4px_4px_0_#000]">
-                    <div className="flex justify-between items-center border-b-2 border-black pb-2">
-                      <span className="font-orbitron text-[9px] bg-black text-white px-2 py-0.5 border border-black uppercase font-black tracking-wider">{app.id}</span>
-                      <span className="font-orbitron text-[9px] text-gray-500 font-bold">{app.date}</span>
-                    </div>
-                    <div>
-                      <span className="text-gray-400 uppercase tracking-widest text-[8px] font-orbitron block mb-0.5">Applicant</span>
-                      <span className="uppercase text-xs sm:text-sm text-black font-extrabold">{app.fullName}</span>
-                    </div>
-                    <div>
-                      <span className="text-gray-400 uppercase tracking-widest text-[8px] font-orbitron block mb-0.5">Email Address</span>
-                      <span className="lowercase text-gray-700 break-all text-xs font-semibold">{app.emailAddress}</span>
-                    </div>
-                    <div>
-                      <span className="text-gray-400 uppercase tracking-widest text-[8px] font-orbitron block mb-0.5">Portfolio / Resume</span>
-                      {app.portfolioLink ? (
-                        <a href={app.portfolioLink} target="_blank" rel="noreferrer" className="text-[var(--theme-accent)] hover:underline break-all font-mono text-[10px] block">
-                          {app.portfolioLink}
-                        </a>
-                      ) : (
-                        <span className="text-gray-400 italic">None Provided</span>
-                      )}
-                    </div>
-                    <div className="flex gap-2 pt-3 border-t border-black/15">
-                      <button
-                        onClick={() => alert(`Applicant ${app.fullName} APPROVED. Contract sent via ${app.emailAddress}`)}
-                        className="flex-1 bg-green-600 hover:bg-black text-white font-orbitron font-black uppercase text-[9px] tracking-wider py-2 border-2 border-black transition-colors cursor-pointer shadow-[2px_2px_0_#000] active:translate-x-0.5 active:translate-y-0.5"
-                      >
-                        Approve
-                      </button>
-                      <button
-                        onClick={() => alert(`Applicant ${app.fullName} archived.`)}
-                        className="flex-1 bg-gray-600 hover:bg-black text-white font-orbitron font-black uppercase text-[9px] tracking-wider py-2 border-2 border-black transition-colors cursor-pointer shadow-[2px_2px_0_#000] active:translate-x-0.5 active:translate-y-0.5"
-                      >
-                        Reject
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Desktop Ledger View (Visible on medium screens and up) */}
-              <div className="hidden md:block overflow-x-auto">
-                <table className="w-full text-left border-collapse border-2 border-black">
-                  <thead>
-                    <tr className="bg-black text-white font-orbitron font-bold uppercase text-[9px] tracking-widest">
-                      <th className="p-3 border border-black">ID</th>
-                      <th className="p-3 border border-black">Applicant</th>
-                      <th className="p-3 border border-black">Email</th>
-                      <th className="p-3 border border-black">Portfolio / Resume</th>
-                      <th className="p-3 border border-black">Applied Date</th>
-                      <th className="p-3 border border-black text-center">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="font-jakarta font-bold text-xs bg-white text-black divide-y-2 divide-black">
-                    {careerApplications.map((app) => (
-                      <tr key={app.id} className="hover:bg-gray-50 transition-colors">
-                        <td className="p-3 border border-black font-orbitron text-[10px] bg-gray-50">{app.id}</td>
-                        <td className="p-3 border border-black uppercase">{app.fullName}</td>
-                        <td className="p-3 border border-black lowercase text-gray-600">{app.emailAddress}</td>
-                        <td className="p-3 border border-black">
-                          {app.portfolioLink ? (
-                            <a href={app.portfolioLink} target="_blank" rel="noreferrer" className="text-[var(--theme-accent)] hover:underline break-all font-mono text-[10px]">
-                              {app.portfolioLink}
-                            </a>
-                          ) : (
-                            <span className="text-gray-400 italic">None Provided</span>
-                          )}
-                        </td>
-                        <td className="p-3 border border-black font-orbitron text-[10px]">{app.date}</td>
-                        <td className="p-3 border border-black text-center">
-                          <div className="flex justify-center gap-1.5">
-                            <button
-                              onClick={() => alert(`Applicant ${app.fullName} APPROVED. Contract sent via ${app.emailAddress}`)}
-                              className="bg-green-600 hover:bg-black text-white font-orbitron font-black uppercase text-[8px] tracking-wider px-2.5 py-1 border border-black transition-colors cursor-pointer"
-                            >
-                              Approve
-                            </button>
-                            <button
-                              onClick={() => alert(`Applicant ${app.fullName} archived.`)}
-                              className="bg-gray-600 hover:bg-black text-white font-orbitron font-black uppercase text-[8px] tracking-wider px-2.5 py-1 border border-black transition-colors cursor-pointer"
-                            >
-                              Reject
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </>
-          )}
-        </div>
+        <AdminCareersLedger />
       )}
 
       {/* Marketplace & VAT ledger */}
@@ -2920,6 +3422,17 @@ function AdminDashboardTab({
                 </div>
               </div>
 
+              {txSuccess && (
+                <motion.div
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="flex items-center gap-2 bg-green-50 border-2 border-green-600 px-3 py-2 shadow-[2px_2px_0_#16a34a]"
+                >
+                  <CheckCircle size={14} className="text-green-600 flex-shrink-0" />
+                  <span className="font-orbitron font-black uppercase text-[9px] tracking-wider text-green-800">Transaction logged successfully!</span>
+                </motion.div>
+              )}
               <button
                 type="submit"
                 className="w-full bg-black text-white font-orbitron font-bold py-2.5 border-2 border-black hover:bg-[var(--theme-accent)] hover:text-white transition-all uppercase text-xs tracking-widest shadow-[3px_3px_0_var(--theme-cyan)] cursor-pointer"
@@ -2941,10 +3454,10 @@ function AdminDashboardTab({
             {/* Mobile Card Stack View (Visible on small screens) */}
             <div className="block md:hidden space-y-4">
               {transactions.map((txn) => (
-                <div key={txn.id} className="border-2 border-black p-4 bg-gray-50 font-jakarta font-bold text-xs space-y-2 shadow-[4px_4px_0_#000]">
+                <div key={txn._id} className="border-2 border-black p-4 bg-gray-50 font-jakarta font-bold text-xs space-y-2 shadow-[4px_4px_0_#000]">
                   <div className="flex justify-between items-center border-b-2 border-black pb-2">
-                    <span className="font-orbitron text-[9px] bg-black text-white px-2 py-0.5 border border-black uppercase font-black tracking-wider">{txn.id}</span>
-                    <span className="font-orbitron text-[9px] text-gray-500 font-bold">{txn.date}</span>
+                    <span className="font-orbitron text-[9px] bg-black text-white px-2 py-0.5 border border-black uppercase font-black tracking-wider">TXN-{txn._id.slice(-6).toUpperCase()}</span>
+                    <span className="font-orbitron text-[9px] text-gray-500 font-bold">{new Date(txn.timestamp).toLocaleDateString()}</span>
                   </div>
                   <div>
                     <span className="text-gray-400 uppercase tracking-widest text-[8px] font-orbitron block mb-0.5">Item Purchased</span>
@@ -2983,13 +3496,13 @@ function AdminDashboardTab({
                 </thead>
                 <tbody className="font-jakarta font-bold text-xs bg-white text-black divide-y-2 divide-black">
                   {transactions.map((txn) => (
-                    <tr key={txn.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="p-3 border border-black font-orbitron text-[10px] bg-gray-50">{txn.id}</td>
+                    <tr key={txn._id} className="hover:bg-gray-50 transition-colors">
+                      <td className="p-3 border border-black font-orbitron text-[10px] bg-gray-50">TXN-{txn._id.slice(-6).toUpperCase()}</td>
                       <td className="p-3 border border-black uppercase">{txn.item}</td>
                       <td className="p-3 border border-black text-right font-mono text-[11px]">PHP {txn.subtotal.toLocaleString()}</td>
                       <td className="p-3 border border-black text-right font-mono text-[11px] text-red-600">+PHP {txn.vat.toLocaleString()}</td>
                       <td className="p-3 border border-black text-right font-mono text-xs font-black text-green-600">PHP {txn.total.toLocaleString()}</td>
-                      <td className="p-3 border border-black font-orbitron text-[10px]">{txn.date}</td>
+                      <td className="p-3 border border-black font-orbitron text-[10px]">{new Date(txn.timestamp).toLocaleDateString()}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -3028,10 +3541,10 @@ function AdminDashboardTab({
                 {/* Mobile Card Stack View (Visible on small screens) */}
                 <div className="block md:hidden space-y-4">
                   {marketingSubmissions.map((sub) => (
-                    <div key={sub.id} className="border-2 border-black p-4 bg-gray-50 font-jakarta font-bold text-xs space-y-2.5 shadow-[4px_4px_0_#000]">
+                    <div key={sub._id} className="border-2 border-black p-4 bg-gray-50 font-jakarta font-bold text-xs space-y-2.5 shadow-[4px_4px_0_#000]">
                       <div className="flex justify-between items-center border-b-2 border-black pb-2">
-                        <span className="font-orbitron text-[9px] bg-black text-white px-2 py-0.5 border border-black uppercase font-black tracking-wider">{sub.id}</span>
-                        <span className="font-orbitron text-[9px] text-gray-500 font-bold">{sub.date}</span>
+                        <span className="font-orbitron text-[9px] bg-black text-white px-2 py-0.5 border border-black uppercase font-black tracking-wider">MKT-{sub._id.slice(-6).toUpperCase()}</span>
+                        <span className="font-orbitron text-[9px] text-gray-500 font-bold">{new Date(sub.timestamp).toLocaleDateString()}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-gray-400 uppercase tracking-widest text-[8px] font-orbitron">Deal Program:</span>
@@ -3078,8 +3591,8 @@ function AdminDashboardTab({
                     </thead>
                     <tbody className="font-jakarta font-bold text-xs bg-white text-black divide-y-2 divide-black">
                       {marketingSubmissions.map((sub) => (
-                        <tr key={sub.id} className="hover:bg-gray-50 transition-colors">
-                          <td className="p-3 border border-black font-orbitron text-[10px] bg-gray-50">{sub.id}</td>
+                        <tr key={sub._id} className="hover:bg-gray-50 transition-colors">
+                          <td className="p-3 border border-black font-orbitron text-[10px] bg-gray-50">MKT-{sub._id.slice(-6).toUpperCase()}</td>
                           <td className="p-3 border border-black">
                             <span className={`font-orbitron font-black text-[9px] px-2 py-0.5 border border-black uppercase text-white ${sub.type === "Partnership" ? "bg-red-600" :
                               sub.type === "Affiliate" ? "bg-cyan-600" :
@@ -3092,7 +3605,7 @@ function AdminDashboardTab({
                           <td className="p-3 border border-black lowercase text-gray-600">{sub.email}</td>
                           <td className="p-3 border border-black font-mono text-[9px] break-all">{sub.detail1}</td>
                           <td className="p-3 border border-black font-mono text-[9px] break-all">{sub.detail2 || "N/A"}</td>
-                          <td className="p-3 border border-black font-orbitron text-[10px]">{sub.date}</td>
+                          <td className="p-3 border border-black font-orbitron text-[10px]">{new Date(sub.timestamp).toLocaleDateString()}</td>
                         </tr>
                       ))}
                     </tbody>

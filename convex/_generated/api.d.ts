@@ -11,8 +11,13 @@
 import type * as ai from "../ai.js";
 import type * as auth from "../auth.js";
 import type * as blogs from "../blogs.js";
+import type * as careers from "../careers.js";
 import type * as credits from "../credits.js";
 import type * as http from "../http.js";
+import type * as jobs from "../jobs.js";
+import type * as marketing from "../marketing.js";
+import type * as marketplace from "../marketplace.js";
+import type * as referrals from "../referrals.js";
 import type * as users from "../users.js";
 
 import type {
@@ -25,8 +30,13 @@ declare const fullApi: ApiFromModules<{
   ai: typeof ai;
   auth: typeof auth;
   blogs: typeof blogs;
+  careers: typeof careers;
   credits: typeof credits;
   http: typeof http;
+  jobs: typeof jobs;
+  marketing: typeof marketing;
+  marketplace: typeof marketplace;
+  referrals: typeof referrals;
   users: typeof users;
 }>;
 
