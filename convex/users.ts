@@ -1,5 +1,6 @@
 import { query } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
+import { v } from "convex/values";
 
 export const current = query({
   args: {},
@@ -33,5 +34,18 @@ export const checkAuth = query({
   args: {},
   handler: async (ctx) => {
     return await ctx.auth.getUserIdentity();
+  },
+});
+
+export const checkEmailExists = query({
+  args: { email: v.string() },
+  handler: async (ctx, args) => {
+    const emailNormalized = args.email.toLowerCase().trim();
+    if (!emailNormalized) return false;
+    const user = await ctx.db
+      .query("users")
+      .withIndex("email", (q) => q.eq("email", emailNormalized))
+      .unique();
+    return user !== null;
   },
 });

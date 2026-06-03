@@ -8,4 +8,8 @@
   Run `npm i` to install the dependencies.
 
   Run `npm run dev` to start the development server.
+
+  ## Full Documentation
+
+  See `PROJECT_DOCUMENTATION.md` for a complete architecture overview, environment setup, backend details, feature list, and extension guide.
   

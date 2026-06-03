@@ -10,7 +10,7 @@ import {
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
-import { useQuery, useAction, useMutation } from "convex/react";
+import { useQuery, useAction, useMutation, useConvex } from "convex/react";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { api } from "../../convex/_generated/api";
 
@@ -49,6 +49,7 @@ export default function App() {
   const user = useQuery(api.users.current);
   const rawIdentity = useQuery(api.users.checkAuth);
   const { signIn, signOut } = useAuthActions();
+  const convex = useConvex();
 
   // Log auth state to browser console for debugging
   useEffect(() => {
@@ -69,11 +70,16 @@ export default function App() {
   const [authLoading, setAuthLoading] = useState(false);
 
   // Auto-redirect admin users to admin panel when they sign in
+  // Also close the auth modal when user becomes authenticated (handles Google OAuth redirect)
   useEffect(() => {
-    if (user?.role === "admin" && activeTab !== "admin") {
-      setActiveTab("admin");
+    if (user) {
+      setIsSignInModalOpen(false);
+      setIsSignUpMode(false);
+      if (user.role === "admin" && activeTab !== "admin") {
+        setActiveTab("admin");
+      }
     }
-  }, [user?.role]);
+  }, [user]);
 
   // Active Tab in Admin Dashboard
   const [adminActiveTab, setAdminActiveTab] = useState<"overview" | "careers" | "marketplace" | "marketing" | "referrals">("overview");
@@ -110,7 +116,10 @@ export default function App() {
               <Zap size={16} className="text-[var(--theme-cyan)]" />
               <span className="text-sm font-orbitron italic font-bold text-white">{credits === "Unlimited" ? "UNLIMITED" : `${credits} UNITS`}</span>
             </div>
-            {user ? (
+            {user === undefined ? (
+              // Auth state still loading — show neutral placeholder to avoid flashing SIGN IN
+              <div className="w-20 h-8 bg-white/10 border-2 border-white/20 animate-pulse" />
+            ) : user ? (
               <div className="relative">
                 <button
                   onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
@@ -750,6 +759,15 @@ export default function App() {
                   setAuthLoading(true);
                   try {
                     if (isSignUpMode) {
+                      // Check if email already exists
+                      const emailNormalized = signInEmail.toLowerCase().trim();
+                      const exists = await convex.query(api.users.checkEmailExists, { email: emailNormalized });
+                      if (exists) {
+                        setAuthError("This email address is already linked to an existing account. Please sign in instead or use a different email.");
+                        setAuthLoading(false);
+                        return;
+                      }
+
                       await signIn("password", {
                         email: signInEmail,
                         password: signInPassword,
@@ -841,7 +859,15 @@ export default function App() {
                   {authLoading ? "PROCESSING..." : isSignUpMode ? "REGISTER ACCOUNT" : "SIGN IN TO PROTOCOL"}
                 </button>
                 {authError && (
-                  <p className="text-red-600 font-jakarta font-bold text-xs mt-2 text-center border-2 border-red-600 p-2">{authError}</p>
+                  <div className="border-4 border-red-600 bg-red-50 p-3.5 text-red-600 font-jakarta font-bold text-xs mt-2 relative shadow-[4px_4px_0_#dc2626]">
+                    <div className="flex items-start gap-2.5">
+                      <AlertTriangle className="size-4 shrink-0 mt-0.5 text-red-600" />
+                      <div className="text-left">
+                        <p className="font-orbitron font-extrabold uppercase text-[10px] tracking-wider leading-none mb-1 text-red-700">ALERT PROTOCOL</p>
+                        <p className="leading-normal">{authError}</p>
+                      </div>
+                    </div>
+                  </div>
                 )}
               </form>
 
@@ -857,10 +883,19 @@ export default function App() {
               {/* Google OAuth Direct Sign-In */}
               <button
                 type="button"
-                onClick={() => {
-                  setAuthError("Google Sign-In is not yet available. Please use email and password.");
+                disabled={authLoading}
+                onClick={async () => {
+                  setAuthError(null);
+                  setAuthLoading(true);
+                  try {
+                    await signIn("google");
+                  } catch (err: any) {
+                    setAuthError(err.message ?? "Google Sign-In failed. Please try again.");
+                  } finally {
+                    setAuthLoading(false);
+                  }
                 }}
-                className="w-full bg-white text-black font-orbitron font-bold py-3 border-2 border-black hover:bg-black hover:text-white transition-all uppercase text-xs tracking-widest shadow-[3px_3px_0_var(--theme-accent)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer flex items-center justify-center gap-2"
+                className="w-full bg-white text-black font-orbitron font-bold py-3 border-2 border-black hover:bg-black hover:text-white transition-all uppercase text-xs tracking-widest shadow-[3px_3px_0_var(--theme-accent)] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-wait"
               >
                 <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
                   <path fill="currentColor" d="M12.24 10.285V14.4h6.887c-.648 2.41-2.519 4.114-5.136 4.114A5.94 5.94 0 0 1 8.05 12.58A5.972 5.972 0 0 1 14 6.64c1.61 0 3.09.64 4.18 1.69l3.15-3.15A10.22 10.22 0 0 0 14 1a10.25 10.25 0 0 0-10.25 10.25a10.25 10.25 0 0 0 10.25 10.25c5.68 0 10.25-4.57 10.25-10.25c0-.62-.05-1.22-.15-1.815z" />
