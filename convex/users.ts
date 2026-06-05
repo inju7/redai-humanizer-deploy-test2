@@ -45,7 +45,7 @@ export const checkEmailExists = query({
     const user = await ctx.db
       .query("users")
       .withIndex("email", (q) => q.eq("email", emailNormalized))
-      .unique();
+      .first();
     return user !== null;
   },
 });

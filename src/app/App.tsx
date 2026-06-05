@@ -5,7 +5,8 @@ import {
   TrendingUp, Users, DollarSign, Share2, Tag,
   ChevronRight, Link, BarChart, PenTool, LayoutTemplate,
   Store, Network, MessageSquare, ArrowRight, Activity, Sliders, CheckCircle, Star, Plus, Minus, X, AlertTriangle, Award, Menu, Lock, ShieldAlert, Eye, EyeOff,
-  Bold, Italic, Underline, Strikethrough, Heading, List, ListOrdered, Quote
+  Bold, Italic, Underline, Strikethrough, Heading, List, ListOrdered, Quote,
+  Copy, Check
 } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -763,7 +764,7 @@ export default function App() {
                       const emailNormalized = signInEmail.toLowerCase().trim();
                       const exists = await convex.query(api.users.checkEmailExists, { email: emailNormalized });
                       if (exists) {
-                        setAuthError("This email address is already linked to an existing account. Please sign in instead or use a different email.");
+                        setAuthError("invalid email. please use another email");
                         setAuthLoading(false);
                         return;
                       }
@@ -811,7 +812,7 @@ export default function App() {
                       value={signUpName}
                       onChange={(e) => setSignUpName(e.target.value)}
                       placeholder="Jane Doe"
-                      className="w-full border-2 border-black p-2.5 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)] text-xs"
+                      className="w-full border-2 border-black p-2.5 font-jakarta font-bold outline-none bg-gray-50 !text-white focus:border-[var(--theme-accent)] text-xs"
                     />
                   </div>
                 )}
@@ -825,7 +826,7 @@ export default function App() {
                     value={signInEmail}
                     onChange={(e) => setSignInEmail(e.target.value)}
                     placeholder="you@example.com"
-                    className="w-full border-2 border-black p-2.5 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)] text-xs"
+                    className="w-full border-2 border-black p-2.5 font-jakarta font-bold outline-none bg-gray-50 !text-white focus:border-[var(--theme-accent)] text-xs"
                   />
                 </div>
                 <div>
@@ -839,7 +840,7 @@ export default function App() {
                       value={signInPassword}
                       onChange={(e) => setSignInPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full border-2 border-black p-2.5 pr-10 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)] text-xs"
+                      className="w-full border-2 border-black p-2.5 pr-10 font-jakarta font-bold outline-none bg-gray-50 !text-white focus:border-[var(--theme-accent)] text-xs"
                     />
                     <button
                       type="button"
@@ -929,13 +930,26 @@ function WorkspaceProcessor({
   const [status, setStatus] = useState<"idle" | "scanning" | "processing" | "complete">("idle");
   const [activeParam, setActiveParam] = useState("Standard");
   const [customInstructions, setCustomInstructions] = useState("");
+  const [copiedOutput, setCopiedOutput] = useState(false);
   const generateAi = useAction(api.ai.generate);
 
   // Reset output and status when tool or parameter changes so the user can execute again immediately
   useEffect(() => {
     setStatus("idle");
     setOutput("");
+    setCopiedOutput(false);
   }, [activeTool, activeParam]);
+
+  const handleCopy = async () => {
+    if (!output) return;
+    try {
+      await navigator.clipboard.writeText(output);
+      setCopiedOutput(true);
+      setTimeout(() => setCopiedOutput(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy text: ", err);
+    }
+  };
 
   const handleProcess = async () => {
     if (!input.trim() || status === "processing" || status === "scanning") return;
@@ -1044,7 +1058,28 @@ function WorkspaceProcessor({
         <div className={`flex flex-col bg-white p-4 transition-colors h-[320px] lg:h-full relative overflow-hidden min-h-0 ${status === "complete" ? "bg-[var(--theme-cyan)]/10" : ""}`}>
           <div className="flex justify-between items-center mb-2">
             <span className="font-bold text-[10px] lg:text-xs text-black uppercase">Output will appear here</span>
-            {status === "complete" && <span className="font-bold text-[10px] lg:text-xs bg-black text-[var(--theme-cyan)] px-2 py-0.5">ANALYSIS READY</span>}
+            {status === "complete" && (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleCopy}
+                  className="flex items-center gap-1.5 px-2 py-0.5 bg-black border-2 border-black hover:bg-[var(--theme-accent)] hover:text-white transition-all text-white font-orbitron font-extrabold text-[9px] uppercase cursor-pointer shadow-[2px_2px_0_var(--theme-cyan)] active:translate-x-0.5 active:translate-y-0.5 select-none"
+                  title="Copy output to clipboard"
+                >
+                  {copiedOutput ? (
+                    <>
+                      <Check size={10} className="text-[var(--theme-cyan)]" />
+                      <span>COPIED</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy size={10} className="text-white" />
+                      <span>COPY</span>
+                    </>
+                  )}
+                </button>
+                <span className="font-bold text-[10px] lg:text-xs bg-black text-[var(--theme-cyan)] px-2 py-0.5 border-2 border-black">ANALYSIS READY</span>
+              </div>
+            )}
           </div>
           {status === "idle" && (
             <div className="flex-1 flex items-center justify-center text-gray-400 font-bold uppercase text-center p-8 text-xs lg:text-sm">
