@@ -102,12 +102,12 @@ export default function App() {
             </div>
 
             <div className="hidden lg:flex items-center gap-4 xl:gap-6">
-              <NavButton active={activeTab === "home"} onClick={() => { setActiveTab("home"); window.scrollTo(0, 0); }}>REDAI HUMANIZER</NavButton>
-              <NavButton active={activeTab === "blog"} onClick={() => { setActiveTab("blog"); window.scrollTo(0, 0); }}>BLOG</NavButton>
-              <NavButton active={activeTab === "ads"} onClick={() => { setActiveTab("ads"); window.scrollTo(0, 0); }}>MARKETING DEALS</NavButton>
-              <NavButton active={activeTab === "marketplace"} onClick={() => { setActiveTab("marketplace"); window.scrollTo(0, 0); }}>MARKETPLACE</NavButton>
-              <NavButton active={activeTab === "referral"} onClick={() => { setActiveTab("referral"); window.scrollTo(0, 0); }}>REFERRAL</NavButton>
-              <NavButton active={activeTab === "career"} onClick={() => { setActiveTab("career"); window.scrollTo(0, 0); }}>CAREER</NavButton>
+              <NavButton active={activeTab === "home"} href="/" onClick={() => { setActiveTab("home"); window.scrollTo(0, 0); }}>REDAI HUMANIZER</NavButton>
+              <NavButton active={activeTab === "blog"} href="/blog" onClick={() => { setActiveTab("blog"); window.scrollTo(0, 0); }}>BLOG</NavButton>
+              <NavButton active={activeTab === "ads"} href="/ads" onClick={() => { setActiveTab("ads"); window.scrollTo(0, 0); }}>MARKETING DEALS</NavButton>
+              <NavButton active={activeTab === "marketplace"} href="/marketplace" onClick={() => { setActiveTab("marketplace"); window.scrollTo(0, 0); }}>MARKETPLACE</NavButton>
+              <NavButton active={activeTab === "referral"} href="/referral" onClick={() => { setActiveTab("referral"); window.scrollTo(0, 0); }}>REFERRAL</NavButton>
+              <NavButton active={activeTab === "career"} href="/career" onClick={() => { setActiveTab("career"); window.scrollTo(0, 0); }}>CAREER</NavButton>
               <div className="w-8"></div>
             </div>
           </div>
@@ -210,27 +210,29 @@ export default function App() {
             className="fixed top-16 lg:top-20 left-0 right-0 bg-black border-b-4 border-black z-50 p-3 lg:hidden flex flex-col gap-1.5 shadow-[0_8px_0_#000]"
           >
             {[
-              { id: "home", label: "REDAI HUMANIZER" },
-              { id: "blog", label: "BLOG" },
-              { id: "ads", label: "MARKETING DEALS" },
-              { id: "marketplace", label: "MARKETPLACE" },
-              { id: "referral", label: "REFERRAL" },
-              { id: "career", label: "CAREER" }
+              { id: "home", label: "REDAI HUMANIZER", href: "/" },
+              { id: "blog", label: "BLOG", href: "/blog" },
+              { id: "ads", label: "MARKETING DEALS", href: "/ads" },
+              { id: "marketplace", label: "MARKETPLACE", href: "/marketplace" },
+              { id: "referral", label: "REFERRAL", href: "/referral" },
+              { id: "career", label: "CAREER", href: "/career" }
             ].map(tab => (
-              <button
+              <a
                 key={tab.id}
-                onClick={() => {
+                href={tab.href}
+                onClick={(e) => {
+                  e.preventDefault();
                   setActiveTab(tab.id as TabState);
                   setIsMobileMenuOpen(false);
                   window.scrollTo(0, 0);
                 }}
-                className={`w-full text-left px-3 py-2.5 font-orbitron font-bold text-[10px] uppercase transition-all border-2 ${activeTab === tab.id
+                className={`w-full text-left px-3 py-2.5 font-orbitron font-bold text-[10px] uppercase transition-all border-2 block ${activeTab === tab.id
                   ? "bg-[var(--theme-accent)] text-white border-white shadow-[2px_2px_0_#fff]"
                   : "bg-transparent text-gray-300 border-transparent hover:border-white hover:text-white"
                   }`}
               >
                 {tab.label}
-              </button>
+              </a>
             ))}
           </motion.div>
         )}
@@ -310,7 +312,12 @@ export default function App() {
                   <div>
                     <div className="inline-block px-2 py-0.5 bg-black text-white font-orbitron italic text-[8px] sm:text-xs mb-1.5 sm:mb-2">AETERNUM PROTOCOL V4.2</div>
                     <div>
-                      <h2 className="inline-block bg-[var(--theme-accent)] text-white border-2 border-black px-3 py-1 sm:px-4 sm:py-1.5 font-orbitron italic font-bold uppercase leading-none text-lg sm:text-2xl md:text-4xl shadow-[3px_3px_0_#000] mb-1 sm:mb-2">Architecting The Truth</h2>
+                      <h1
+                        style={{ WebkitTextStroke: '0px' }}
+                        className="inline-block bg-[var(--theme-accent)] text-white border-2 border-black px-3 py-1 sm:px-4 sm:py-1.5 font-orbitron italic font-bold uppercase leading-none text-lg sm:text-2xl md:text-4xl shadow-[3px_3px_0_#000] mb-1 sm:mb-2"
+                      >
+                        Architecting The Truth
+                      </h1>
                     </div>
                   </div>
                 </div>
@@ -1190,11 +1197,20 @@ function PageWrapper({ children }: { children: React.ReactNode }) {
   );
 }
 
-function NavButton({ active, children, onClick }: any) {
+function NavButton({ active, children, onClick, href = "#" }: any) {
   return (
-    <button onClick={onClick} className={`text-sm font-orbitron uppercase tracking-widest italic transition-colors ${active ? 'text-[var(--theme-cyan)] font-bold' : 'text-white hover:text-[var(--theme-cyan)]'}`}>
+    <a
+      href={href}
+      onClick={(e) => {
+        if (onClick) {
+          e.preventDefault();
+          onClick();
+        }
+      }}
+      className={`text-sm font-orbitron uppercase tracking-widest italic transition-colors ${active ? 'text-[var(--theme-cyan)] font-bold' : 'text-white hover:text-[var(--theme-cyan)]'}`}
+    >
       {children}
-    </button>
+    </a>
   );
 }
 
