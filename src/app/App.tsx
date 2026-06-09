@@ -68,6 +68,36 @@ export default function App() {
     }
   };
 
+  // Dynamically update <link rel="canonical"> and <title> per active tab so
+  // search engines index each route under its own canonical URL, not under /.
+  useEffect(() => {
+    const BASE = "https://redai-humanizer.vercel.app";
+    const PAGE_META: Record<string, { path: string; title: string }> = {
+      home:        { path: "/",           title: "REDAI Humanizer | Free Bypass AI Detectors (Turn AI to Human Text)" },
+      blog:        { path: "/blog",       title: "Blog & SEO Content | REDAI Humanizer" },
+      ads:         { path: "/ads",        title: "Marketing Deals | REDAI Humanizer" },
+      marketplace: { path: "/marketplace", title: "Marketplace | REDAI Humanizer" },
+      referral:    { path: "/referral",   title: "Referral Program | REDAI Humanizer" },
+      career:      { path: "/careers",    title: "Careers | REDAI Humanizer" },
+      admin:       { path: "/admin",      title: "Admin Panel | REDAI Humanizer" },
+    };
+
+    const meta = PAGE_META[activeTab] ?? PAGE_META["home"];
+
+    // Update canonical
+    let canonicalEl = document.getElementById("canonical-url") as HTMLLinkElement | null;
+    if (!canonicalEl) {
+      canonicalEl = document.createElement("link");
+      canonicalEl.rel = "canonical";
+      canonicalEl.id = "canonical-url";
+      document.head.appendChild(canonicalEl);
+    }
+    canonicalEl.href = `${BASE}${meta.path}`;
+
+    // Update page title
+    document.title = meta.title;
+  }, [activeTab]);
+
   // Listen to browser back/forward navigation popstate events
   useEffect(() => {
     const handlePopState = () => {
