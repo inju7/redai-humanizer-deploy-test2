@@ -25,5 +25,11 @@
         }
       ]
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/((?!assets/|static/|favicon.ico|api/).*)",
+      "destination": "/index.html"
+    }
   ]
 }

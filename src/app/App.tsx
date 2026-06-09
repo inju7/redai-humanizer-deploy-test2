@@ -37,7 +37,18 @@ const TOOLS_LIST = [
 ];
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<TabState | "admin">("home");
+  const [activeTab, setActiveTab] = useState<TabState | "admin">(() => {
+    if (typeof window !== "undefined") {
+      const path = window.location.pathname.replace(/\/$/, "");
+      if (path === "/blog") return "blog";
+      if (path === "/ads") return "ads";
+      if (path === "/marketplace") return "marketplace";
+      if (path === "/referral") return "referral";
+      if (path === "/career" || path === "/careers") return "career";
+      if (path === "/admin") return "admin";
+    }
+    return "home";
+  });
   const [activeTool, setActiveTool] = useState<string>("Text Humanizer");
   const [guestCredits, setGuestCredits] = useState<number>(5);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -45,6 +56,33 @@ export default function App() {
   const [conscienceCleansed, setConscienceCleansed] = useState(false);
   const [copiedShare, setCopiedShare] = useState(false);
   const [showInsufficientAlert, setShowInsufficientAlert] = useState(false);
+
+  // Custom SPA router helper
+  const handleTabChange = (tab: TabState | "admin") => {
+    setActiveTab(tab);
+    if (typeof window !== "undefined") {
+      const path = tab === "home" ? "/" : tab === "career" ? "/careers" : `/${tab}`;
+      if (window.location.pathname !== path) {
+        window.history.pushState(null, "", path);
+      }
+    }
+  };
+
+  // Listen to browser back/forward navigation popstate events
+  useEffect(() => {
+    const handlePopState = () => {
+      const path = window.location.pathname.replace(/\/$/, "");
+      if (path === "/blog") setActiveTab("blog");
+      else if (path === "/ads") setActiveTab("ads");
+      else if (path === "/marketplace") setActiveTab("marketplace");
+      else if (path === "/referral") setActiveTab("referral");
+      else if (path === "/career" || path === "/careers") setActiveTab("career");
+      else if (path === "/admin") setActiveTab("admin");
+      else setActiveTab("home");
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
 
   // Authentication via Convex Auth
   const user = useQuery(api.users.current);
@@ -77,7 +115,7 @@ export default function App() {
       setIsSignInModalOpen(false);
       setIsSignUpMode(false);
       if (user.role === "admin" && activeTab !== "admin") {
-        setActiveTab("admin");
+        handleTabChange("admin");
       }
     }
   }, [user]);
@@ -92,7 +130,7 @@ export default function App() {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-black border-b-[4px] border-black text-white h-16 lg:h-20">
         <div className="w-full max-w-full mx-auto h-full flex items-center justify-between px-3 sm:px-6">
           <div className="flex items-center gap-4 lg:gap-12">
-            <div className="flex items-center gap-2 lg:gap-3 cursor-pointer" onClick={() => { setActiveTab("home"); window.scrollTo(0, 0); }}>
+            <div className="flex items-center gap-2 lg:gap-3 cursor-pointer" onClick={() => { handleTabChange("home"); window.scrollTo(0, 0); }}>
               <div className="w-8 h-8 lg:w-10 lg:h-10 flex items-center justify-center bg-white border-2 border-white">
                 <Cpu className="text-black size-[18px] lg:size-[24px]" />
               </div>
@@ -102,12 +140,12 @@ export default function App() {
             </div>
 
             <div className="hidden lg:flex items-center gap-4 xl:gap-6">
-              <NavButton active={activeTab === "home"} href="/" onClick={() => { setActiveTab("home"); window.scrollTo(0, 0); }}>REDAI HUMANIZER</NavButton>
-              <NavButton active={activeTab === "blog"} href="/blog" onClick={() => { setActiveTab("blog"); window.scrollTo(0, 0); }}>BLOG</NavButton>
-              <NavButton active={activeTab === "ads"} href="/ads" onClick={() => { setActiveTab("ads"); window.scrollTo(0, 0); }}>MARKETING DEALS</NavButton>
-              <NavButton active={activeTab === "marketplace"} href="/marketplace" onClick={() => { setActiveTab("marketplace"); window.scrollTo(0, 0); }}>MARKETPLACE</NavButton>
-              <NavButton active={activeTab === "referral"} href="/referral" onClick={() => { setActiveTab("referral"); window.scrollTo(0, 0); }}>REFERRAL</NavButton>
-              <NavButton active={activeTab === "career"} href="/career" onClick={() => { setActiveTab("career"); window.scrollTo(0, 0); }}>CAREER</NavButton>
+              <NavButton active={activeTab === "home"} href="/" onClick={() => { handleTabChange("home"); window.scrollTo(0, 0); }}>REDAI HUMANIZER</NavButton>
+              <NavButton active={activeTab === "blog"} href="/blog" onClick={() => { handleTabChange("blog"); window.scrollTo(0, 0); }}>BLOG</NavButton>
+              <NavButton active={activeTab === "ads"} href="/ads" onClick={() => { handleTabChange("ads"); window.scrollTo(0, 0); }}>MARKETING DEALS</NavButton>
+              <NavButton active={activeTab === "marketplace"} href="/marketplace" onClick={() => { handleTabChange("marketplace"); window.scrollTo(0, 0); }}>MARKETPLACE</NavButton>
+              <NavButton active={activeTab === "referral"} href="/referral" onClick={() => { handleTabChange("referral"); window.scrollTo(0, 0); }}>REFERRAL</NavButton>
+              <NavButton active={activeTab === "career"} href="/careers" onClick={() => { handleTabChange("career"); window.scrollTo(0, 0); }}>CAREER</NavButton>
               <div className="w-8"></div>
             </div>
           </div>
@@ -156,9 +194,9 @@ export default function App() {
                           onClick={() => {
                             setIsProfileDropdownOpen(false);
                             if (activeTab === "admin") {
-                              setActiveTab("home");
+                              handleTabChange("home");
                             } else {
-                              setActiveTab("admin");
+                              handleTabChange("admin");
                             }
                           }}
                           className="w-full text-center py-2 font-orbitron font-black uppercase bg-[var(--theme-accent)] text-white hover:bg-black hover:text-white border-2 border-black transition-all mb-2 cursor-pointer shadow-[2px_2px_0_#000] active:translate-x-0.5 active:translate-y-0.5"
@@ -172,7 +210,7 @@ export default function App() {
                       onClick={() => {
                         void signOut();
                         setIsProfileDropdownOpen(false);
-                        if (activeTab === "admin") setActiveTab("home");
+                        if (activeTab === "admin") handleTabChange("home");
                       }}
                       className="w-full text-center py-2 font-orbitron font-black uppercase bg-black text-white hover:bg-[var(--theme-accent)] border-2 border-black transition-colors cursor-pointer"
                     >
@@ -215,14 +253,14 @@ export default function App() {
               { id: "ads", label: "MARKETING DEALS", href: "/ads" },
               { id: "marketplace", label: "MARKETPLACE", href: "/marketplace" },
               { id: "referral", label: "REFERRAL", href: "/referral" },
-              { id: "career", label: "CAREER", href: "/career" }
+              { id: "career", label: "CAREER", href: "/careers" }
             ].map(tab => (
               <a
                 key={tab.id}
                 href={tab.href}
                 onClick={(e) => {
                   e.preventDefault();
-                  setActiveTab(tab.id as TabState);
+                  handleTabChange(tab.id as TabState);
                   setIsMobileMenuOpen(false);
                   window.scrollTo(0, 0);
                 }}
@@ -264,7 +302,7 @@ export default function App() {
                   key={tool}
                   onClick={() => {
                     setActiveTool(tool);
-                    setActiveTab("home");
+                    handleTabChange("home");
                     setIsSidebarOpen(false);
                   }}
                   className={`w-full text-left px-3 py-2 font-jakarta text-[13px] font-bold uppercase transition-all border-2 ${activeTool === tool
@@ -336,9 +374,9 @@ export default function App() {
                       <div className="w-6 h-6 bg-black text-[var(--theme-cyan)] flex items-center justify-center border border-black shadow-[1px_1px_0_var(--theme-accent)]">
                         <Activity size={12} className="animate-spin" />
                       </div>
-                      <h3 className="text-sm sm:text-base font-orbitron italic font-extrabold uppercase text-black tracking-tight leading-none mt-0.5">
+                      <h2 className="text-sm sm:text-base font-orbitron italic font-extrabold uppercase text-black tracking-tight leading-none mt-0.5">
                         Proprietary Moral Tax Protocol V1.2
-                      </h3>
+                      </h2>
                     </div>
 
                     <p className="font-jakarta text-[11px] sm:text-xs font-bold text-black leading-relaxed mb-6">
@@ -682,7 +720,7 @@ export default function App() {
                 <button
                   onClick={() => {
                     setShowInsufficientAlert(false);
-                    setActiveTab("marketplace");
+                    handleTabChange("marketplace");
                     window.scrollTo(0, 0);
                   }}
                   className="w-full py-3 bg-[var(--theme-cyan)] text-black border-2 border-black font-orbitron font-bold uppercase shadow-[4px_4px_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_#000] transition-all"
@@ -1228,7 +1266,7 @@ function MiniAdContainer() {
 function BlogDetailView({ blog, onBack }: { blog: any, onBack: () => void }) {
   const user = useQuery(api.users.current);
   const isAdmin = user?.role === "admin";
-  const removeBlog = useAction(api.blogs.remove) || useMutation(api.blogs.remove); // fallback if mutation
+  const removeBlog = useMutation(api.blogs.remove);
   const [showConfirm, setShowConfirm] = useState(false);
 
   return (
@@ -1350,11 +1388,10 @@ function BlogDetailView({ blog, onBack }: { blog: any, onBack: () => void }) {
                 </button>
                 <button
                   onClick={async () => {
-                    await removeBlog({ id: blog._id });
+                    await removeBlog({ id: blog.id });
                     setShowConfirm(false);
                     onBack();
                   }}
-                  className="w-full py-2 bg-red-600 text-white border-2 border-black font-orbitron font-bold uppercase hover:bg-black active:translate-y-[1px] transition-all text-xs cursor-pointer"
                 >
                   Delete Post
                 </button>
@@ -1424,7 +1461,7 @@ function BlogTab() {
       {/* Reduced Header Container */}
       <div className="flex flex-col md:flex-row md:items-center justify-between border-b-2 border-black pb-4 gap-4">
         <div>
-          <h2 className="text-2xl md:text-3xl text-black font-orbitron italic font-bold uppercase">BLOG & SEO CONTENT</h2>
+          <h1 className="text-2xl md:text-3xl text-black font-orbitron italic font-bold uppercase">BLOG & SEO CONTENT</h1>
           <p className="text-[10px] text-gray-500 font-jakarta font-bold uppercase tracking-wider">AETERNUM KNOWLEDGE REPOSITORY</p>
         </div>
 
@@ -1807,9 +1844,9 @@ function CareerTab({ user }: { user?: any }) {
         <span className="inline-block text-[9px] font-orbitron font-black bg-black text-white px-2 py-0.5 border border-black uppercase tracking-widest mb-2">
           AETERNUM RECRUITMENT PROTOCOL
         </span>
-        <h2 className="text-3xl md:text-5xl font-orbitron italic font-bold uppercase text-black leading-none mb-2">
+        <h1 className="text-3xl md:text-5xl font-orbitron italic font-bold uppercase text-black leading-none mb-2">
           JOIN THE REDAI TEAM
-        </h2>
+        </h1>
         <p className="font-jakarta font-bold text-sm text-gray-600 max-w-2xl">
           We're building the most powerful AI bypass infrastructure on the planet. All roles are currently in a{" "}
           <span className="text-[var(--theme-accent)] font-black">talent pipeline</span> — submit your application and we'll reach out when a position opens.
@@ -2041,7 +2078,7 @@ function MarketingDealsTab() {
           {/* Compact Header with Sub-tab Switcher */}
           <div className="flex flex-col md:flex-row md:items-center justify-between border-b-2 border-black pb-4 mb-4 gap-4">
             <div>
-              <h2 className="text-lg sm:text-2xl md:text-3xl text-black font-orbitron italic font-bold uppercase tracking-tight leading-tight">MARKETING DEALS & CONSIGNMENTS</h2>
+              <h1 className="text-lg sm:text-2xl md:text-3xl text-black font-orbitron italic font-bold uppercase tracking-tight leading-tight">MARKETING DEALS & CONSIGNMENTS</h1>
               <p className="text-[10px] text-gray-500 font-jakarta font-bold uppercase tracking-wider">AETERNUM COLLABORATION PROTOCOL</p>
             </div>
 
@@ -2690,7 +2727,7 @@ function MarketplaceTab() {
       )}
 
       <div className="text-center mb-8">
-        <h2 className="text-xl sm:text-3xl md:text-5xl text-black font-orbitron italic font-bold uppercase tracking-tighter leading-tight mb-4">RED<span className="text-[var(--theme-accent)]">AI</span>'S <span className="text-[var(--theme-accent)]">MARKETPLACE</span></h2>
+        <h1 className="text-xl sm:text-3xl md:text-5xl text-black font-orbitron italic font-bold uppercase tracking-tighter leading-tight mb-4">RED<span className="text-[var(--theme-accent)]">AI</span>'S <span className="text-[var(--theme-accent)]">MARKETPLACE</span></h1>
       </div>
 
       {/* Filter Bar */}
@@ -3710,7 +3747,7 @@ function TabContainer({ title, subtitle, children, gridClass = "grid-cols-1 md:g
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }} className="space-y-12">
       <div className="text-center mb-10 md:mb-16 px-4">
-        <h2 className="text-2xl sm:text-4xl md:text-6xl text-black font-orbitron italic font-bold uppercase tracking-tighter leading-none mb-3 md:mb-4">{title}</h2>
+        <h1 className="text-2xl sm:text-4xl md:text-6xl text-black font-orbitron italic font-bold uppercase tracking-tighter leading-none mb-3 md:mb-4">{title}</h1>
         {subtitle && <p className="text-xs sm:text-base md:text-xl text-black font-jakarta max-w-3xl mx-auto font-bold">{subtitle}</p>}
       </div>
       <div className={`grid gap-8 ${gridClass}`}>
@@ -4225,3 +4262,7 @@ function BlogEditor({ blogToEdit, onCancel, onComplete }: { blogToEdit?: any, on
     </div>
   );
 }
+
+
+
+
