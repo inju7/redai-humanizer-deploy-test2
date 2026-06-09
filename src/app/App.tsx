@@ -1700,7 +1700,7 @@ function MiniAdContainer() {
   );
 }
 
-function BlogDetailView({ blog, onBack }: { blog: any, onBack: () => void }) {
+function BlogDetailView({ blog, onBack, onDeleteLocal }: { blog: any, onBack: () => void, onDeleteLocal?: (id: string) => void }) {
   const user = useQuery(api.users.current);
   const isAdmin = user?.role === "admin";
   const removeBlog = useMutation(api.blogs.remove);
@@ -1825,10 +1825,21 @@ function BlogDetailView({ blog, onBack }: { blog: any, onBack: () => void }) {
                 </button>
                 <button
                   onClick={async () => {
-                    await removeBlog({ id: blog.id });
+                    try {
+                      if (blog.id && !blog.id.includes("-")) {
+                        await removeBlog({ id: blog.id });
+                      }
+                    } catch (err) {
+                      console.warn("Convex database removal skipped or failed", err);
+                    }
+                    if (onDeleteLocal) {
+                      onDeleteLocal(blog.id);
+                    } else {
+                      onBack();
+                    }
                     setShowConfirm(false);
-                    onBack();
                   }}
+                  className="w-full py-2 bg-red-600 text-white border-2 border-black font-orbitron font-bold uppercase hover:bg-red-700 active:translate-y-[1px] transition-all text-xs cursor-pointer shadow-[2px_2px_0_#000]"
                 >
                   Delete Post
                 </button>
@@ -1873,13 +1884,14 @@ function BlogTab() {
   const [isEditingBlog, setIsEditingBlog] = useState(false);
   const [activeCategory, setActiveCategory] = useState("All");
   const [sortBy, setSortBy] = useState<"newest" | "oldest">("newest");
+  const [deletedBlogIds, setDeletedBlogIds] = useState<string[]>([]);
 
   const user = useQuery(api.users.current);
   const isAdmin = user?.role === "admin";
 
   const dbBlogs = useQuery(api.blogs.list) || [];
-  const blogs = [...dbBlogs];
-  blogsData.forEach(bData => {
+  const blogs = [...dbBlogs].filter((b: any) => !deletedBlogIds.includes(b._id) && !deletedBlogIds.includes(b.id));
+  blogsData.filter(b => !deletedBlogIds.includes(b.id)).forEach(bData => {
     if (!blogs.some((b: any) => b.title === bData.title || b.id === bData.id || b._id === bData.id)) {
       blogs.push({
         id: bData.id,
@@ -1907,7 +1919,16 @@ function BlogTab() {
   }
 
   if (selectedBlog) {
-    return <BlogDetailView blog={selectedBlog} onBack={() => setSelectedBlog(null)} />;
+    return (
+      <BlogDetailView
+        blog={selectedBlog}
+        onBack={() => setSelectedBlog(null)}
+        onDeleteLocal={(id) => {
+          setDeletedBlogIds(prev => [...prev, id]);
+          setSelectedBlog(null);
+        }}
+      />
+    );
   }
 
   return (
