@@ -14,8 +14,22 @@ import rehypeRaw from 'rehype-raw';
 import { useQuery, useAction, useMutation, useConvex } from "convex/react";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { api } from "../../convex/_generated/api";
+import { blogsData } from "./data/blogsData";
+import { entitiesData } from "./data/entitiesData";
+import { comparisonsData } from "./data/comparisonsData";
+import { commercialData } from "./data/commercialData";
 
-type TabState = "home" | "blog" | "ads" | "marketplace" | "referral" | "career";
+import SEOContent from "./components/SEOContent";
+import EntityPage from "./components/EntityPage";
+import ComparisonPage from "./components/ComparisonPage";
+import CommercialPage from "./components/CommercialPage";
+import EEATPages from "./components/EEATPages";
+
+type TabState =
+  | "home" | "blog" | "ads" | "marketplace" | "referral" | "career"
+  | "about" | "contact" | "privacy" | "terms" | "cookies"
+  | "pricing" | "features" | "api" | "integrations" | "agencies" | "enterprise" | "education"
+  | "entity" | "comparison";
 
 const TOOLS_LIST = [
   "Text Humanizer",
@@ -46,9 +60,56 @@ export default function App() {
       if (path === "/referral") return "referral";
       if (path === "/career" || path === "/careers") return "career";
       if (path === "/admin") return "admin";
+      if (path === "/about") return "about";
+      if (path === "/contact") return "contact";
+      if (path === "/privacy") return "privacy";
+      if (path === "/terms") return "terms";
+      if (path === "/cookies") return "cookies";
+      if (path === "/pricing") return "pricing";
+      if (path === "/features") return "features";
+      if (path === "/api") return "api";
+      if (path === "/integrations") return "integrations";
+      if (path === "/agencies") return "agencies";
+      if (path === "/enterprise") return "enterprise";
+      if (path === "/education") return "education";
+      if (path.startsWith("/entity/")) return "entity";
+      if ([
+        "/chatgpt-vs-claude",
+        "/chatgpt-vs-gemini",
+        "/gptzero-vs-copyleaks",
+        "/copyleaks-vs-turnitin",
+        "/seo-vs-geo",
+        "/geo-vs-aeo"
+      ].includes(path)) return "comparison";
     }
     return "home";
   });
+  const [entityId, setEntityId] = useState<string | null>(() => {
+    if (typeof window !== "undefined") {
+      const path = window.location.pathname.replace(/\/$/, "");
+      if (path.startsWith("/entity/")) {
+        return path.replace("/entity/", "");
+      }
+    }
+    return null;
+  });
+  const [comparisonId, setComparisonId] = useState<string | null>(() => {
+    if (typeof window !== "undefined") {
+      const path = window.location.pathname.replace(/\/$/, "");
+      const comps = [
+        "chatgpt-vs-claude",
+        "chatgpt-vs-gemini",
+        "gptzero-vs-copyleaks",
+        "copyleaks-vs-turnitin",
+        "seo-vs-geo",
+        "geo-vs-aeo"
+      ];
+      const found = comps.find(c => `/${c}` === path);
+      return found || null;
+    }
+    return null;
+  });
+
   const [activeTool, setActiveTool] = useState<string>("Text Humanizer");
   const [guestCredits, setGuestCredits] = useState<number>(5);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -58,31 +119,110 @@ export default function App() {
   const [showInsufficientAlert, setShowInsufficientAlert] = useState(false);
 
   // Custom SPA router helper
-  const handleTabChange = (tab: TabState | "admin") => {
+  const handleTabChange = (tab: TabState | "admin", subId?: string) => {
     setActiveTab(tab);
+    if (tab === "entity" && subId) {
+      setEntityId(subId);
+    } else if (tab === "comparison" && subId) {
+      setComparisonId(subId);
+    }
     if (typeof window !== "undefined") {
-      const path = tab === "home" ? "/" : tab === "career" ? "/careers" : `/${tab}`;
+      let path = "/";
+      if (tab === "home") path = "/";
+      else if (tab === "career") path = "/careers";
+      else if (tab === "entity" && subId) path = `/entity/${subId}`;
+      else if (tab === "comparison" && subId) path = `/${subId}`;
+      else path = `/${tab}`;
+
       if (window.location.pathname !== path) {
         window.history.pushState(null, "", path);
       }
     }
   };
 
-  // Dynamically update <link rel="canonical"> and <title> per active tab so
-  // search engines index each route under its own canonical URL, not under /.
+  // Dynamically update <link rel="canonical">, <title>, meta description and JSON-LD schemas
   useEffect(() => {
     const BASE = "https://redai-humanizer.vercel.app";
-    const PAGE_META: Record<string, { path: string; title: string }> = {
-      home:        { path: "/",           title: "REDAI Humanizer | Free Bypass AI Detectors (Turn AI to Human Text)" },
-      blog:        { path: "/blog",       title: "Blog & SEO Content | REDAI Humanizer" },
-      ads:         { path: "/ads",        title: "Marketing Deals | REDAI Humanizer" },
-      marketplace: { path: "/marketplace", title: "Marketplace | REDAI Humanizer" },
-      referral:    { path: "/referral",   title: "Referral Program | REDAI Humanizer" },
-      career:      { path: "/careers",    title: "Careers | REDAI Humanizer" },
-      admin:       { path: "/admin",      title: "Admin Panel | REDAI Humanizer" },
-    };
+    
+    // Resolve dynamic active route details
+    let path = `/${activeTab}`;
+    let title = "REDAI Humanizer: Humanize AI Text, Detect AI Content & Optimize for GEO SEO AEO";
+    let desc = "Humanize AI text, bypass AI detection, check plagiarism, rewrite content, and optimize for GEO, SEO, and AEO. Free AI Humanizer platform.";
 
-    const meta = PAGE_META[activeTab] ?? PAGE_META["home"];
+    if (activeTab === "home") {
+      path = "/";
+      title = "REDAI Humanizer & AI Detector | Humanize AI Text, Plagiarism Checker, GEO SEO AEO Platform";
+      desc = "Humanize AI text, bypass AI detection, check plagiarism, rewrite content, and optimize for GEO, SEO, and AEO. Free AI Humanizer platform.";
+    } else if (activeTab === "blog") {
+      title = "Blog & SEO Content | REDAI Humanizer";
+      desc = "Read the latest articles on AI detectors, SEO strategies, Generative Engine Optimization (GEO), and content humanization techniques.";
+    } else if (activeTab === "ads") {
+      title = "Marketing Deals & Consignments | REDAI Humanizer";
+      desc = "Scale your marketing campaigns with REDAI's exclusive business solutions and programmatic copy humanizers.";
+    } else if (activeTab === "marketplace") {
+      title = "Marketplace | REDAI Humanizer";
+      desc = "Purchase credits, license models, and explore content optimization plugins in the REDAI Marketplace.";
+    } else if (activeTab === "referral") {
+      title = "Referral Program | REDAI Humanizer";
+      desc = "Join the REDAI referral network, share your link, and earn credits or commission for every user who registers.";
+    } else if (activeTab === "career") {
+      path = "/careers";
+      title = "Careers at REDAI | Join the NLP Revolution";
+      desc = "Explore job openings, salary bands, and join our team in building the next generation of AI content humanizers.";
+    } else if (activeTab === "admin") {
+      title = "Admin Panel | REDAI Humanizer";
+      desc = "Operations monitoring dashboard for REDAI systems administrators.";
+    } else if (activeTab === "about") {
+      title = "About REDAI Humanizer | Trust & Mission";
+      desc = "Dr. Catherine Carter and Marcus Vance explain the mission behind REDAI Humanizer: protecting user voice and writing privacy.";
+    } else if (activeTab === "contact") {
+      title = "Contact REDAI Operations | 24/7 Technical Support";
+      desc = "Contact REDAI support for custom API keys, bulk pricing, or enterprise GPU cluster integrations.";
+    } else if (activeTab === "privacy") {
+      title = "Privacy Policy | REDAI Humanizer";
+      desc = "Learn about REDAI's strict data privacy practices. We process text in-memory and never cache inputs.";
+    } else if (activeTab === "terms") {
+      title = "Terms & Conditions | REDAI Humanizer";
+      desc = "Read our terms of service and license agreement for using REDAI and its API keys.";
+    } else if (activeTab === "cookies") {
+      title = "Cookie Policy | REDAI Humanizer";
+      desc = "Learn how REDAI uses essential browser session cookies to maintain login states.";
+    } else if (activeTab === "pricing") {
+      title = "Flexible Pricing Plans | REDAI Humanizer";
+      desc = "Select the perfect credit tier to bypass AI scanners. Pro, Starter, and free options available.";
+    } else if (activeTab === "features") {
+      title = "REDAI Feature Matrix | 16+ Advanced Writing Tools";
+      desc = "Explore all REDAI features including Text Humanizer, AI Detector, Plagiarism Scanner, and Citation compilers.";
+    } else if (activeTab === "api") {
+      title = "Enterprise Developer API | REDAI Humanizer";
+      desc = "Integrate REDAI humanization and AI detection directly into your publishing app or CMS.";
+    } else if (activeTab === "integrations") {
+      title = "Native App Integrations & Plugins | REDAI Humanizer";
+      desc = "Connect REDAI to Google Docs, WordPress, Chrome extensions, and Microsoft Word.";
+    } else if (activeTab === "agencies") {
+      title = "REDAI for Content Agencies & Networks";
+      desc = "Scale your content marketing and programmatic SEO safely with bulk uploads and team accounts.";
+    } else if (activeTab === "enterprise") {
+      title = "Enterprise Bypass Solutions & Security";
+      desc = "High-speed dedicated GPU clusters, SOC2 security compliance, and custom SLA contracts.";
+    } else if (activeTab === "education") {
+      title = "REDAI for Academic & Educational Integrity";
+      desc = "Get student discounts and utilize specialized academic parameters to bypass Turnitin.";
+    } else if (activeTab === "entity" && entityId) {
+      path = `/entity/${entityId}`;
+      const ent = entitiesData.find(e => e.id === entityId);
+      if (ent) {
+        title = `${ent.name} GEO Optimization Guide | REDAI Humanizer`;
+        desc = `How to optimize content for ${ent.name}, understand its parameters, use cases, and how to bypass its checks.`;
+      }
+    } else if (activeTab === "comparison" && comparisonId) {
+      path = `/${comparisonId}`;
+      const comp = comparisonsData.find(c => c.id === comparisonId);
+      if (comp) {
+        title = `${comp.title} | REDAI Humanizer`;
+        desc = `${comp.subtitle} side-by-side matrices, pros & cons, and FAQs.`;
+      }
+    }
 
     // Update canonical
     let canonicalEl = document.getElementById("canonical-url") as HTMLLinkElement | null;
@@ -92,11 +232,224 @@ export default function App() {
       canonicalEl.id = "canonical-url";
       document.head.appendChild(canonicalEl);
     }
-    canonicalEl.href = `${BASE}${meta.path}`;
+    canonicalEl.href = `${BASE}${path}`;
 
     // Update page title
-    document.title = meta.title;
-  }, [activeTab]);
+    document.title = title;
+
+    // Update meta description
+    let descEl = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
+    if (!descEl) {
+      descEl = document.createElement("meta");
+      descEl.name = "description";
+      document.head.appendChild(descEl);
+    }
+    descEl.content = desc;
+
+    // --- DYNAMIC SCHEMA INJECTION ---
+    const existingScript = document.getElementById("redai-jsonld-schema");
+    if (existingScript) {
+      existingScript.remove();
+    }
+
+    // Standard schemas
+    const schemas: any[] = [
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "@id": `${BASE}/#organization`,
+        "name": "REDAI Humanizer",
+        "url": BASE,
+        "logo": `${BASE}/logo.png`,
+        "sameAs": [
+          "https://twitter.com/redaihumanizer",
+          "https://github.com/redai-humanizer"
+        ],
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "telephone": "+1-800-555-7332",
+          "contactType": "customer service",
+          "email": "support@redai-humanizer.app"
+        }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "@id": `${BASE}/#website`,
+        "url": BASE,
+        "name": "REDAI Humanizer",
+        "publisher": {
+          "@id": `${BASE}/#organization`
+        }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "REDAI Humanizer",
+        "operatingSystem": "All",
+        "applicationCategory": "BusinessApplication",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        }
+      }
+    ];
+
+    // Page-specific schemas
+    if (activeTab === "home") {
+      // 20 FAQs Page Schema
+      const faqsData = [
+        {
+          q: "What is an AI Humanizer?",
+          a: "An AI Humanizer is an advanced software platform designed to rewrite and polish text generated by artificial intelligence models (such as ChatGPT, Claude, and Gemini). It analyzes word pairing probability (perplexity) and sentence length distribution (burstiness) to match the natural flow and rhythm of human writing."
+        },
+        {
+          q: "How does AI content detection work?",
+          a: "AI content detectors evaluate text by measuring statistical predictability. Since large language models (LLMs) output tokens based on high mathematical probability, their prose exhibits low perplexity (predictable word choices) and low burstiness (uniform sentence structures). Scanners flag text when these markers stay above a threshold."
+        },
+        {
+          q: "Can GPTZero detect ChatGPT-4o writing?",
+          a: "Yes. GPTZero's classification models are constantly trained on GPT-4o, Claude 3.5, and Gemini outputs. They easily spot the signature vocabulary and sentence symmetry of raw drafts unless the text is humanized."
+        },
+        {
+          q: "Can Turnitin detect AI-generated writing?",
+          a: "Yes, Turnitin has a highly advanced, proprietary AI classifier integrated directly into its plagiarism checking software. It breaks down student papers into segments and calculates a synthetic likelihood score, flagging copied phrases or AI structural patterns."
+        },
+        {
+          q: "What is GEO (Generative Engine Optimization)?",
+          a: "GEO is the process of structuring and writing website content so that AI search engines (like ChatGPT Search, Gemini, Perplexity, and Claude) cite, footnote, and recommend your site in their conversational answers."
+        },
+        {
+          q: "What is AEO (Answer Engine Optimization)?",
+          a: "AEO focuses on tailoring content to provide direct, concise answers for quick featured snippets and vocal smart assistants (like Siri, Google Assistant, and Alexa). It relies heavily on structured FAQs, checklists, and summary definitions."
+        },
+        {
+          q: "How do AI search engines crawl websites?",
+          a: "AI search engines use specialized user-agents (like OAI-SearchBot or PerplexityBot) to index the web. They extract structured data, schemas, direct answers, and reputable outbound link references to construct conversational responses."
+        },
+        {
+          q: "How does REDAI Humanizer bypass AI detectors?",
+          a: "REDAI restructures synthetic text by shuffling syntax trees, varying sentence lengths (increasing burstiness), replacing predictable AI transition markers, and using context-aware vocabulary to drop AI scores to 0%."
+        },
+        {
+          q: "Does Google search penalize AI content?",
+          a: "Google's search guidelines state they reward high-quality, original content that demonstrates E-E-A-T (Experience, Expertise, Authoritativeness, and Trustworthiness), regardless of how it was produced. However, they actively penalize thin, repetitive synthetic spam."
+        },
+        {
+          q: "Is using an AI humanizer safe for academic submissions?",
+          a: "Yes, when used responsibly to check, refine, and improve the clarity of your own arguments. REDAI's Academic bypass preserves citations and data integrity while randomizing statistical patterns."
+        },
+        {
+          q: "What is the difference between GEO and traditional SEO?",
+          a: "Traditional SEO focuses on keyword density, backlinks, and domain authority to rank in Google's blue links. GEO focuses on entity relevance, factual density, and schema markup to win footnotes and citation chips in AI chatbot responses."
+        },
+        {
+          q: "How does AEO differ from GEO?",
+          a: "AEO focuses on short, direct voice-search answers and featured snippets. GEO optimized for multi-layered LLM reasoning queries that combine multiple entities and require comprehensive citation-backed research pages."
+        },
+        {
+          q: "How do I secure citations in Perplexity?",
+          a: "Provide high-factual-density content, place a clear answer summary at the top of your page, maintain fast page loads, and format data using structured tables or bullets."
+        },
+        {
+          q: "Does REDAI offer API support?",
+          a: "Yes. REDAI offers a developer API that integrates easily into your CMS, article generators, or agency dashboards, automating AI scans and humanizations in bulk."
+        },
+        {
+          q: "Does REDAI check for plagiarism?",
+          a: "Yes, we integrate an advanced plagiarism scanner that matches your output against indexed pages to guarantee your content is completely original before exporting."
+        },
+        {
+          q: "What are REDAI's rewrite parameters?",
+          a: "We offer specialized modes: Academic (formal collegiate tone), Flowing (engaging blog style), Shorten (condensed copy), Formal (corporate prose), and Custom (prompt-driven directions)."
+        },
+        {
+          q: "What is a false positive in AI detection?",
+          a: "A false positive occurs when a human-written document is misclassified as AI. This happens frequently on highly structured technical papers, essays by non-native English speakers, or formulaic reviews."
+        },
+        {
+          q: "Can Copyleaks detect paraphrased AI text?",
+          a: "Standard paraphrasers that only swap synonyms are quickly flagged by Copyleaks. REDAI bypasses Copyleaks by applying deep structural alterations to sentence structures."
+        },
+        {
+          q: "Why is an indexable sitemap important?",
+          a: "Sitemaps list all active URLs, allowing traditional search spiders and AI search agents to locate and index your articles, entity pages, and tools without missing deep directories."
+        },
+        {
+          q: "How do E-E-A-T pages benefit my website?",
+          a: "Pages like About, Contact, and Policies show Google and AI assistants that your website is owned and run by real, trustworthy entities, increasing your domain authority and recommendation scores."
+        }
+      ];
+      schemas.push({
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": faqsData.map(f => ({
+          "@type": "Question",
+          "name": f.q,
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": f.a
+          }
+        }))
+      });
+    } else if (activeTab === "entity" && entityId) {
+      const ent = entitiesData.find(e => e.id === entityId);
+      if (ent) {
+        schemas.push({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": ent.faq.map(f => ({
+            "@type": "Question",
+            "name": f.q,
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": f.a
+            }
+          }))
+        });
+        schemas.push({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": BASE },
+            { "@type": "ListItem", "position": 2, "name": "Entities", "item": `${BASE}/entity` },
+            { "@type": "ListItem", "position": 3, "name": ent.name, "item": `${BASE}/entity/${entityId}` }
+          ]
+        });
+      }
+    } else if (activeTab === "comparison" && comparisonId) {
+      const comp = comparisonsData.find(c => c.id === comparisonId);
+      if (comp) {
+        schemas.push({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": comp.faq.map(f => ({
+            "@type": "Question",
+            "name": f.q,
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": f.a
+            }
+          }))
+        });
+        schemas.push({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": BASE },
+            { "@type": "ListItem", "position": 2, "name": comp.title, "item": `${BASE}/${comparisonId}` }
+          ]
+        });
+      }
+    }
+
+    const script = document.createElement("script");
+    script.type = "application/ld+json";
+    script.id = "redai-jsonld-schema";
+    script.innerHTML = JSON.stringify(schemas);
+    document.head.appendChild(script);
+  }, [activeTab, entityId, comparisonId]);
 
   // Listen to browser back/forward navigation popstate events
   useEffect(() => {
@@ -108,7 +461,38 @@ export default function App() {
       else if (path === "/referral") setActiveTab("referral");
       else if (path === "/career" || path === "/careers") setActiveTab("career");
       else if (path === "/admin") setActiveTab("admin");
-      else setActiveTab("home");
+      else if (path === "/about") setActiveTab("about");
+      else if (path === "/contact") setActiveTab("contact");
+      else if (path === "/privacy") setActiveTab("privacy");
+      else if (path === "/terms") setActiveTab("terms");
+      else if (path === "/cookies") setActiveTab("cookies");
+      else if (path === "/pricing") setActiveTab("pricing");
+      else if (path === "/features") setActiveTab("features");
+      else if (path === "/api") setActiveTab("api");
+      else if (path === "/integrations") setActiveTab("integrations");
+      else if (path === "/agencies") setActiveTab("agencies");
+      else if (path === "/enterprise") setActiveTab("enterprise");
+      else if (path === "/education") setActiveTab("education");
+      else if (path.startsWith("/entity/")) {
+        setActiveTab("entity");
+        setEntityId(path.replace("/entity/", ""));
+      } else {
+        const comps = [
+          "chatgpt-vs-claude",
+          "chatgpt-vs-gemini",
+          "gptzero-vs-copyleaks",
+          "copyleaks-vs-turnitin",
+          "seo-vs-geo",
+          "geo-vs-aeo"
+        ];
+        const found = comps.find(c => `/${c}` === path);
+        if (found) {
+          setActiveTab("comparison");
+          setComparisonId(found);
+        } else {
+          setActiveTab("home");
+        }
+      }
     };
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
@@ -701,6 +1085,9 @@ export default function App() {
                 </div>
               </section>
 
+              {/* 2500+ words SEO + GEO + AEO Expanded Content and FAQ Accordion */}
+              <SEOContent handleTabChange={handleTabChange} />
+
             </motion.div>
           )}
 
@@ -714,6 +1101,26 @@ export default function App() {
             </PageWrapper>
           )}
           {activeTab === "admin" && <PageWrapper key="admin"><AdminDashboardTab user={user} setIsSignInModalOpen={setIsSignInModalOpen} /></PageWrapper>}
+
+          {/* E-E-A-T informational pages */}
+          {activeTab === "about" && <PageWrapper key="about"><EEATPages pageId="about" onBack={() => handleTabChange("home")} /></PageWrapper>}
+          {activeTab === "contact" && <PageWrapper key="contact"><EEATPages pageId="contact" onBack={() => handleTabChange("home")} /></PageWrapper>}
+          {activeTab === "privacy" && <PageWrapper key="privacy"><EEATPages pageId="privacy" onBack={() => handleTabChange("home")} /></PageWrapper>}
+          {activeTab === "terms" && <PageWrapper key="terms"><EEATPages pageId="terms" onBack={() => handleTabChange("home")} /></PageWrapper>}
+          {activeTab === "cookies" && <PageWrapper key="cookies"><EEATPages pageId="cookies" onBack={() => handleTabChange("home")} /></PageWrapper>}
+
+          {/* Commercial Pages */}
+          {activeTab === "pricing" && <PageWrapper key="pricing"><CommercialPage pageId="pricing" onBack={() => handleTabChange("home")} /></PageWrapper>}
+          {activeTab === "features" && <PageWrapper key="features"><CommercialPage pageId="features" onBack={() => handleTabChange("home")} /></PageWrapper>}
+          {activeTab === "api" && <PageWrapper key="api"><CommercialPage pageId="api" onBack={() => handleTabChange("home")} /></PageWrapper>}
+          {activeTab === "integrations" && <PageWrapper key="integrations"><CommercialPage pageId="integrations" onBack={() => handleTabChange("home")} /></PageWrapper>}
+          {activeTab === "agencies" && <PageWrapper key="agencies"><CommercialPage pageId="agencies" onBack={() => handleTabChange("home")} /></PageWrapper>}
+          {activeTab === "enterprise" && <PageWrapper key="enterprise"><CommercialPage pageId="enterprise" onBack={() => handleTabChange("home")} onCtaClick={() => handleTabChange("contact")} /></PageWrapper>}
+          {activeTab === "education" && <PageWrapper key="education"><CommercialPage pageId="education" onBack={() => handleTabChange("home")} /></PageWrapper>}
+
+          {/* Dynamic Entity and Comparison target pages */}
+          {activeTab === "entity" && entityId && <PageWrapper key="entity"><EntityPage entityId={entityId} onBack={() => handleTabChange("home")} /></PageWrapper>}
+          {activeTab === "comparison" && comparisonId && <PageWrapper key="comparison"><ComparisonPage comparisonId={comparisonId} onBack={() => handleTabChange("home")} /></PageWrapper>}
         </AnimatePresence>
       </main>
 
@@ -1470,7 +1877,24 @@ function BlogTab() {
   const user = useQuery(api.users.current);
   const isAdmin = user?.role === "admin";
 
-  const blogs = useQuery(api.blogs.list) || [];
+  const dbBlogs = useQuery(api.blogs.list) || [];
+  const blogs = [...dbBlogs];
+  blogsData.forEach(bData => {
+    if (!blogs.some((b: any) => b.title === bData.title || b.id === bData.id || b._id === bData.id)) {
+      blogs.push({
+        id: bData.id,
+        _id: bData.id as any,
+        title: bData.title,
+        subtitle: bData.subtitle,
+        category: bData.category,
+        author: bData.author,
+        dateStr: bData.dateStr,
+        createdAt: bData.createdAt,
+        content: bData.content,
+        image: bData.image
+      } as any);
+    }
+  });
 
   const categories = ["All", "SEO & Content", "Technology"];
 
@@ -3807,74 +4231,110 @@ function BrutalCard({ title, desc, icon, badge, descClass, onClick, compact = fa
   );
 }
 
-function Footer() {
+function Footer({ handleTabChange }: { handleTabChange: (tab: TabState | "admin", subId?: string) => void }) {
+  const handleLink = (e: React.MouseEvent<HTMLAnchorElement>, tab: TabState | "admin", subId?: string) => {
+    e.preventDefault();
+    handleTabChange(tab, subId);
+    window.scrollTo(0, 0);
+  };
+
   return (
-    <footer className="border-t-8 border-black bg-white py-20 text-black px-6 mt-20">
-      <div className="max-w-[1600px] mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
-          <div className="col-span-1 md:col-span-1">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 flex items-center justify-center bg-black border-2 border-black">
-                <Cpu size={24} className="text-white" />
+    <footer className="border-t-8 border-black bg-white py-16 text-black px-6 mt-16 font-jakarta">
+      <div className="max-w-[1600px] mx-auto space-y-12">
+        
+        {/* Five Column Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
+          
+          {/* Col 1: Branding & Intro */}
+          <div className="col-span-2 md:col-span-1 space-y-4">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 flex items-center justify-center bg-black border-2 border-black">
+                <Cpu size={18} className="text-white" />
               </div>
-              <span className="text-3xl font-orbitron italic font-bold tracking-tighter text-black uppercase">
+              <span className="text-xl font-orbitron italic font-bold tracking-tighter text-black uppercase">
                 RED<span className="text-[var(--theme-accent)]">AI</span>
               </span>
             </div>
-            <p className="font-jakarta text-black text-sm font-bold leading-relaxed">
-              The world's most advanced AI detection and humanization protocol. Engineered for the Aeternum age. High-performance neural verification for creators and developers.
+            <p className="text-xs text-gray-700 font-bold leading-relaxed">
+              Undetectable AI content humanization, AI checking, and generative visibility protocols. Re-engineering syntax for Google, Perplexity, ChatGPT, and Turnitin search algorithms.
+            </p>
+            <p className="text-[10px] font-orbitron text-black uppercase font-bold italic pt-4">
+              © 2026 REDAI PROTOCOL.
             </p>
           </div>
 
+          {/* Col 2: Optimization Tools */}
           <div>
-            <h4 className="font-orbitron font-bold uppercase text-[var(--theme-accent)] mb-6 text-sm tracking-widest border-b-2 border-black pb-2 inline-block">Protocols</h4>
-            <ul className="space-y-3 font-jakarta text-sm font-bold uppercase text-black">
-              <li className="hover:text-[var(--theme-accent)] cursor-pointer transition-colors">Text Humanizer</li>
-              <li className="hover:text-[var(--theme-accent)] cursor-pointer transition-colors">AI Detector</li>
-              <li className="hover:text-[var(--theme-accent)] cursor-pointer transition-colors">Plagiarism Matrix</li>
-              <li className="hover:text-[var(--theme-accent)] cursor-pointer transition-colors">Neural Rewriter</li>
-              <li className="hover:text-[var(--theme-accent)] cursor-pointer transition-colors">API Access</li>
+            <h4 className="font-orbitron font-extrabold uppercase text-[var(--theme-accent)] mb-4 text-[11px] tracking-widest border-b border-black pb-1 inline-block">Bypass Tools</h4>
+            <ul className="space-y-2 text-xs font-bold uppercase">
+              <li><a href="/" onClick={(e) => handleLink(e, "home")} className="hover:text-[var(--theme-accent)] transition-colors">Text Humanizer</a></li>
+              <li><a href="/" onClick={(e) => handleLink(e, "home")} className="hover:text-[var(--theme-accent)] transition-colors">AI Content Detector</a></li>
+              <li><a href="/" onClick={(e) => handleLink(e, "home")} className="hover:text-[var(--theme-accent)] transition-colors">Plagiarism Scanner</a></li>
+              <li><a href="/features" onClick={(e) => handleLink(e, "features")} className="hover:text-[var(--theme-accent)] transition-colors">Sentence Rewriter</a></li>
+              <li><a href="/features" onClick={(e) => handleLink(e, "features")} className="hover:text-[var(--theme-accent)] transition-colors">Paragraph Rewriter</a></li>
+              <li><a href="/features" onClick={(e) => handleLink(e, "features")} className="hover:text-[var(--theme-accent)] transition-colors">Grammar Checker</a></li>
             </ul>
           </div>
 
+          {/* Col 3: GEO Entity Hub */}
           <div>
-            <h4 className="font-orbitron font-bold uppercase text-[var(--theme-cyan)] mb-6 text-sm tracking-widest border-b-2 border-black pb-2 inline-block">Network</h4>
-            <ul className="space-y-3 font-jakarta text-sm font-bold uppercase text-black">
-              <li className="hover:text-[var(--theme-cyan)] cursor-pointer transition-colors">Marketplace</li>
-              <li className="hover:text-[var(--theme-cyan)] cursor-pointer transition-colors">Affiliate Hub</li>
-              <li className="hover:text-[var(--theme-cyan)] cursor-pointer transition-colors">Referral Link</li>
-              <li className="hover:text-[var(--theme-cyan)] cursor-pointer transition-colors">Career Portal</li>
-              <li className="hover:text-[var(--theme-cyan)] cursor-pointer transition-colors">Ad Partners</li>
+            <h4 className="font-orbitron font-extrabold uppercase text-[var(--theme-cyan)] mb-4 text-[11px] tracking-widest border-b border-black pb-1 inline-block">Entity Indexes</h4>
+            <ul className="space-y-2 text-xs font-bold uppercase">
+              <li><a href="/entity/chatgpt" onClick={(e) => handleLink(e, "entity", "chatgpt")} className="hover:text-[var(--theme-cyan)] transition-colors">ChatGPT</a></li>
+              <li><a href="/entity/claude" onClick={(e) => handleLink(e, "entity", "claude")} className="hover:text-[var(--theme-cyan)] transition-colors">Claude AI</a></li>
+              <li><a href="/entity/gemini" onClick={(e) => handleLink(e, "entity", "gemini")} className="hover:text-[var(--theme-cyan)] transition-colors">Google Gemini</a></li>
+              <li><a href="/entity/perplexity" onClick={(e) => handleLink(e, "entity", "perplexity")} className="hover:text-[var(--theme-cyan)] transition-colors">Perplexity AI</a></li>
+              <li><a href="/entity/gptzero" onClick={(e) => handleLink(e, "entity", "gptzero")} className="hover:text-[var(--theme-cyan)] transition-colors">GPTZero</a></li>
+              <li><a href="/entity/copyleaks" onClick={(e) => handleLink(e, "entity", "copyleaks")} className="hover:text-[var(--theme-cyan)] transition-colors">Copyleaks</a></li>
+              <li><a href="/entity/originality-ai" onClick={(e) => handleLink(e, "entity", "originality-ai")} className="hover:text-[var(--theme-cyan)] transition-colors">Originality.ai</a></li>
+              <li><a href="/entity/turnitin" onClick={(e) => handleLink(e, "entity", "turnitin")} className="hover:text-[var(--theme-cyan)] transition-colors">Turnitin Scanner</a></li>
             </ul>
           </div>
 
+          {/* Col 4: Comparison Matrix */}
           <div>
-            <h4 className="font-orbitron font-bold uppercase text-black mb-6 text-sm tracking-widest border-b-2 border-black pb-2 inline-block">Connect</h4>
-            <div className="flex gap-4">
-              <div className="w-12 h-12 bg-black border-4 border-black flex items-center justify-center group cursor-pointer hover:bg-[var(--theme-accent)] transition-colors shadow-[4px_4px_0_#000]">
-                <Terminal size={24} className="text-white group-hover:text-black" />
-              </div>
-              <div className="w-12 h-12 bg-black border-4 border-black flex items-center justify-center group cursor-pointer hover:bg-[var(--theme-cyan)] transition-colors shadow-[4px_4px_0_#000]">
-                <MessageSquare size={24} className="text-white group-hover:text-black" />
-              </div>
-              <div className="w-12 h-12 bg-black border-4 border-black flex items-center justify-center group cursor-pointer hover:bg-[var(--theme-accent)] transition-colors shadow-[4px_4px_0_#000]">
-                <Layers size={24} className="text-white group-hover:text-black" />
-              </div>
-            </div>
-            <p className="mt-8 text-[11px] font-orbitron text-black uppercase font-bold italic">© 2026 REDAI PROTOCOL. ALL RIGHTS RESERVED.</p>
+            <h4 className="font-orbitron font-extrabold uppercase text-black mb-4 text-[11px] tracking-widest border-b border-black pb-1 inline-block">Comparisons</h4>
+            <ul className="space-y-2 text-xs font-bold uppercase">
+              <li><a href="/chatgpt-vs-claude" onClick={(e) => handleLink(e, "comparison", "chatgpt-vs-claude")} className="hover:text-[var(--theme-accent)] transition-colors">ChatGPT vs Claude</a></li>
+              <li><a href="/chatgpt-vs-gemini" onClick={(e) => handleLink(e, "comparison", "chatgpt-vs-gemini")} className="hover:text-[var(--theme-accent)] transition-colors">ChatGPT vs Gemini</a></li>
+              <li><a href="/gptzero-vs-copyleaks" onClick={(e) => handleLink(e, "comparison", "gptzero-vs-copyleaks")} className="hover:text-[var(--theme-accent)] transition-colors">GPTZero vs Copyleaks</a></li>
+              <li><a href="/copyleaks-vs-turnitin" onClick={(e) => handleLink(e, "comparison", "copyleaks-vs-turnitin")} className="hover:text-[var(--theme-accent)] transition-colors">Copyleaks vs Turnitin</a></li>
+              <li><a href="/seo-vs-geo" onClick={(e) => handleLink(e, "comparison", "seo-vs-geo")} className="hover:text-[var(--theme-accent)] transition-colors">SEO vs GEO Search</a></li>
+              <li><a href="/geo-vs-aeo" onClick={(e) => handleLink(e, "comparison", "geo-vs-aeo")} className="hover:text-[var(--theme-accent)] transition-colors">GEO vs AEO Strategy</a></li>
+            </ul>
+          </div>
+
+          {/* Col 5: Commercial & Policies */}
+          <div>
+            <h4 className="font-orbitron font-extrabold uppercase text-black mb-4 text-[11px] tracking-widest border-b border-black pb-1 inline-block">Enterprise</h4>
+            <ul className="space-y-2 text-xs font-bold uppercase">
+              <li><a href="/pricing" onClick={(e) => handleLink(e, "pricing")} className="hover:text-gray-600 transition-colors">Pricing Options</a></li>
+              <li><a href="/api" onClick={(e) => handleLink(e, "api")} className="hover:text-gray-600 transition-colors">Developer API</a></li>
+              <li><a href="/integrations" onClick={(e) => handleLink(e, "integrations")} className="hover:text-gray-600 transition-colors">Integrations</a></li>
+              <li><a href="/agencies" onClick={(e) => handleLink(e, "agencies")} className="hover:text-gray-600 transition-colors">Agencies Portal</a></li>
+              <li><a href="/enterprise" onClick={(e) => handleLink(e, "enterprise")} className="hover:text-gray-600 transition-colors">Enterprise SLA</a></li>
+              <li><a href="/education" onClick={(e) => handleLink(e, "education")} className="hover:text-gray-600 transition-colors">Academic Portal</a></li>
+            </ul>
+          </div>
+
+        </div>
+
+        {/* Bottom EEAT compliance and system states */}
+        <div className="pt-8 border-t-2 border-black flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] font-orbitron font-bold uppercase tracking-widest italic">
+          <div className="flex flex-wrap justify-center gap-6 text-black">
+            <a href="/about" onClick={(e) => handleLink(e, "about")} className="hover:text-[var(--theme-accent)] transition-colors">About Us</a>
+            <a href="/contact" onClick={(e) => handleLinkClick || ((e: any) => handleLink(e, "contact"))} className="hover:text-[var(--theme-accent)] transition-colors">Contact Support</a>
+            <a href="/privacy" onClick={(e) => handleLink(e, "privacy")} className="hover:text-[var(--theme-cyan)] transition-colors">Privacy Matrix</a>
+            <a href="/terms" onClick={(e) => handleLink(e, "terms")} className="hover:text-[var(--theme-cyan)] transition-colors">Terms of Service</a>
+            <a href="/cookies" onClick={(e) => handleLink(e, "cookies")} className="hover:text-[var(--theme-cyan)] transition-colors">Cookie Policy</a>
+            <a href="/careers" onClick={(e) => handleLink(e, "career")} className="hover:text-gray-500 transition-colors">Careers Matrix</a>
+            <a href="/sitemap.xml" target="_blank" className="hover:text-gray-500 transition-colors">Sitemap XML</a>
+          </div>
+          <div className="px-3 py-1 border-2 border-black bg-gray-50 text-black">
+            REDAI BUILD STABLE // V4.2.6
           </div>
         </div>
 
-        <div className="pt-12 border-t-4 border-black flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex gap-8 text-[11px] font-orbitron uppercase tracking-widest italic text-black font-bold">
-            <span className="hover:text-[var(--theme-accent)] cursor-pointer transition-colors">Protocol Rules</span>
-            <span className="hover:text-[var(--theme-cyan)] cursor-pointer transition-colors">Privacy Matrix</span>
-            <span className="hover:text-gray-400 cursor-pointer transition-colors">Security Audit</span>
-          </div>
-          <div className="text-[11px] font-orbitron text-black uppercase font-bold italic px-4 py-1 border-2 border-black bg-gray-100">
-            V4.2.0-STABLE // BUILD 05162026
-          </div>
-        </div>
       </div>
     </footer>
   );
