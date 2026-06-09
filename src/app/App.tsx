@@ -1892,6 +1892,30 @@ function BlogTab() {
 
   // Read exclusively from Convex — no static data merge so deletions persist on refresh
   const blogs = useQuery(api.blogs.list) || [];
+  const seedBlogs = useMutation(api.blogs.seed);
+  const seedOneBlog = useMutation(api.blogs.seedOne);
+
+  // Auto-seed: populate DB on first load if empty; also ensure the featured article exists
+  useEffect(() => {
+    if (blogs.length === 0) {
+      void seedBlogs();
+    } else {
+      const aiHumanizerTitle = "What Is AI Humanizer Meaning: AI Humanizer Guide 2026";
+      const hasAiHumanizerPost = blogs.some((b: any) => b.title === aiHumanizerTitle);
+      if (!hasAiHumanizerPost) {
+        void seedOneBlog({
+          title: aiHumanizerTitle,
+          category: "Technology",
+          subtitle: "Learn what an AI humanizer is, how it works, and when to use it to make AI-written content sound natural, authentic, and detection-safe.",
+          author: "REDAI Editorial",
+          dateStr: "JUN 10, 2026",
+          createdAt: new Date("2026-06-10").getTime(),
+          content: `An AI humanizer is a tool designed to transform machine-generated text into natural, human-like writing. When users search for **what is ai humanizer** or **ai humanizer meaning**, they are trying to understand how AI-written content can be refined so it feels authentic, readable, and less robotic while keeping the original message intact.\n\nIn practice, AI humanizers work by adjusting sentence flow, improving vocabulary variation, and reducing repetitive phrasing commonly found in large language models. Instead of changing meaning, they enhance tone, rhythm, and emotional clarity, making content easier to read and more engaging for real audiences. This is why marketers, bloggers, and SEO professionals increasingly rely on them to improve performance without fully rewriting content.\n\nThe rise of generative AI tools has increased the need for humanization systems. However, experts emphasize responsible use. Over-reliance can reduce originality and raise transparency concerns, especially in academic, journalistic, or business-critical writing where authenticity matters.\n\nResearch from OpenAI highlights that AI-generated text often requires human refinement to improve clarity, structure, and context awareness. Meanwhile, academic and industry discussions, including reports from MIT Technology Review, stress the importance of human oversight in AI-assisted writing to maintain trust and content integrity.\n\nUltimately, AI humanizers are not replacements for writers but enhancement tools. They bridge automation and human communication, helping content rank better in search engines while still feeling natural, readable, and trustworthy.`,
+          image: "https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=400&q=80",
+        });
+      }
+    }
+  }, [blogs.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const categories = ["All", "SEO & Content", "Technology"];
 
@@ -4552,145 +4576,159 @@ function BlogEditor({ blogToEdit, onCancel, onComplete }: { blogToEdit?: any, on
   };
 
   return (
-    <div className="bg-white border-4 border-black p-4 sm:p-8 md:p-12 animate-in fade-in slide-in-from-bottom-4 duration-500 overflow-hidden w-full max-w-4xl mx-auto">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-orbitron font-bold uppercase">{blogToEdit ? "Edit Blog" : "Create Blog"}</h2>
-        <button type="button" onClick={onCancel} className="text-sm font-bold uppercase hover:text-[var(--theme-accent)]">Cancel</button>
+    <div className="bg-white border-4 border-black animate-in fade-in slide-in-from-bottom-4 duration-500 overflow-hidden w-full max-w-4xl mx-auto">
+      {/* Header */}
+      <div className="flex justify-between items-center px-6 py-4 border-b-4 border-black bg-black">
+        <h2 className="text-xl font-orbitron font-black uppercase tracking-widest text-white">
+          {blogToEdit ? "EDIT BLOG" : "CREATE BLOG"}
+        </h2>
+        <button
+          type="button"
+          onClick={onCancel}
+          className="text-[10px] font-orbitron font-black uppercase tracking-widest text-gray-400 hover:text-[var(--theme-cyan)] transition-colors cursor-pointer"
+        >
+          CANCEL
+        </button>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
+      <form onSubmit={handleSubmit} className="p-6 space-y-5">
+        {/* Row 1: Title + Category */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-[10px] font-bold uppercase mb-1">Title</label>
-            <input required type="text" className="w-full border-2 border-black p-2 font-jakarta text-sm text-white"
+            <label className="block text-[9px] font-orbitron font-black uppercase tracking-widest text-gray-500 mb-1.5">Title</label>
+            <input
+              required
+              type="text"
+              className="w-full border-2 border-black p-2.5 font-jakarta text-sm text-black bg-white focus:outline-none focus:border-[var(--theme-cyan)] transition-colors placeholder-gray-400"
+              placeholder="Blog post title..."
               value={formData.title}
               onChange={e => setFormData({ ...formData, title: e.target.value })}
-              style={{ color: 'white' }}
             />
           </div>
           <div>
-            <label className="block text-[10px] font-bold uppercase mb-1">Category</label>
-            <input required type="text" className="w-full border-2 border-black p-2 font-jakarta text-sm"
+            <label className="block text-[9px] font-orbitron font-black uppercase tracking-widest text-gray-500 mb-1.5">Category</label>
+            <select
+              required
+              className="w-full border-2 border-black p-2.5 font-jakarta text-sm text-black bg-white focus:outline-none focus:border-[var(--theme-cyan)] transition-colors cursor-pointer"
               value={formData.category}
               onChange={e => setFormData({ ...formData, category: e.target.value })}
-              style={{ color: 'white' }} />
+            >
+              <option value="Technology">Technology</option>
+              <option value="SEO &amp; Content">SEO &amp; Content</option>
+              <option value="AI Tools">AI Tools</option>
+              <option value="Writing">Writing</option>
+              <option value="Marketing">Marketing</option>
+            </select>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        {/* Row 2: Author + Date String */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-[10px] font-bold uppercase mb-1">Author</label>
-            <input required type="text" className="w-full border-2 border-black p-2 font-jakarta text-sm"
+            <label className="block text-[9px] font-orbitron font-black uppercase tracking-widest text-gray-500 mb-1.5">Author</label>
+            <input
+              required
+              type="text"
+              className="w-full border-2 border-black p-2.5 font-jakarta text-sm text-black bg-white focus:outline-none focus:border-[var(--theme-cyan)] transition-colors placeholder-gray-400"
+              placeholder="Author name..."
               value={formData.author}
               onChange={e => setFormData({ ...formData, author: e.target.value })}
-              style={{ color: 'white' }} />
+            />
           </div>
           <div>
-            <label className="block text-[10px] font-bold uppercase mb-1">Date String</label>
-            <input required type="text" className="w-full border-2 border-black p-2 font-jakarta text-sm"
+            <label className="block text-[9px] font-orbitron font-black uppercase tracking-widest text-gray-500 mb-1.5">Date String</label>
+            <input
+              required
+              type="text"
+              className="w-full border-2 border-black p-2.5 font-jakarta text-sm text-black bg-white focus:outline-none focus:border-[var(--theme-cyan)] transition-colors placeholder-gray-400"
+              placeholder="JUN 10, 2026"
               value={formData.dateStr}
               onChange={e => setFormData({ ...formData, dateStr: e.target.value })}
-              style={{ color: 'white' }} />
+            />
           </div>
         </div>
 
+        {/* Full-Width: Subtitle */}
         <div>
-          <label className="block text-[10px] font-bold uppercase mb-1">Subtitle</label>
-          <input required type="text" className="w-full border-2 border-black p-2 font-jakarta text-sm"
+          <label className="block text-[9px] font-orbitron font-black uppercase tracking-widest text-gray-500 mb-1.5">Subtitle</label>
+          <input
+            required
+            type="text"
+            className="w-full border-2 border-black p-2.5 font-jakarta text-sm text-black bg-white focus:outline-none focus:border-[var(--theme-cyan)] transition-colors placeholder-gray-400"
+            placeholder="A short, compelling subtitle..."
             value={formData.subtitle}
             onChange={e => setFormData({ ...formData, subtitle: e.target.value })}
-            style={{ color: 'white' }} />
+          />
         </div>
 
+        {/* Full-Width: Image URL */}
         <div>
-          <label className="block text-[10px] font-bold uppercase mb-1">Image URL</label>
-          <input required type="text" className="w-full border-2 border-black p-2 font-jakarta text-sm"
+          <label className="block text-[9px] font-orbitron font-black uppercase tracking-widest text-gray-500 mb-1.5">Image URL</label>
+          <input
+            required
+            type="text"
+            className="w-full border-2 border-black p-2.5 font-jakarta text-sm text-black bg-white focus:outline-none focus:border-[var(--theme-cyan)] transition-colors placeholder-gray-400"
+            placeholder="https://images.unsplash.com/..."
             value={formData.image}
             onChange={e => setFormData({ ...formData, image: e.target.value })}
-            style={{ color: 'white' }} />
+          />
         </div>
 
+        {/* Rich Text Editor Section */}
         <div>
-          <label className="block text-[10px] font-bold uppercase mb-1 flex justify-between">
-            <span>Blog Content</span>
-            <span className="text-[var(--theme-accent)]">Format with toolbar below or Markdown syntax</span>
-          </label>
+          <div className="flex items-center justify-between mb-1.5">
+            <label className="text-[9px] font-orbitron font-black uppercase tracking-widest text-gray-500">BLOG CONTENT</label>
+            <span className="text-[9px] font-orbitron font-black uppercase tracking-widest text-red-600">FORMAT WITH TOOLBAR BELOW OR MARKDOWN SYNTAX</span>
+          </div>
 
           <div className="border-2 border-black flex flex-col">
-            {/* Neo-Brutalist Formatting Toolbar */}
-            <div className="bg-gray-50 border-b-2 border-black p-2 flex flex-wrap items-center gap-1.5 select-none">
-              <button
-                type="button"
-                onClick={() => insertFormatting("bold")}
-                className="p-1.5 text-black hover:bg-[var(--theme-cyan)] hover:text-black border border-transparent hover:border-black active:translate-y-[1px] transition-all rounded-sm flex items-center justify-center cursor-pointer"
-                title="Bold"
-              >
-                <Bold size={14} />
+            {/* Formatting Toolbar */}
+            <div className="bg-gray-50 border-b-2 border-black px-2 py-2 flex flex-wrap items-center gap-1 select-none">
+              {/* Text styles */}
+              <button type="button" onClick={() => insertFormatting("bold")}
+                className="p-1.5 text-black hover:bg-[var(--theme-cyan)] border border-transparent hover:border-black active:translate-y-[1px] transition-all rounded-sm flex items-center justify-center cursor-pointer"
+                title="Bold">
+                <Bold size={13} />
               </button>
-              <button
-                type="button"
-                onClick={() => insertFormatting("italic")}
-                className="p-1.5 text-black hover:bg-[var(--theme-cyan)] hover:text-black border border-transparent hover:border-black active:translate-y-[1px] transition-all rounded-sm flex items-center justify-center cursor-pointer"
-                title="Italic"
-              >
-                <Italic size={14} />
+              <button type="button" onClick={() => insertFormatting("italic")}
+                className="p-1.5 text-black hover:bg-[var(--theme-cyan)] border border-transparent hover:border-black active:translate-y-[1px] transition-all rounded-sm flex items-center justify-center cursor-pointer"
+                title="Italic">
+                <Italic size={13} />
               </button>
-              <button
-                type="button"
-                onClick={() => insertFormatting("underline")}
-                className="p-1.5 text-black hover:bg-[var(--theme-cyan)] hover:text-black border border-transparent hover:border-black active:translate-y-[1px] transition-all rounded-sm flex items-center justify-center cursor-pointer"
-                title="Underline"
-              >
-                <Underline size={14} />
+              <button type="button" onClick={() => insertFormatting("underline")}
+                className="p-1.5 text-black hover:bg-[var(--theme-cyan)] border border-transparent hover:border-black active:translate-y-[1px] transition-all rounded-sm flex items-center justify-center cursor-pointer"
+                title="Underline">
+                <Underline size={13} />
               </button>
-              <button
-                type="button"
-                onClick={() => insertFormatting("strikethrough")}
-                className="p-1.5 text-black hover:bg-[var(--theme-cyan)] hover:text-black border border-transparent hover:border-black active:translate-y-[1px] transition-all rounded-sm flex items-center justify-center cursor-pointer"
-                title="Strikethrough"
-              >
-                <Strikethrough size={14} />
+              <button type="button" onClick={() => insertFormatting("strikethrough")}
+                className="p-1.5 text-black hover:bg-[var(--theme-cyan)] border border-transparent hover:border-black active:translate-y-[1px] transition-all rounded-sm flex items-center justify-center cursor-pointer"
+                title="Strikethrough">
+                <Strikethrough size={13} />
               </button>
 
-              <div className="w-[1px] h-4 bg-black mx-1" />
+              <div className="w-[1px] h-4 bg-gray-300 mx-1" />
 
-              <button
-                type="button"
-                onClick={() => insertFormatting("h1")}
-                className="px-2 py-0.5 text-black font-orbitron font-black text-xs hover:bg-[var(--theme-cyan)] border border-transparent hover:border-black active:translate-y-[1px] transition-all rounded-sm cursor-pointer"
-                title="Heading 1"
-              >
+              {/* Headings */}
+              <button type="button" onClick={() => insertFormatting("h1")}
+                className="px-2 py-1 text-black font-orbitron font-black text-[10px] hover:bg-[var(--theme-cyan)] border border-transparent hover:border-black active:translate-y-[1px] transition-all rounded-sm cursor-pointer">
                 H1
               </button>
-              <button
-                type="button"
-                onClick={() => insertFormatting("h2")}
-                className="px-2 py-0.5 text-black font-orbitron font-black text-xs hover:bg-[var(--theme-cyan)] border border-transparent hover:border-black active:translate-y-[1px] transition-all rounded-sm cursor-pointer"
-                title="Heading 2"
-              >
+              <button type="button" onClick={() => insertFormatting("h2")}
+                className="px-2 py-1 text-black font-orbitron font-black text-[10px] hover:bg-[var(--theme-cyan)] border border-transparent hover:border-black active:translate-y-[1px] transition-all rounded-sm cursor-pointer">
                 H2
               </button>
-              <button
-                type="button"
-                onClick={() => insertFormatting("h3")}
-                className="px-2 py-0.5 text-black font-orbitron font-black text-xs hover:bg-[var(--theme-cyan)] border border-transparent hover:border-black active:translate-y-[1px] transition-all rounded-sm cursor-pointer"
-                title="Heading 3"
-              >
+              <button type="button" onClick={() => insertFormatting("h3")}
+                className="px-2 py-1 text-black font-orbitron font-black text-[10px] hover:bg-[var(--theme-cyan)] border border-transparent hover:border-black active:translate-y-[1px] transition-all rounded-sm cursor-pointer">
                 H3
               </button>
 
-              <div className="w-[1px] h-4 bg-black mx-1" />
+              <div className="w-[1px] h-4 bg-gray-300 mx-1" />
 
               {/* Font Size Dropdown */}
               <select
-                onChange={(e) => {
-                  if (e.target.value) {
-                    insertFormatting("font-size", e.target.value);
-                    e.target.value = ""; // Reset value so it can be re-selected
-                  }
-                }}
+                onChange={(e) => { if (e.target.value) { insertFormatting("font-size", e.target.value); e.target.value = ""; } }}
                 value=""
-                className="border border-black bg-white px-1.5 py-0.5 text-[10px] font-bold font-orbitron focus:outline-none hover:bg-gray-100 cursor-pointer h-[24px]"
+                className="border border-black bg-white px-1.5 py-0.5 text-[9px] font-bold font-orbitron focus:outline-none hover:bg-gray-100 cursor-pointer h-[26px] text-black"
               >
                 <option value="" disabled>Size</option>
                 <option value="12px">12px</option>
@@ -4702,39 +4740,28 @@ function BlogEditor({ blogToEdit, onCancel, onComplete }: { blogToEdit?: any, on
                 <option value="32px">32px</option>
               </select>
 
-              <div className="w-[1px] h-4 bg-black mx-1" />
+              <div className="w-[1px] h-4 bg-gray-300 mx-1" />
 
-              <button
-                type="button"
-                onClick={() => insertFormatting("list")}
-                className="p-1.5 text-black hover:bg-[var(--theme-cyan)] hover:text-black border border-transparent hover:border-black active:translate-y-[1px] transition-all rounded-sm flex items-center justify-center cursor-pointer"
-                title="Bullet List"
-              >
-                <List size={14} />
+              {/* Lists & Blocks */}
+              <button type="button" onClick={() => insertFormatting("list")}
+                className="p-1.5 text-black hover:bg-[var(--theme-cyan)] border border-transparent hover:border-black active:translate-y-[1px] transition-all rounded-sm flex items-center justify-center cursor-pointer"
+                title="Bullet List">
+                <List size={13} />
               </button>
-              <button
-                type="button"
-                onClick={() => insertFormatting("numlist")}
-                className="p-1.5 text-black hover:bg-[var(--theme-cyan)] hover:text-black border border-transparent hover:border-black active:translate-y-[1px] transition-all rounded-sm flex items-center justify-center cursor-pointer"
-                title="Numbered List"
-              >
-                <ListOrdered size={14} />
+              <button type="button" onClick={() => insertFormatting("numlist")}
+                className="p-1.5 text-black hover:bg-[var(--theme-cyan)] border border-transparent hover:border-black active:translate-y-[1px] transition-all rounded-sm flex items-center justify-center cursor-pointer"
+                title="Numbered List">
+                <ListOrdered size={13} />
               </button>
-              <button
-                type="button"
-                onClick={() => insertFormatting("quote")}
-                className="p-1.5 text-black hover:bg-[var(--theme-cyan)] hover:text-black border border-transparent hover:border-black active:translate-y-[1px] transition-all rounded-sm flex items-center justify-center cursor-pointer"
-                title="Quote"
-              >
-                <Quote size={14} />
+              <button type="button" onClick={() => insertFormatting("quote")}
+                className="p-1.5 text-black hover:bg-[var(--theme-cyan)] border border-transparent hover:border-black active:translate-y-[1px] transition-all rounded-sm flex items-center justify-center cursor-pointer"
+                title="Blockquote">
+                <Quote size={13} />
               </button>
-              <button
-                type="button"
-                onClick={() => insertFormatting("link")}
-                className="p-1.5 text-black hover:bg-[var(--theme-cyan)] hover:text-black border border-transparent hover:border-black active:translate-y-[1px] transition-all rounded-sm flex items-center justify-center cursor-pointer"
-                title="Link"
-              >
-                <Link size={14} />
+              <button type="button" onClick={() => insertFormatting("link")}
+                className="p-1.5 text-black hover:bg-[var(--theme-cyan)] border border-transparent hover:border-black active:translate-y-[1px] transition-all rounded-sm flex items-center justify-center cursor-pointer"
+                title="Link">
+                <Link size={13} />
               </button>
             </div>
 
@@ -4742,17 +4769,21 @@ function BlogEditor({ blogToEdit, onCancel, onComplete }: { blogToEdit?: any, on
             <textarea
               ref={textareaRef}
               required
-              className="w-full p-3 font-jakarta text-sm min-h-[350px] focus:outline-none resize-y"
+              className="w-full p-4 font-jakarta text-sm text-black min-h-[380px] focus:outline-none resize-y bg-white placeholder-gray-400"
               value={formData.content}
               onChange={e => setFormData({ ...formData, content: e.target.value })}
               placeholder="Start writing... Use the formatting bar above to help style your content."
-              style={{ color: 'white' }}
             />
           </div>
         </div>
 
-        <button type="submit" disabled={isSubmitting} className="w-full bg-[var(--theme-cyan)] border-2 border-black p-3 font-orbitron font-bold uppercase text-black hover:bg-black hover:text-white transition-colors mt-4 cursor-pointer">
-          {isSubmitting ? "Saving..." : "Save Blog Post"}
+        {/* Submit Button */}
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full bg-[var(--theme-cyan)] border-2 border-black py-3.5 font-orbitron font-black uppercase tracking-widest text-black text-sm hover:bg-black hover:text-[var(--theme-cyan)] transition-all shadow-[4px_4px_0_#000] active:translate-y-[2px] active:shadow-none cursor-pointer mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isSubmitting ? "SAVING..." : "SAVE BLOG POST"}
         </button>
       </form>
     </div>

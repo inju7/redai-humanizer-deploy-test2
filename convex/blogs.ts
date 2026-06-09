@@ -89,6 +89,24 @@ export const seed = mutation({
 
     const blogs = [
       {
+        title: "What Is AI Humanizer Meaning: AI Humanizer Guide 2026",
+        category: "Technology",
+        subtitle: "Learn what an AI humanizer is, how it works, and when to use it to make AI-written content sound natural, authentic, and detection-safe.",
+        author: "REDAI Editorial",
+        dateStr: "JUN 10, 2026",
+        createdAt: new Date("2026-06-10").getTime(),
+        content: `An AI humanizer is a tool designed to transform machine-generated text into natural, human-like writing. When users search for **what is ai humanizer** or **ai humanizer meaning**, they are trying to understand how AI-written content can be refined so it feels authentic, readable, and less robotic while keeping the original message intact.
+
+In practice, AI humanizers work by adjusting sentence flow, improving vocabulary variation, and reducing repetitive phrasing commonly found in large language models. Instead of changing meaning, they enhance tone, rhythm, and emotional clarity, making content easier to read and more engaging for real audiences. This is why marketers, bloggers, and SEO professionals increasingly rely on them to improve performance without fully rewriting content.
+
+The rise of generative AI tools has increased the need for humanization systems. However, experts emphasize responsible use. Over-reliance can reduce originality and raise transparency concerns, especially in academic, journalistic, or business-critical writing where authenticity matters.
+
+Research from OpenAI highlights that AI-generated text often requires human refinement to improve clarity, structure, and context awareness. Meanwhile, academic and industry discussions, including reports from MIT Technology Review, stress the importance of human oversight in AI-assisted writing to maintain trust and content integrity.
+
+Ultimately, AI humanizers are not replacements for writers but enhancement tools. They bridge automation and human communication, helping content rank better in search engines while still feeling natural, readable, and trustworthy.`,
+        image: "https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=400&q=80"
+      },
+      {
         title: "Bypassing Turnitin in 2026",
         category: "Technology",
         subtitle: "How to safely humanize academic submissions without triggering secondary patterns.",
@@ -135,5 +153,32 @@ export const seed = mutation({
     }
 
     return "Seeded successfully";
+  },
+});
+
+// Insert a single blog post directly (bypasses the "already seeded" guard)
+// Use this to add individual posts after initial seeding has already occurred.
+export const seedOne = mutation({
+  args: {
+    title: v.string(),
+    category: v.string(),
+    subtitle: v.string(),
+    author: v.string(),
+    dateStr: v.string(),
+    content: v.string(),
+    image: v.string(),
+    createdAt: v.number(),
+  },
+  handler: async (ctx, args) => {
+    // Deduplicate: skip if a blog with the same title already exists
+    const existing = await ctx.db
+      .query("blogs")
+      .collect();
+    const alreadyExists = existing.some((b) => b.title === args.title);
+    if (alreadyExists) {
+      return "Already exists";
+    }
+    const id = await ctx.db.insert("blogs", args);
+    return id;
   },
 });
