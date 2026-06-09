@@ -1826,14 +1826,17 @@ function BlogDetailView({ blog, onBack, onDeleteLocal }: { blog: any, onBack: ()
                 <button
                   onClick={async () => {
                     try {
-                      if (blog.id && !blog.id.includes("-")) {
-                        await removeBlog({ id: blog.id });
+                      // Use blog._id which is the real Convex document ID
+                      const blogId = blog._id || blog.id;
+                      if (blogId) {
+                        await removeBlog({ id: blogId });
                       }
                     } catch (err) {
-                      console.warn("Convex database removal skipped or failed", err);
+                      console.warn("Convex database removal failed", err);
                     }
+                    // Navigate back — Convex reactivity will update the list
                     if (onDeleteLocal) {
-                      onDeleteLocal(blog.id);
+                      onDeleteLocal(blog._id || blog.id);
                     } else {
                       onBack();
                     }
@@ -1884,33 +1887,15 @@ function BlogTab() {
   const [isEditingBlog, setIsEditingBlog] = useState(false);
   const [activeCategory, setActiveCategory] = useState("All");
   const [sortBy, setSortBy] = useState<"newest" | "oldest">("newest");
-  const [deletedBlogIds, setDeletedBlogIds] = useState<string[]>([]);
-
   const user = useQuery(api.users.current);
   const isAdmin = user?.role === "admin";
 
-  const dbBlogs = useQuery(api.blogs.list) || [];
-  const blogs = [...dbBlogs].filter((b: any) => !deletedBlogIds.includes(b._id) && !deletedBlogIds.includes(b.id));
-  blogsData.filter(b => !deletedBlogIds.includes(b.id)).forEach(bData => {
-    if (!blogs.some((b: any) => b.title === bData.title || b.id === bData.id || b._id === bData.id)) {
-      blogs.push({
-        id: bData.id,
-        _id: bData.id as any,
-        title: bData.title,
-        subtitle: bData.subtitle,
-        category: bData.category,
-        author: bData.author,
-        dateStr: bData.dateStr,
-        createdAt: bData.createdAt,
-        content: bData.content,
-        image: bData.image
-      } as any);
-    }
-  });
+  // Read exclusively from Convex — no static data merge so deletions persist on refresh
+  const blogs = useQuery(api.blogs.list) || [];
 
   const categories = ["All", "SEO & Content", "Technology"];
 
-  const filteredBlogs = blogs
+  const filteredBlogs = [...blogs]
     .filter((b: any) => activeCategory === "All" || b.category === activeCategory)
     .sort((a: any, b: any) => sortBy === "newest" ? b.createdAt - a.createdAt : a.createdAt - b.createdAt);
 
@@ -1923,8 +1908,8 @@ function BlogTab() {
       <BlogDetailView
         blog={selectedBlog}
         onBack={() => setSelectedBlog(null)}
-        onDeleteLocal={(id) => {
-          setDeletedBlogIds(prev => [...prev, id]);
+        onDeleteLocal={() => {
+          // Convex real-time subscription will remove the deleted post from the list automatically
           setSelectedBlog(null);
         }}
       />
