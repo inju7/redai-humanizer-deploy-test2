@@ -5,7 +5,7 @@ import { v } from "convex/values";
 import { api } from "./_generated/api";
 import { getAuthUserId } from "@convex-dev/auth/server";
 
-const GROQ_MODEL = "llama-3.3-70b-versatile";
+const GROQ_MODEL = "groq/compound-mini";
 const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
 
 function buildSystemPrompt(tool: string, parameter: string, customInstructions?: string): string {
