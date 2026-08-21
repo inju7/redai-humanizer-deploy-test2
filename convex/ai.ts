@@ -69,23 +69,34 @@ export const generate = action({
   handler: async (ctx, args) => {
     // 1. Verify Authentication & Deduct Credits for logged-in users
     if (!args.isAnonymous) {
-      const userId = await getAuthUserId(ctx);
-      if (!userId) {
-        throw new Error("Unauthorized");
+      let userId: string | null = null;
+      try {
+        userId = await getAuthUserId(ctx);
+      } catch (authErr: any) {
+        console.error("[ai:generate] Auth check failed:", authErr?.message ?? authErr);
+        throw new Error(`Authentication failed: ${authErr?.message ?? "unknown auth error"}`);
       }
-      await ctx.runMutation(api.credits.deduct, {
-        amount: 1,
-        description: `Used ${args.tool}`,
-      });
+      if (!userId) {
+        throw new Error("Unauthorized: No active session. Please sign in.");
+      }
+      try {
+        await ctx.runMutation(api.credits.deduct, {
+          amount: 1,
+          description: `Used ${args.tool}`,
+        });
+      } catch (creditErr: any) {
+        console.error("[ai:generate] Credit deduction failed:", creditErr?.message ?? creditErr);
+        throw new Error(`Credit error: ${creditErr?.message ?? "Could not deduct credits"}`);
+      }
     }
 
     // 2. Get API Key
     const GROQ_API_KEY = process.env.GROQ_API_KEY;
     if (!GROQ_API_KEY) {
       if (!args.isAnonymous) {
-        await ctx.runMutation(api.credits.refund, { amount: 1, description: "System configuration error refund" });
+        await ctx.runMutation(api.credits.refund, { amount: 1, description: "System configuration error refund" }).catch(() => {});
       }
-      throw new Error("Server configuration error: Missing API Key");
+      throw new Error("Server configuration error: GROQ_API_KEY is not set in Convex environment variables.");
     }
 
     // 3. Build prompt inline
@@ -112,19 +123,22 @@ export const generate = action({
       });
 
       if (!response.ok) {
-        throw new Error(`API request failed with status ${response.status}`);
+        // Log the full Groq error body so we can see it in the dashboard
+        const errorBody = await response.text().catch(() => "(could not read body)");
+        console.error(`[ai:generate] Groq API error ${response.status}:`, errorBody);
+        throw new Error(`Groq API error ${response.status}: ${errorBody}`);
       }
 
       const json = await response.json();
       return parseGroqResponse(json);
 
     } catch (error: any) {
-      console.error("AI Request Failed:", error);
+      console.error("[ai:generate] AI Request Failed:", error?.message ?? error);
       // 5. Refund on failure for logged-in users
       if (!args.isAnonymous) {
-        await ctx.runMutation(api.credits.refund, { amount: 1, description: "Failed generation refund" });
+        await ctx.runMutation(api.credits.refund, { amount: 1, description: "Failed generation refund" }).catch(() => {});
       }
-      throw new Error(`The Aeternum Protocol encountered a severe neural disconnect: ${error.message || error}`);
+      throw new Error(`Generation failed: ${error.message || error}`);
     }
   },
 });

@@ -143,7 +143,7 @@ export default function App() {
   // Dynamically update <link rel="canonical">, <title>, meta description and JSON-LD schemas
   useEffect(() => {
     const BASE = "https://redai-humanizer.vercel.app";
-    
+
     // Resolve dynamic active route details
     let path = `/${activeTab}`;
     let title = "REDAI Humanizer: Humanize AI Text, Detect AI Content & Optimize for GEO SEO AEO";
@@ -154,7 +154,7 @@ export default function App() {
       title = "REDAI Humanizer & AI Detector | Humanize AI Text, Plagiarism Checker, GEO SEO AEO Platform";
       desc = "Humanize AI text, bypass AI detection, check plagiarism, rewrite content, and optimize for GEO, SEO, and AEO. Free AI Humanizer platform.";
     } else if (activeTab === "blog") {
-      title = "Blog & SEO Content | REDAI Humanizer";
+      title = "Blog | REDAI Humanizer";
       desc = "Read the latest articles on AI detectors, SEO strategies, Generative Engine Optimization (GEO), and content humanization techniques.";
     } else if (activeTab === "ads") {
       title = "Marketing Deals & Consignments | REDAI Humanizer";
@@ -1961,7 +1961,7 @@ function BlogTab() {
       {/* Reduced Header Container */}
       <div className="flex flex-col md:flex-row md:items-center justify-between border-b-2 border-black pb-4 gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl text-black font-orbitron italic font-bold uppercase">BLOG & SEO CONTENT</h1>
+          <h1 className="text-2xl md:text-3xl text-black font-orbitron italic font-bold uppercase">BLOG</h1>
           <p className="text-[10px] text-gray-500 font-jakarta font-bold uppercase tracking-wider">AETERNUM KNOWLEDGE REPOSITORY</p>
         </div>
 
@@ -2163,10 +2163,10 @@ function ReferralTab({ setCredits }: { setCredits: React.Dispatch<React.SetState
           <h2 className="text-4xl font-orbitron italic font-bold uppercase mb-2 text-black">Referral Claim Form</h2>
           <p className="font-jakarta font-bold text-gray-600 uppercase text-sm">Submit your proof of successful conversion here</p>
         </div>
-        <form className="grid grid-cols-1 md:grid-cols-2 gap-8" onSubmit={async (e) => { 
-          e.preventDefault(); 
+        <form className="grid grid-cols-1 md:grid-cols-2 gap-8" onSubmit={async (e) => {
+          e.preventDefault();
           setClaimStatus("loading");
-          
+
           const formData = new FormData(e.currentTarget);
           const fullName = formData.get("fullName") as string;
           const brandReferred = formData.get("brandReferred") as string;
@@ -2174,9 +2174,9 @@ function ReferralTab({ setCredits }: { setCredits: React.Dispatch<React.SetState
           try {
             await submitClaim({ fullName, brandReferred });
             // Optimistic update for guests (real users will get their credits synced via Convex query if we had one)
-            setCredits(prev => prev + 20); 
+            setCredits(prev => prev + 20);
             setClaimStatus("success");
-            
+
             setTimeout(() => {
               setClaimStatus("idle");
               (e.target as HTMLFormElement).reset();
@@ -2497,37 +2497,36 @@ function CareerTab({ user }: { user?: any }) {
                       Full Name <span className="text-[var(--theme-accent)]">*</span>
                     </label>
                     <input type="text" name="fullName" required placeholder="John Doe"
-                      className="w-full border-2 border-black p-2.5 font-jakarta font-bold outline-none bg-black text-white focus:border-[var(--theme-accent)] text-xs placeholder:text-gray-500" />
+                      className="w-full border-2 border-black p-2.5 font-jakarta font-bold outline-none bg-black text-white focus:border-[var(--theme-accent)] text-xs placeholder:text-gray-500" style={{ color: 'white' }} />
                   </div>
                   <div>
                     <label className="block text-[9px] font-orbitron font-bold uppercase mb-0.5 text-black tracking-widest">
                       Email Address <span className="text-[var(--theme-accent)]">*</span>
                     </label>
                     <input type="email" name="emailAddress" required placeholder="john@example.com"
-                      className="w-full border-2 border-black p-2.5 font-jakarta font-bold outline-none bg-black text-white focus:border-[var(--theme-accent)] text-xs placeholder:text-gray-500" />
+                      className="w-full border-2 border-black p-2.5 font-jakarta font-bold outline-none bg-black text-white focus:border-[var(--theme-accent)] text-xs placeholder:text-gray-500" style={{ color: 'white' }} />
                   </div>
                   <div>
                     <label className="block text-[9px] font-orbitron font-bold uppercase mb-0.5 text-black tracking-widest">
                       LinkedIn / Portfolio / GitHub
                     </label>
                     <input type="text" name="portfolioLink" placeholder="https://linkedin.com/in/yourprofile"
-                      className="w-full border-2 border-black p-2.5 font-jakarta font-bold outline-none bg-black text-white focus:border-[var(--theme-accent)] text-xs placeholder:text-gray-500" />
+                      className="w-full border-2 border-black p-2.5 font-jakarta font-bold outline-none bg-black text-white focus:border-[var(--theme-accent)] text-xs placeholder:text-gray-500" style={{ color: 'white' }} />
                   </div>
                   <div>
                     <label className="block text-[9px] font-orbitron font-bold uppercase mb-0.5 text-black tracking-widest">
                       Cover Message <span className="text-gray-400 normal-case font-jakarta font-semibold">(optional)</span>
                     </label>
                     <textarea name="message" rows={3} placeholder="Tell us why you're a great fit for this role…"
-                      className="w-full border-2 border-black p-2.5 font-jakarta font-bold outline-none bg-black text-white focus:border-[var(--theme-accent)] text-xs placeholder:text-gray-500 resize-none" />
+                      className="w-full border-2 border-black p-2.5 font-jakarta font-bold outline-none bg-black text-white focus:border-[var(--theme-accent)] text-xs placeholder:text-gray-500 resize-none" style={{ color: 'white' }} />
                   </div>
                   <button
                     type="submit"
                     disabled={formState === "loading"}
-                    className={`w-full font-orbitron font-bold py-3 border-2 border-black uppercase mt-1 text-xs tracking-wider transition-all shadow-[3px_3px_0_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none ${
-                      formState === "loading"
-                        ? "bg-gray-400 text-gray-200 cursor-not-allowed"
-                        : "bg-[var(--theme-accent)] text-white hover:bg-black hover:border-white hover:shadow-[3px_3px_0_var(--theme-cyan)]"
-                    }`}
+                    className={`w-full font-orbitron font-bold py-3 border-2 border-black uppercase mt-1 text-xs tracking-wider transition-all shadow-[3px_3px_0_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none ${formState === "loading"
+                      ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+                      : "bg-[var(--theme-accent)] text-white hover:bg-black hover:border-white hover:shadow-[3px_3px_0_var(--theme-cyan)]"
+                      }`}
                   >
                     {formState === "loading" ? "Submitting…" : "Submit Application →"}
                   </button>
@@ -3019,7 +3018,7 @@ function MarketplaceTab() {
   const [checkoutItems, setCheckoutItems] = useState<any[]>([]);
   const [activeFilter, setActiveFilter] = useState("All");
   const [paymentMethod, setPaymentMethod] = useState("GCash");
-  
+
   // Convex integration
   const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
   const [isCheckoutSuccess, setIsCheckoutSuccess] = useState(false);
@@ -3227,7 +3226,7 @@ function MarketplaceTab() {
       )}
 
       <div className="text-center mb-8">
-        <h1 className="text-xl sm:text-3xl md:text-5xl text-black font-orbitron italic font-bold uppercase tracking-tighter leading-tight mb-4">RED<span className="text-[var(--theme-accent)]">AI</span>'S <span className="text-[var(--theme-accent)]">MARKETPLACE</span></h1>
+        <h1 className="text-xl sm:text-3xl md:text-5xl text-white font-orbitron italic font-bold uppercase tracking-tighter leading-tight mb-4" style={{ WebkitTextStroke: '2px var(--theme-cyan)' }}>RED<span className="text-[var(--theme-accent)]">AI</span>'S <span className="text-[var(--theme-accent)]">MARKETPLACE</span></h1>
       </div>
 
       {/* Filter Bar */}
@@ -3362,20 +3361,20 @@ function MarketplaceTab() {
                   <form className="space-y-3" onSubmit={async (e) => {
                     e.preventDefault();
                     setIsCheckoutLoading(true);
-                    
+
                     try {
                       // Log a combined order for all checkout items
-                      const itemName = checkoutItems.length > 1 
-                        ? `Multiple Items (${checkoutItems.length})` 
+                      const itemName = checkoutItems.length > 1
+                        ? `Multiple Items (${checkoutItems.length})`
                         : checkoutItems[0].name;
-                        
+
                       await purchaseMutation({
                         item: itemName,
                         subtotal: totalCheckoutPrice,
                         vat: Math.round(totalCheckoutPrice * 0.12),
                         total: totalCheckoutPrice + Math.round(totalCheckoutPrice * 0.12)
                       });
-                      
+
                       setIsCheckoutSuccess(true);
                       setTimeout(() => {
                         setIsCheckoutOpen(false);
@@ -3397,15 +3396,15 @@ function MarketplaceTab() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                       <div>
                         <label className="block text-[8px] font-orbitron font-bold uppercase mb-0.5 text-black tracking-widest">Full Name</label>
-                        <input type="text" required className="w-full border-2 border-black p-2 font-jakarta bg-white text-black rounded-none focus:border-[var(--theme-accent)] outline-none transition-colors text-[9px] font-bold" />
+                        <input type="text" required className="w-full border-2 border-black p-2 font-jakarta bg-white text-black rounded-none focus:border-[var(--theme-accent)] outline-none transition-colors text-[9px] font-bold" style={{ color: 'white' }} />
                       </div>
                       <div>
                         <label className="block text-[8px] font-orbitron font-bold uppercase mb-0.5 text-black tracking-widest">Email</label>
-                        <input type="email" required className="w-full border-2 border-black p-2 font-jakarta bg-white text-black rounded-none focus:border-[var(--theme-accent)] outline-none transition-colors text-[9px] font-bold" />
+                        <input type="email" required className="w-full border-2 border-black p-2 font-jakarta bg-white text-black rounded-none focus:border-[var(--theme-accent)] outline-none transition-colors text-[9px] font-bold" style={{ color: 'white' }} />
                       </div>
                       <div>
                         <label className="block text-[8px] font-orbitron font-bold uppercase mb-0.5 text-black tracking-widest">Shipping Address</label>
-                        <input type="text" required placeholder="Street, City, Province, Zip" className="w-full border-2 border-black p-2 font-jakarta bg-white text-black rounded-none focus:border-[var(--theme-accent)] outline-none transition-colors text-[9px] font-bold placeholder-gray-400" />
+                        <input type="text" required placeholder="Street, City, Province, Zip" className="w-full border-2 border-black p-2 font-jakarta bg-white text-black rounded-none focus:border-[var(--theme-accent)] outline-none transition-colors text-[9px] font-bold placeholder-gray-400" style={{ color: 'white' }} />
                       </div>
                     </div>
 
@@ -3523,16 +3522,16 @@ function AdminCareersLedger() {
           {/* Stats Row */}
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-[10px] bg-black text-white px-2.5 py-0.5 font-orbitron font-black uppercase tracking-widest">{allApplications.length} TOTAL</span>
-            <span className="text-[10px] bg-green-600 text-white px-2.5 py-0.5 font-orbitron font-black uppercase tracking-widest">{allApplications.filter(a=>a.status==="approved").length} APPROVED</span>
-            <span className="text-[10px] bg-orange-500 text-white px-2.5 py-0.5 font-orbitron font-black uppercase tracking-widest">{allApplications.filter(a=>a.status==="pending").length} PENDING</span>
-            <span className="text-[10px] bg-gray-600 text-white px-2.5 py-0.5 font-orbitron font-black uppercase tracking-widest">{allApplications.filter(a=>a.status==="rejected").length} REJECTED</span>
+            <span className="text-[10px] bg-green-600 text-white px-2.5 py-0.5 font-orbitron font-black uppercase tracking-widest">{allApplications.filter(a => a.status === "approved").length} APPROVED</span>
+            <span className="text-[10px] bg-orange-500 text-white px-2.5 py-0.5 font-orbitron font-black uppercase tracking-widest">{allApplications.filter(a => a.status === "pending").length} PENDING</span>
+            <span className="text-[10px] bg-gray-600 text-white px-2.5 py-0.5 font-orbitron font-black uppercase tracking-widest">{allApplications.filter(a => a.status === "rejected").length} REJECTED</span>
           </div>
 
           {/* Filter tabs */}
           <div className="flex gap-1.5 flex-wrap">
             {(["all", "pending", "approved", "rejected"] as const).map(f => (
               <button key={f} onClick={() => setCareerFilter(f)} className={`px-3 py-1.5 font-orbitron font-black uppercase text-[9px] tracking-wider border-2 border-black transition-all ${careerFilter === f ? f === "approved" ? "bg-green-600 text-white shadow-none" : f === "rejected" ? "bg-gray-600 text-white shadow-none" : f === "pending" ? "bg-orange-500 text-white shadow-none" : "bg-[var(--theme-accent)] text-white shadow-none" : "bg-white text-black hover:bg-gray-50 shadow-[2px_2px_0_#000]"}`}>
-                {f === "all" ? `All (${allApplications.length})` : `${f} (${allApplications.filter(a=>a.status===f).length})`}
+                {f === "all" ? `All (${allApplications.length})` : `${f} (${allApplications.filter(a => a.status === f).length})`}
               </button>
             ))}
           </div>
@@ -3665,17 +3664,17 @@ function AdminCareersLedger() {
             >
               <div>
                 <label className="block text-[9px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Job Title <span className="text-[var(--theme-accent)]">*</span></label>
-                <input name="title" required placeholder="e.g. Senior AI Engineer" className="w-full border-2 border-black p-2.5 font-jakarta font-bold text-xs bg-white outline-none focus:border-[var(--theme-accent)] transition-colors" />
+                <input name="title" required placeholder="e.g. Senior AI Engineer" className="w-full border-2 border-black p-2.5 font-jakarta font-bold text-xs font-white bg-white outline-none focus:border-[var(--theme-accent)] transition-colors" style={{ color: 'white' }} />
               </div>
               <div>
                 <label className="block text-[9px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Department Badge <span className="text-[var(--theme-accent)]">*</span></label>
-                <input name="badge" required placeholder="e.g. ENGINEERING" className="w-full border-2 border-black p-2.5 font-jakarta font-bold text-xs bg-white outline-none focus:border-[var(--theme-accent)] transition-colors" />
+                <input name="badge" required placeholder="e.g. ENGINEERING" className="w-full border-2 border-black p-2.5 font-jakarta font-bold text-xs bg-white outline-none focus:border-[var(--theme-accent)] transition-colors" style={{ color: 'white' }} />
               </div>
               <div>
                 <label className="block text-[9px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Badge Color <span className="text-[var(--theme-accent)]">*</span></label>
                 <div className="flex gap-2">
                   <input name="color" required type="color" defaultValue="#dc2626" className="w-10 h-10 border-2 border-black cursor-pointer bg-white p-0.5" />
-                  <input name="colorText" placeholder="#7c3aed or CSS var" className="flex-1 border-2 border-black p-2.5 font-jakarta font-bold text-xs bg-white outline-none focus:border-[var(--theme-accent)] transition-colors"
+                  <input name="colorText" placeholder="#7c3aed or CSS var" className="flex-1 border-2 border-black p-2.5 font-jakarta font-bold text-xs bg-white outline-none focus:border-[var(--theme-accent)] transition-colors" style={{ color: 'white' }}
                     onChange={(e) => {
                       const colorInput = e.currentTarget.closest("div")?.querySelector("input[type=color]") as HTMLInputElement;
                       if (colorInput && e.target.value) colorInput.value = e.target.value;
@@ -3685,19 +3684,19 @@ function AdminCareersLedger() {
               </div>
               <div>
                 <label className="block text-[9px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Salary Range <span className="text-[var(--theme-accent)]">*</span></label>
-                <input name="salary" required placeholder="e.g. PHP 80,000–120,000 / mo" className="w-full border-2 border-black p-2.5 font-jakarta font-bold text-xs bg-white outline-none focus:border-[var(--theme-accent)] transition-colors" />
+                <input name="salary" required placeholder="e.g. PHP 80,000–120,000 / mo" className="w-full border-2 border-black p-2.5 font-jakarta font-bold text-xs bg-white outline-none focus:border-[var(--theme-accent)] transition-colors" style={{ color: 'white' }} />
               </div>
               <div>
                 <label className="block text-[9px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Work Type <span className="text-[var(--theme-accent)]">*</span></label>
-                <input name="type" required placeholder="e.g. Remote · Full-Time" className="w-full border-2 border-black p-2.5 font-jakarta font-bold text-xs bg-white outline-none focus:border-[var(--theme-accent)] transition-colors" />
+                <input name="type" required placeholder="e.g. Remote · Full-Time" className="w-full border-2 border-black p-2.5 font-jakarta font-bold text-xs bg-white outline-none focus:border-[var(--theme-accent)] transition-colors" style={{ color: 'white' }} />
               </div>
               <div>
                 <label className="block text-[9px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Requirements <span className="text-[var(--theme-accent)]">*</span> <span className="normal-case font-jakarta text-gray-400">(comma-separated)</span></label>
-                <input name="requirements" required placeholder="React, TypeScript, 3+ yrs experience" className="w-full border-2 border-black p-2.5 font-jakarta font-bold text-xs bg-white outline-none focus:border-[var(--theme-accent)] transition-colors" />
+                <input name="requirements" required placeholder="React, TypeScript, 3+ yrs experience" className="w-full border-2 border-black p-2.5 font-jakarta font-bold text-xs bg-white outline-none focus:border-[var(--theme-accent)] transition-colors" style={{ color: 'white' }} />
               </div>
               <div className="sm:col-span-2">
                 <label className="block text-[9px] font-orbitron font-bold uppercase mb-1 text-black tracking-widest">Job Description <span className="text-[var(--theme-accent)]">*</span></label>
-                <textarea name="desc" required rows={2} placeholder="Brief description of the role and what you'll be building…" className="w-full border-2 border-black p-2.5 font-jakarta font-bold text-xs bg-white outline-none focus:border-[var(--theme-accent)] transition-colors resize-none" />
+                <textarea name="desc" required rows={2} placeholder="Brief description of the role and what you'll be building…" className="w-full border-2 border-black p-2.5 font-jakarta font-bold text-xs bg-white outline-none focus:border-[var(--theme-accent)] transition-colors resize-none" style={{ color: 'white' }} />
               </div>
               <div className="sm:col-span-2">
                 <button type="submit" className="w-full bg-black text-white font-orbitron font-black uppercase text-xs tracking-widest py-3 border-2 border-black hover:bg-[var(--theme-accent)] transition-colors shadow-[3px_3px_0_#555] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none">
@@ -3764,7 +3763,7 @@ function AdminDashboardTab({
   setIsSignInModalOpen: (open: boolean) => void;
 }) {
   const [adminTab, setAdminTab] = useState<"overview" | "careers" | "marketplace" | "marketing">("overview");
-  
+
   // Custom states for Overview filtering
   const allApplications = useQuery(api.careers.list) ?? [];
   // Live marketing submissions from Convex (admin-only query — returns [] if not admin yet)
@@ -3773,7 +3772,7 @@ function AdminDashboardTab({
   // Live states for Transaction ledger (Marketplace VAT calculator)
   const transactions = useQuery(api.marketplace.list) ?? [];
   const logOrder = useMutation(api.marketplace.logOrder);
-  
+
   const [newItemName, setNewItemName] = useState("");
   const [newItemSubtotal, setNewItemSubtotal] = useState<number>(0);
   const [txSuccess, setTxSuccess] = useState(false);
@@ -3783,14 +3782,14 @@ function AdminDashboardTab({
     if (!newItemName || newItemSubtotal <= 0) return;
     const vat = Math.round(newItemSubtotal * 0.12);
     const total = newItemSubtotal + vat;
-    
+
     await logOrder({
       item: newItemName,
       subtotal: newItemSubtotal,
       vat,
       total,
     });
-    
+
     setNewItemName("");
     setNewItemSubtotal(0);
     setTxSuccess(true);
@@ -3969,13 +3968,13 @@ function AdminDashboardTab({
 
               <div className="space-y-3 sm:space-y-4">
                 {blogVisits.map((blog, idx) => (
-                  <div key={idx} className="border-2 border-black p-3 hover:bg-black hover:text-white transition-all flex justify-between items-center bg-gray-50">
+                  <div key={idx} className="group border-2 border-black p-3 hover:bg-black transition-all flex justify-between items-center bg-gray-50">
                     <div className="max-w-[70%]">
-                      <p className="font-orbitron font-black text-[9px] sm:text-[10px] uppercase tracking-wider line-clamp-1">{blog.title}</p>
-                      <span className="font-jakarta text-[8px] text-gray-500 block truncate">/blog/{blog.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}</span>
+                      <p className="font-orbitron font-black text-[9px] sm:text-[10px] uppercase tracking-wider line-clamp-1 group-hover:text-white">{blog.title}</p>
+                      <span className="font-jakarta text-[8px] text-gray-500 block truncate group-hover:text-gray-300">/blog/{blog.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}</span>
                     </div>
                     <div className="text-right flex-shrink-0 pl-2">
-                      <p className="font-orbitron font-black text-xs">{blog.visits} hits</p>
+                      <p className="font-orbitron font-black text-xs group-hover:text-white">{blog.visits} hits</p>
                       <span className="text-[7px] text-green-500 font-bold uppercase tracking-widest font-orbitron animate-pulse block">Active Now</span>
                     </div>
                   </div>
@@ -4010,6 +4009,7 @@ function AdminDashboardTab({
                   onChange={(e) => setNewItemName(e.target.value)}
                   placeholder="e.g. REDAI Premium Monthly subscription"
                   className="w-full border-2 border-black p-2.5 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)] text-xs"
+                  style={{ color: 'white' }}
                 />
               </div>
 
@@ -4023,6 +4023,7 @@ function AdminDashboardTab({
                   onChange={(e) => setNewItemSubtotal(Number(e.target.value))}
                   placeholder="e.g. 5000"
                   className="w-full border-2 border-black p-2.5 font-jakarta font-bold outline-none bg-gray-50 text-black focus:border-[var(--theme-accent)] text-xs"
+                  style={{ color: 'white' }}
                 />
               </div>
 
@@ -4287,10 +4288,10 @@ function Footer({ handleTabChange }: { handleTabChange: (tab: TabState | "admin"
   return (
     <footer className="border-t-8 border-black bg-white py-16 text-black px-6 mt-16 font-jakarta">
       <div className="max-w-[1600px] mx-auto space-y-12">
-        
+
         {/* Five Column Grid */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
-          
+
           {/* Col 1: Branding & Intro */}
           <div className="col-span-2 md:col-span-1 space-y-4">
             <div className="flex items-center gap-2">
@@ -4615,7 +4616,7 @@ function BlogEditor({ blogToEdit, onCancel, onComplete }: { blogToEdit?: any, on
             <input
               required
               type="text"
-              className="w-full border-2 border-black p-2.5 font-jakarta text-sm text-black bg-white focus:outline-none focus:border-[var(--theme-cyan)] transition-colors placeholder-gray-400"
+              className="w-full border-2 border-black p-2.5 font-jakarta text-sm text-white bg-white focus:outline-none focus:border-[var(--theme-cyan)] transition-colors placeholder-gray-400"
               placeholder="Blog post title..."
               value={formData.title}
               onChange={e => setFormData({ ...formData, title: e.target.value })}
